@@ -157,8 +157,8 @@ _EOF_
 
 noArgsHook() {
     if [[ $# -eq 0 ]] ; then
-	vis_examples
-	return
+        vis_examples
+        return
     fi
 
     lcntNu=$1
@@ -166,13 +166,13 @@ noArgsHook() {
     vis_findLcntBaseDir
 
 #     case "$1" in
-# 	force-reload)
-#             forced-reload $@			     
-# 	    ;;
-# 	*)
-# 	    echo "Usage: $0 {start|stop|reload|force-reload|restart}"
-# 	    exit 1
-# 	    ;;
+#       force-reload)
+#             forced-reload $@                       
+#           ;;
+#       *)
+#           echo "Usage: $0 {start|stop|reload|force-reload|restart}"
+#           exit 1
+#           ;;
 #     esac
 }
 
@@ -313,7 +313,7 @@ function isPubSite {
     cat ${this_lcntInfoBaseDir}/pubDestUrls | 
     while read this_line ; do
       if [[ "${this_line}_" == "${testingForPubSite}_" ]] ; then
-	return 0
+        return 0
       fi
     done
     return 1

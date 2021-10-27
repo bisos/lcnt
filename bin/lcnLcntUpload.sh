@@ -145,8 +145,8 @@ function vis_obtainFiles {
       cntntRawHome=$( lcnLcntOutputs.sh -p cntntRawHome=. -i lcntNuStdout | cut -d ":" -f2 )
       if [ "${lcntNu}_" == "_" ] ; then 
         EH_problem "document not found"
-	opDo pwd
-	return 101
+        opDo pwd
+        return 101
       fi
     fi
 
@@ -185,8 +185,8 @@ function vis_obtainExportFiles {
       cntntRawHome=$( lcnLcntOutputs.sh -p cntntRawHome=. -i lcntNuStdout | cut -d ":" -f2 )
       if [ "${lcntNu}_" == "_" ] ; then 
         EH_problem "document not found"
-	opDo pwd
-	return 101
+        opDo pwd
+        return 101
       fi
     fi
 
@@ -194,11 +194,11 @@ function vis_obtainExportFiles {
     if [ "${lcntAttrPermanence}_" == "sw_" ] || [ "${lcntAttrPermanence}_" == "repub_" ] ; then
       opDo obtainPublishableFiles "${lcntNu}" "${cntntRawHome}"
     else
-	opDo obtainPLPCExportFiles "${lcntNu}" "${cntntRawHome}"
-	#
-	# NOTYET
-	#
-	#opDo obtainPublishableFiles "${lcntNu}" "${cntntRawHome}"
+        opDo obtainPLPCExportFiles "${lcntNu}" "${cntntRawHome}"
+        #
+        # NOTYET
+        #
+        #opDo obtainPublishableFiles "${lcntNu}" "${cntntRawHome}"
     fi
   done
 
@@ -217,11 +217,11 @@ _EOF_
     }
     EH_assert [[ $# -eq 0 ]]
 
-    #if vis_reRunAsRoot G_thisFunc $@ ; then lpReturn globalReRunRetVal; fi;	
+    #if vis_reRunAsRoot G_thisFunc $@ ; then lpReturn globalReRunRetVal; fi;    
 
     if [ ! -d /rsync ] ; then
-	opDo sudo mkdir /rsync
-	opDo sudo chown lsipusr:employee /rsync
+        opDo sudo mkdir /rsync
+        opDo sudo chown lsipusr:employee /rsync
     fi
 
     opDo FN_dirCreatePathIfNotThere /rsync/lcnt
@@ -229,7 +229,7 @@ _EOF_
     # NOTYET, node_modules needs to be setup
 
     lpReturn
-}	
+}       
 
 function lcntMmBasesExportPrep {
    G_funcEntry
@@ -242,25 +242,25 @@ _EOF_
     local exportPathBase="$2"    
 
     if [ -d "${cntntRawHome}/image" ] ; then
-	opDo FN_dirCreatePathIfNotThere ${exportPathBase}/image
-	opDo cp -p ${cntntRawHome}/image/*.pdf ${exportPathBase}/image
-	opDo cp -p ${cntntRawHome}/image/*.png ${exportPathBase}/image
+        opDo FN_dirCreatePathIfNotThere ${exportPathBase}/image
+        opDo cp -p ${cntntRawHome}/image/*.pdf ${exportPathBase}/image
+        opDo cp -p ${cntntRawHome}/image/*.png ${exportPathBase}/image
     else
-	ANT_raw "Skipped: Missing ${cntntRawHome}/image"
+        ANT_raw "Skipped: Missing ${cntntRawHome}/image"
     fi
 
     if [ -d "${cntntRawHome}/audio" ] ; then
-	opDo FN_dirCreatePathIfNotThere ${exportPathBase}/audio
-	opDo cp -p ${cntntRawHome}/audio/*.mp3 ${exportPathBase}/audio
+        opDo FN_dirCreatePathIfNotThere ${exportPathBase}/audio
+        opDo cp -p ${cntntRawHome}/audio/*.mp3 ${exportPathBase}/audio
     else
-	ANT_raw "Skipped: Missing ${cntntRawHome}/audio"
+        ANT_raw "Skipped: Missing ${cntntRawHome}/audio"
     fi
 
     if [ -d "${cntntRawHome}/video" ] ; then
-	opDo FN_dirCreatePathIfNotThere ${exportPathBase}/video
-	opDo cp -p ${cntntRawHome}/video/*.mp4 ${exportPathBase}/video
+        opDo FN_dirCreatePathIfNotThere ${exportPathBase}/video
+        opDo cp -p ${cntntRawHome}/video/*.mp4 ${exportPathBase}/video
     else
-	ANT_raw "Skipped: Missing ${cntntRawHome}/video"
+        ANT_raw "Skipped: Missing ${cntntRawHome}/video"
     fi
 
     opDo FN_fileSymlinkUpdate /rsync/lcnt/common/figures ${exportPathBase}/figures 
@@ -268,7 +268,7 @@ _EOF_
     
 
     lpReturn
-}	
+}       
 
 _CommentBegin_
 *  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || IIF       ::  commonFiguresCopyUpdate  [[elisp:(org-cycle)][| ]]
@@ -290,13 +290,13 @@ _EOF_
     local filesList=$( grep "./figures" ${inFileWithFigures} | sed 's:.*/figures/\(.*\)\".:\1:' )
 
     for each in ${filesList} ; do
-	if [ -f /lcnt/lgpc/bystar/permanent/common/figures/${each} ] ; then
-	    opDo cp /lcnt/lgpc/bystar/permanent/common/figures/${each} ${figuresDestBaseDir}
-	fi
+        if [ -f /lcnt/lgpc/bystar/permanent/common/figures/${each} ] ; then
+            opDo cp /lcnt/lgpc/bystar/permanent/common/figures/${each} ${figuresDestBaseDir}
+        fi
     done
     
     lpReturn
-}	
+}       
 
 
 
@@ -329,87 +329,87 @@ _EOF_
 
     local lcntSrcType
     for this_docSrcList in ${lcnt_docSrcList} ; do
-	lcntSrcType=$( vis_determineSrcType "${cntntRawHome}" "${this_docSrcList}" )
+        lcntSrcType=$( vis_determineSrcType "${cntntRawHome}" "${this_docSrcList}" )
 
-	typeset thisOneFormat
-	for thisOneFormat in ${lcnt_pubFormats} ; do
+        typeset thisOneFormat
+        for thisOneFormat in ${lcnt_pubFormats} ; do
 
-	    print ${cntntRawHome} ${thisOneFormat} ${lcntSrcType}  ${docModuleExportPath} -- ${this_docSrcList}
+            print ${cntntRawHome} ${thisOneFormat} ${lcntSrcType}  ${docModuleExportPath} -- ${this_docSrcList}
 
-	    function notyetSupported {
-		echo "NOTYET Supported"
-	    }
+            function notyetSupported {
+                echo "NOTYET Supported"
+            }
 
-	    function badLcntSrcType {
-		EH_problem "Bad Doc: ${this_docSrcList} ${lcntSrcType}"
-	    }
-	    
-	    case ${thisOneFormat} in
-		"heveaHtml")
-		    if [ "${lcntSrcType}" == "presentation" ]  ; then
-			# What we really want is the reveal.js files
-			opDo FN_dirCreatePathIfNotThere ${docModuleExportPath}/pres
-			opDoComplain /bin/cp --no-dereference ${cntntRawHome}/revealJsBase/* ${docModuleExportPath}/pres
-			opDoComplain /bin/cp ${docModuleExportPath}/pres/${this_docSrcList}.html ${docModuleExportPath}/pres/${lcntNu}-pres.html
+            function badLcntSrcType {
+                EH_problem "Bad Doc: ${this_docSrcList} ${lcntSrcType}"
+            }
+            
+            case ${thisOneFormat} in
+                "heveaHtml")
+                    if [ "${lcntSrcType}" == "presentation" ]  ; then
+                        # What we really want is the reveal.js files
+                        opDo FN_dirCreatePathIfNotThere ${docModuleExportPath}/pres
+                        opDoComplain /bin/cp --no-dereference ${cntntRawHome}/revealJsBase/* ${docModuleExportPath}/pres
+                        opDoComplain /bin/cp ${docModuleExportPath}/pres/${this_docSrcList}.html ${docModuleExportPath}/pres/${lcntNu}-pres.html
 
-			vis_commonFiguresCopyUpdate ${docModuleExportPath}/pres/${lcntNu}-pres.html /rsync/lcnt/common/figures
-			
-			opDoComplain /bin/ls -l ${docModuleExportPath}/pres/${lcntNu}-pres.html
-		    elif [ "${lcntSrcType}" == "article" ]  ; then
-			opDo FN_dirCreatePathIfNotThere ${docModuleExportPath}/art
-			opDoComplain /bin/cp --no-dereference ${cntntRawHome}/heveaHtml-${this_docSrcList}/* ${docModuleExportPath}/art
-			opDoComplain /bin/mv ${docModuleExportPath}/art/index.html ${docModuleExportPath}/art/${lcntNu}-art.html
-			opDoComplain /bin/ls -l ${docModuleExportPath}/art/${lcntNu}-art.html
-		    elif [ "${lcntSrcType}" == "presArt" ]  ; then
-			opDo FN_dirCreatePathIfNotThere ${docModuleExportPath}/presArt
-			opDoComplain /bin/cp --no-dereference ${cntntRawHome}/heveaHtml-${this_docSrcList}/* ${docModuleExportPath}/presArt
-			opDoComplain /bin/mv ${docModuleExportPath}/presArt/index.html ${docModuleExportPath}/presArt/${lcntNu}-presArt.html
-			opDoComplain /bin/ls -l ${docModuleExportPath}/presArt/${lcntNu}-presArt.html
-		    else
-			badLcntSrcType
-		    fi
-		    ;;
-		
-		"pdf")
-		    if [ "${lcntSrcType}" == "presentation" ]  ; then
-			opDo FN_dirCreatePathIfNotThere ${docModuleExportPath}/pres
-			opDoComplain FN_fileCopy ${cntntRawHome}/${this_docSrcList}.pdf ${docModuleExportPath}/pres/${lcntNu}-pres.pdf
-			opDoComplain /bin/ls -l ${docModuleExportPath}/pres/${lcntNu}-pres.pdf
-		    elif [ "${lcntSrcType}" == "article" ]  ; then
-			opDo FN_dirCreatePathIfNotThere ${docModuleExportPath}/art
-			opDoComplain FN_fileCopy ${cntntRawHome}/${this_docSrcList}.pdf ${docModuleExportPath}/art/${lcntNu}-art.pdf
-			opDoComplain /bin/ls -l ${docModuleExportPath}/art/${lcntNu}-art.pdf
-		    elif [ "${lcntSrcType}" == "presArt" ]  ; then
-			opDo FN_dirCreatePathIfNotThere ${docModuleExportPath}/presArt
-			opDoComplain FN_fileCopy ${cntntRawHome}/${this_docSrcList}.pdf ${docModuleExportPath}/presArt/${lcntNu}-presArt.pdf
-			opDoComplain /bin/ls -l ${docModuleExportPath}/presArt/${lcntNu}-presArt.pdf
-		    else
-			badLcntSrcType
-		    fi
-		    ;;
-		
-		"ps")
-		    notyetSupported
-		    ;;
-		
-		"odp")
-		    notyetSupported
-		    ;;
-		
-		"tty")
-		    notyetSupported
-		    ;;
-		
-		"ttyClean")
-		    notyetSupported
-		    ;;
-		
-		*)
-		    EH_problem "UnKnown Type: ${thisOneFormat}"
-		    return 0
-		    ;;
-	    esac
-	done
+                        vis_commonFiguresCopyUpdate ${docModuleExportPath}/pres/${lcntNu}-pres.html /rsync/lcnt/common/figures
+                        
+                        opDoComplain /bin/ls -l ${docModuleExportPath}/pres/${lcntNu}-pres.html
+                    elif [ "${lcntSrcType}" == "article" ]  ; then
+                        opDo FN_dirCreatePathIfNotThere ${docModuleExportPath}/art
+                        opDoComplain /bin/cp --no-dereference ${cntntRawHome}/heveaHtml-${this_docSrcList}/* ${docModuleExportPath}/art
+                        opDoComplain /bin/mv ${docModuleExportPath}/art/index.html ${docModuleExportPath}/art/${lcntNu}-art.html
+                        opDoComplain /bin/ls -l ${docModuleExportPath}/art/${lcntNu}-art.html
+                    elif [ "${lcntSrcType}" == "presArt" ]  ; then
+                        opDo FN_dirCreatePathIfNotThere ${docModuleExportPath}/presArt
+                        opDoComplain /bin/cp --no-dereference ${cntntRawHome}/heveaHtml-${this_docSrcList}/* ${docModuleExportPath}/presArt
+                        opDoComplain /bin/mv ${docModuleExportPath}/presArt/index.html ${docModuleExportPath}/presArt/${lcntNu}-presArt.html
+                        opDoComplain /bin/ls -l ${docModuleExportPath}/presArt/${lcntNu}-presArt.html
+                    else
+                        badLcntSrcType
+                    fi
+                    ;;
+                
+                "pdf")
+                    if [ "${lcntSrcType}" == "presentation" ]  ; then
+                        opDo FN_dirCreatePathIfNotThere ${docModuleExportPath}/pres
+                        opDoComplain FN_fileCopy ${cntntRawHome}/${this_docSrcList}.pdf ${docModuleExportPath}/pres/${lcntNu}-pres.pdf
+                        opDoComplain /bin/ls -l ${docModuleExportPath}/pres/${lcntNu}-pres.pdf
+                    elif [ "${lcntSrcType}" == "article" ]  ; then
+                        opDo FN_dirCreatePathIfNotThere ${docModuleExportPath}/art
+                        opDoComplain FN_fileCopy ${cntntRawHome}/${this_docSrcList}.pdf ${docModuleExportPath}/art/${lcntNu}-art.pdf
+                        opDoComplain /bin/ls -l ${docModuleExportPath}/art/${lcntNu}-art.pdf
+                    elif [ "${lcntSrcType}" == "presArt" ]  ; then
+                        opDo FN_dirCreatePathIfNotThere ${docModuleExportPath}/presArt
+                        opDoComplain FN_fileCopy ${cntntRawHome}/${this_docSrcList}.pdf ${docModuleExportPath}/presArt/${lcntNu}-presArt.pdf
+                        opDoComplain /bin/ls -l ${docModuleExportPath}/presArt/${lcntNu}-presArt.pdf
+                    else
+                        badLcntSrcType
+                    fi
+                    ;;
+                
+                "ps")
+                    notyetSupported
+                    ;;
+                
+                "odp")
+                    notyetSupported
+                    ;;
+                
+                "tty")
+                    notyetSupported
+                    ;;
+                
+                "ttyClean")
+                    notyetSupported
+                    ;;
+                
+                *)
+                    EH_problem "UnKnown Type: ${thisOneFormat}"
+                    return 0
+                    ;;
+            esac
+        done
     done
 }
 
@@ -430,57 +430,57 @@ for this_docSrcList in ${lcnt_docSrcList} ; do
   for thisOneFormat in ${lcnt_pubFormats} ; do
     case ${thisOneFormat} in
       #"html"|"tex4ht")
-	"tex4ht")
+        "tex4ht")
            opDo FN_dirCreatePathIfNotThere ${docModulePath}/${this_docSrcList}
-	   opDoComplain /bin/cp ${cntntRawHome}/tex4ht-${this_docSrcList}/* ${docModulePath}/${this_docSrcList}
-	   opDoComplain /bin/ls -l ${docModulePath}/${this_docSrcList}/index.html
-	 ;;
-	"heveaHtml")
-	    if egrep 'documentclass.*beamer' ${this_docSrcList}.ttytex ; then
-		ANT_raw "Skipping: obtainPLPCFiles of ${this_docSrcList}"
-	    else
-		opDo FN_dirCreatePathIfNotThere ${docModulePath}/${this_docSrcList}
-		opDoComplain /bin/cp ${cntntRawHome}/heveaHtml-${this_docSrcList}/* ${docModulePath}/${this_docSrcList}
-		opDoComplain /bin/ls -l ${docModulePath}/${this_docSrcList}/index.html
-	    fi
-	 ;;
-	"html"|"genHtml")
-		 # ODP presentations (ooimpress, ...)
-		 #
-	   opDo FN_dirCreatePathIfNotThere ${docModulePath}/${this_docSrcList}
+           opDoComplain /bin/cp ${cntntRawHome}/tex4ht-${this_docSrcList}/* ${docModulePath}/${this_docSrcList}
+           opDoComplain /bin/ls -l ${docModulePath}/${this_docSrcList}/index.html
+         ;;
+        "heveaHtml")
+            if egrep 'documentclass.*beamer' ${this_docSrcList}.ttytex ; then
+                ANT_raw "Skipping: obtainPLPCFiles of ${this_docSrcList}"
+            else
+                opDo FN_dirCreatePathIfNotThere ${docModulePath}/${this_docSrcList}
+                opDoComplain /bin/cp ${cntntRawHome}/heveaHtml-${this_docSrcList}/* ${docModulePath}/${this_docSrcList}
+                opDoComplain /bin/ls -l ${docModulePath}/${this_docSrcList}/index.html
+            fi
+         ;;
+        "html"|"genHtml")
+                 # ODP presentations (ooimpress, ...)
+                 #
+           opDo FN_dirCreatePathIfNotThere ${docModulePath}/${this_docSrcList}
 
-	   opDoComplain /bin/cp ${cntntRawHome}/${this_docSrcList}/* ${docModulePath}/${this_docSrcList}
-	   opDoComplain /bin/ls -l ${docModulePath}/${this_docSrcList}/index.html
-	 ;;
+           opDoComplain /bin/cp ${cntntRawHome}/${this_docSrcList}/* ${docModulePath}/${this_docSrcList}
+           opDoComplain /bin/ls -l ${docModulePath}/${this_docSrcList}/index.html
+         ;;
       "pdf")
-	   opDo FN_dirCreatePathIfNotThere ${docModulePath}
-	   opDoComplain FN_fileCopy ${cntntRawHome}/${this_docSrcList}.pdf ${docModulePath}
-	   opDoComplain /bin/ls -l ${docModulePath}/${this_docSrcList}.pdf
-	   ;;
+           opDo FN_dirCreatePathIfNotThere ${docModulePath}
+           opDoComplain FN_fileCopy ${cntntRawHome}/${this_docSrcList}.pdf ${docModulePath}
+           opDoComplain /bin/ls -l ${docModulePath}/${this_docSrcList}.pdf
+           ;;
       "ps")
-	   opDo FN_dirCreatePathIfNotThere ${docModulePath}
-	   opDoComplain FN_fileCopy ${cntntRawHome}/${this_docSrcList}.ps ${docModulePath}
-	   opDoComplain /bin/ls -l ${docModulePath}/${this_docSrcList}.ps
-	   ;;
+           opDo FN_dirCreatePathIfNotThere ${docModulePath}
+           opDoComplain FN_fileCopy ${cntntRawHome}/${this_docSrcList}.ps ${docModulePath}
+           opDoComplain /bin/ls -l ${docModulePath}/${this_docSrcList}.ps
+           ;;
       "odp")
-	   opDo FN_dirCreatePathIfNotThere ${docModulePath}
-	   opDoComplain FN_fileCopy ${cntntRawHome}/${this_docSrcList}.odp ${docModulePath}
-	   opDoComplain /bin/ls -l ${docModulePath}/${this_docSrcList}.odp
-	   ;;
+           opDo FN_dirCreatePathIfNotThere ${docModulePath}
+           opDoComplain FN_fileCopy ${cntntRawHome}/${this_docSrcList}.odp ${docModulePath}
+           opDoComplain /bin/ls -l ${docModulePath}/${this_docSrcList}.odp
+           ;;
       "tty")
-	   opDo FN_dirCreatePathIfNotThere ${docModulePath}
-	   opDoComplain FN_fileCopy ${cntntRawHome}/${this_docSrcList}.tty ${docModulePath}
-	   opDoComplain /bin/ls -l ${docModulePath}/${this_docSrcList}.tty
-	   ;;
+           opDo FN_dirCreatePathIfNotThere ${docModulePath}
+           opDoComplain FN_fileCopy ${cntntRawHome}/${this_docSrcList}.tty ${docModulePath}
+           opDoComplain /bin/ls -l ${docModulePath}/${this_docSrcList}.tty
+           ;;
       "ttyClean")
-	   opDo FN_dirCreatePathIfNotThere ${docModulePath}
-	   opDoComplain FN_fileCopy ${cntntRawHome}/${this_docSrcList}.ttyClean ${docModulePath}/${this_docSrcList}.tty
-	   opDoComplain /bin/ls -l ${docModulePath}/${this_docSrcList}.tty
-	   ;;
+           opDo FN_dirCreatePathIfNotThere ${docModulePath}
+           opDoComplain FN_fileCopy ${cntntRawHome}/${this_docSrcList}.ttyClean ${docModulePath}/${this_docSrcList}.tty
+           opDoComplain /bin/ls -l ${docModulePath}/${this_docSrcList}.tty
+           ;;
       *)
-	   EH_problem "UnKnown Type: ${thisOneFormat}"
-	   return 0
-	   ;;
+           EH_problem "UnKnown Type: ${thisOneFormat}"
+           return 0
+           ;;
     esac
   done
 done

@@ -32,7 +32,7 @@ fi
 ####+END:
 
 _CommentBegin_
-####+BEGIN: bx:dblock:global:file-insert-cond :cond "./blee.el" :file "/libre/ByStar/InitialTemplates/software/plusOrg/dblock/inserts/topControls.org"
+####+BEGIN: bx:dblock:global:file-insert-cond :cond "./blee.el" :file "/bisos/apps/defaults/software/plusOrg/dblock/inserts/topControls.org"
 *  /Controls/ ::  [[elisp:(org-cycle)][| ]]  [[elisp:(show-all)][Show-All]]  [[elisp:(org-shifttab)][Overview]]  [[elisp:(progn (org-shifttab) (org-content))][Content]] | [[file:Panel.org][Panel]] | [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] | [[elisp:(bx:org:run-me)][Run]] | [[elisp:(bx:org:run-me-eml)][RunEml]] | [[elisp:(delete-other-windows)][(1)]] | [[elisp:(progn (save-buffer) (kill-buffer))][S&Q]]  [[elisp:(save-buffer)][Save]]  [[elisp:(kill-buffer)][Quit]] [[elisp:(org-cycle)][| ]]
 ** /Version Control/ ::  [[elisp:(call-interactively (quote cvs-update))][cvs-update]]  [[elisp:(vc-update)][vc-update]] | [[elisp:(bx:org:agenda:this-file-otherWin)][Agenda-List]]  [[elisp:(bx:org:todo:this-file-otherWin)][ToDo-List]] 
 
@@ -47,7 +47,7 @@ _CommentEnd_
 
 function vis_moduleDescription {  cat  << _EOF_
 *  [[elisp:(org-cycle)][| ]]  Xrefs         :: *[Related/Xrefs:]*  <<Xref-Here->>  -- External Documents  [[elisp:(org-cycle)][| ]]
-**  [[elisp:(org-cycle)][| ]]  Panel        :: [[file:/libre/ByStar/InitialTemplates/activeDocs/bxServices/versionControl/fullUsagePanel-en.org::Xref-VersionControl][Panel Roadmap Documentation]] [[elisp:(org-cycle)][| ]]
+**  [[elisp:(org-cycle)][| ]]  Panel        :: [[file:/bisos/apps/defaults/activeDocs/bxServices/versionControl/fullUsagePanel-en.org::Xref-VersionControl][Panel Roadmap Documentation]] [[elisp:(org-cycle)][| ]]
 *  [[elisp:(org-cycle)][| ]]  Info          :: *[Module Description:]* [[elisp:(org-cycle)][| ]]
 
 _EOF_
@@ -76,7 +76,7 @@ _CommentEnd_
 
 typeset -t doc=""
 typeset -t firstRun=""
-
+typeset -t lcntNu=""
 
 _CommentBegin_
 *  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || IIF   ::  G_postParamHook    [[elisp:(org-cycle)][| ]]
@@ -279,9 +279,9 @@ ${G_myName} ${extraInfo} -p cntntRawHome=. -p srcForms="art+pres" -p srcLangs="e
 
    - BaseStart: 
         Creates basic tempalets in a totally EMPTY directory.
-	It creates starting point templates.
+        It creates starting point templates.
 
-	   - It needs a docType and docBaseName
+           - It needs a docType and docBaseName
 
    - FullStart: (OBSOLETE)
 
@@ -381,7 +381,7 @@ function vis_autoRegThisDoc {
 
   lcntPathAnalyze ${baseDir}
 
-  if [ "${lcntNu}" = "00000" ] ; then
+  if [ "${lcntNu:-}" = "00000" ] ; then
       ANT_raw "lcntNu=${lcntNu}"
       lpReturn
   fi
@@ -432,27 +432,27 @@ function vis_getNextNuForRegistration {
 
     case ${lcntAttrPermanence} in 
       "record"|"draft"|"permanent")
-	    lastUsedNu=$( sort ${lcntBaseDir}${lcntAttrGenPub}/${lcntAttrSource}/SOURCE-INFO/${lcntAttrPermanence}.reg  | egrep '^[0-9]'|  tail -1 | cut -d ':' -f 1 )
+            lastUsedNu=$( sort ${lcntBaseDir}${lcntAttrGenPub}/${lcntAttrSource}/SOURCE-INFO/${lcntAttrPermanence}.reg  | egrep '^[0-9]'|  tail -1 | cut -d ':' -f 1 )
 
-	    if [[ -z ${lastUsedNu} ]] ; then
-		EH_problem "Empty lastUsedNu"
-		return 101
-	    fi
-	    integer nextNu=$( expr ${lastUsedNu} + 1 )
-	    echo ${nextNu}
-	    ;;
+            if [[ -z ${lastUsedNu} ]] ; then
+                EH_problem "Empty lastUsedNu"
+                return 101
+            fi
+            integer nextNu=$( expr ${lastUsedNu} + 1 )
+            echo ${nextNu}
+            ;;
       "repub")      
-	    grep ${baseDir}/${fileName}   /lcnt/REGISTRY/repub/repub.reg | cut -d ':' -f 1
-	    ;;
+            grep ${baseDir}/${fileName}   /lcnt/REGISTRY/repub/repub.reg | cut -d ':' -f 1
+            ;;
 
       "sw")      
-	    grep ${baseDir}   /lcnt/REGISTRY/sw/sw.reg | cut -d ':' -f 1
-	    ;;
+            grep ${baseDir}   /lcnt/REGISTRY/sw/sw.reg | cut -d ':' -f 1
+            ;;
 
       *)
-	   EH_problem "Unknown lcntAttrPermanence: ${lcntAttrPermanence}"
-	   return 1
-	 ;;
+           EH_problem "Unknown lcntAttrPermanence: ${lcntAttrPermanence}"
+           return 1
+         ;;
     esac
 }
 
@@ -470,7 +470,7 @@ function vis_regNuShow {
   cd $baseDir
   baseDir=`pwd`
 
-  if [ "${lcntNu}" = "00000" ] ; then
+  if [ "${lcntNu:-}" = "00000" ] ; then
       echo ${baseDir}
       lpReturn
   fi
@@ -512,20 +512,20 @@ function vis_regNuShow {
     # /lcnt/lgpc/mohsen/SOURCE-INFO/permanent.reg 
     case ${lcntAttrPermanence} in 
       "record"|"draft"|"permanent")
-	    grep ${baseDir}/${fileName}   ${lcntBaseDir}${lcntAttrGenPub}/${lcntAttrSource}/SOURCE-INFO/${lcntAttrPermanence}.reg | cut -d ':' -f 1
-	    ;;
+            grep ${baseDir}/${fileName}   ${lcntBaseDir}${lcntAttrGenPub}/${lcntAttrSource}/SOURCE-INFO/${lcntAttrPermanence}.reg | cut -d ':' -f 1
+            ;;
       "repub")      
-	    grep ${baseDir}/${fileName}   /lcnt/REGISTRY/repub/repub.reg | cut -d ':' -f 1
-	    ;;
+            grep ${baseDir}/${fileName}   /lcnt/REGISTRY/repub/repub.reg | cut -d ':' -f 1
+            ;;
 
       "sw")      
-	    grep ${baseDir}   /lcnt/REGISTRY/sw/sw.reg | cut -d ':' -f 1
-	    ;;
+            grep ${baseDir}   /lcnt/REGISTRY/sw/sw.reg | cut -d ':' -f 1
+            ;;
 
       *)
-	   EH_problem "Unknown lcntAttrPermanence: ${lcntAttrPermanence}"
-	   return 1
-	 ;;
+           EH_problem "Unknown lcntAttrPermanence: ${lcntAttrPermanence}"
+           return 1
+         ;;
     esac
   done
 
@@ -597,121 +597,121 @@ function vis_emptyCreateMulti {
   case ${multiFormats} in 
       "art:en+fa")
             perhapsTouch articleEnFa.ttytex
-	    primaryDocument="articleEnFa.ttytex"
-	    ;;
+            primaryDocument="articleEnFa.ttytex"
+            ;;
       "memo:en+fa")
             perhapsTouch memoEnFa.ttytex
-	    primaryDocument="memoEnFa.ttytex"
-	    ;;
+            primaryDocument="memoEnFa.ttytex"
+            ;;
       "memo:fa+en")
             perhapsTouch memoFaEn.ttytex
-	    primaryDocument="memoFaEn.ttytex"
-	    ;;
+            primaryDocument="memoFaEn.ttytex"
+            ;;
       "memo:en")
             perhapsTouch memoEn.ttytex
-	    primaryDocument="memoEn.ttytex"
-	    ;;
+            primaryDocument="memoEn.ttytex"
+            ;;
       "art+pres:en+fa")
           perhapsTouch articleEnFa.ttytex
-	  sleep 1   # So that article is older
+          sleep 1   # So that article is older
           perhapsTouch presentationEnFa.ttytex
-	  perhapsTouch presArtEnFa.ttytex
+          perhapsTouch presArtEnFa.ttytex
           #perhapsTouch bodyEnFa.tex
-	  primaryDocument="articleEnFa.ttytex"
-	  ;;
+          primaryDocument="articleEnFa.ttytex"
+          ;;
       "pres+art:en+fa")
           perhapsTouch presentationEnFa.ttytex
-	  sleep 1
+          sleep 1
           perhapsTouch articleEnFa.ttytex
-	  perhapsTouch presArtEnFa.ttytex
+          perhapsTouch presArtEnFa.ttytex
           #perhapsTouch bodyEnFa.tex
-	  primaryDocument="presentationEnFa.ttytex"
-	  ;;
+          primaryDocument="presentationEnFa.ttytex"
+          ;;
       "art:fa+en")
             perhapsTouch articleFaEn.ttytex
-	    primaryDocument="articleFaEn.ttytex"
-	    ;;
+            primaryDocument="articleFaEn.ttytex"
+            ;;
       "art+pres:fa+en")
           perhapsTouch articleFaEn.ttytex
-	  sleep 1
+          sleep 1
             perhapsTouch presentationFaEn.ttytex
             #perhapsTouch bodyFaEn.tex
-	    primaryDocument="articleFaEn.ttytex"
-	    ;;
+            primaryDocument="articleFaEn.ttytex"
+            ;;
       "pres+art:fa+en")
           perhapsTouch presentationFaEn.ttytex
-	  sleep 1
+          sleep 1
             perhapsTouch articleFaEn.ttytex
             #perhapsTouch bodyFaEn.tex
-	    primaryDocument="presentationFaEn.ttytex"
-	    ;;
+            primaryDocument="presentationFaEn.ttytex"
+            ;;
       "art:en")
             perhapsTouch articleEn.ttytex
-	    primaryDocument="articleEn.ttytex"
-	    ;;
+            primaryDocument="articleEn.ttytex"
+            ;;
       "art+pres:en")
           perhapsTouch articleEn.ttytex
-	  sleep 1
+          sleep 1
           perhapsTouch presentationEn.ttytex
-	  perhapsTouch presArtEn.ttytex	  	  
+          perhapsTouch presArtEn.ttytex           
           #NOTYET perhapsTouch bodyEn.tex
-	  primaryDocument="articleEn.ttytex"
-	  ;;
+          primaryDocument="articleEn.ttytex"
+          ;;
       "pres+art:en")
-	  perhapsTouch presentationEn.ttytex
-	  sleep 1
+          perhapsTouch presentationEn.ttytex
+          sleep 1
           perhapsTouch articleEn.ttytex
-	  perhapsTouch presArtEn.ttytex	  
+          perhapsTouch presArtEn.ttytex   
 
           #NOTYET perhapsTouch bodyEn.tex
-	  primaryDocument="presentationEn.ttytex"
-	  ;;
+          primaryDocument="presentationEn.ttytex"
+          ;;
       "art:fa")
           perhapsTouch articleFa.ttytex
-	  primaryDocument="articleFa.ttytex"
-	  ;;
+          primaryDocument="articleFa.ttytex"
+          ;;
       "art+pres:fa")
           perhapsTouch articleFa.ttytex
-	  sleep 1	  
+          sleep 1         
           perhapsTouch presentationFa.ttytex
           perhapsTouch presArtFa.ttytex
-	  
+          
           #perhapsTouch bodyFa.tex
-	  primaryDocument="articleFa.ttytex"
-	  ;;
+          primaryDocument="articleFa.ttytex"
+          ;;
       "pres+art:fa")
           perhapsTouch presentationFa.ttytex
-	  sleep 1
+          sleep 1
           perhapsTouch articleFa.ttytex
-          perhapsTouch presArtFa.ttytex	  
+          perhapsTouch presArtFa.ttytex   
 
           #perhapsTouch bodyFa.tex
-	  primaryDocument="presentationFa.ttytex"
-	  ;;
+          primaryDocument="presentationFa.ttytex"
+          ;;
       "webpage"|"webpage:fa"|"webpage:en"|"webpage:en+fa"|"webpage:fa+en")
             perhapsTouch webpage.ttytex
-	    primaryDocument="webpage.ttytex"
-	    ;;
+            primaryDocument="webpage.ttytex"
+            ;;
       "mailLcnt"|"mailLcnt:fa"|"mailLcnt:en"|"mailLcnt:en+fa"|"mailLcnt:fa+en")
-	  if [ "${lcntNu}" == "00000" ] ; then
-	      perhapsTouch mailLcnt.ttytex
-	      primaryDocument="mailLcnt.ttytex"
-	  else
-	      perhapsTouch webMailLcnt.ttytex
-	      primaryDocument="webMailLcnt.ttytex"
-	  fi
-	  ;;
+          if [ "${lcntNu}" == "00000" ] ; then
+              perhapsTouch mailLcnt.ttytex
+              primaryDocument="mailLcnt.ttytex"
+          else
+              perhapsTouch webMailLcnt.ttytex
+              primaryDocument="webMailLcnt.ttytex"
+          fi
+          ;;
       "pdf:")
-	  primaryDocument="PRIMARY.PDF"
-	  primaryDocument=$( ls -tr *.pdf 2> /dev/null | head -1 )
-	  ;;
+          primaryDocument="PRIMARY.PDF"
+          primaryDocument=$( ls -tr *.pdf 2> /dev/null | head -1 )
+          ;;
       "html:")
-	  primaryDocument="PRIMARY.HTML"
-	  ;;
+          primaryDocument="PRIMARY.HTML"
+          ;;
       *)
-	 EH_problem "Unknown multiFormats: ${multiFormats}"
-	 return 1
-	 ;;
+         EH_problem "Unknown multiFormats: ${multiFormats}"
+         return 1
+         ;;
     esac
 
     echo ${primaryDocument}
@@ -771,12 +771,12 @@ function vis_lcntBaseStart {
 
   case ${docFormat} in 
     "ttytex"|"odp")
-		    doNothing
-	    ;;
+                    doNothing
+            ;;
       *)
-	 EH_problem "Unknown docFormat: ${docFormat}"
-	 return 1
-	 ;;
+         EH_problem "Unknown docFormat: ${docFormat}"
+         return 1
+         ;;
     esac
 
 
@@ -847,7 +847,7 @@ function configFormsLangsTemplate {
     classSrcForms=$2
 
     cat ${templateFile} | sed -e "s%@srcForms@%${classSrcForms}%g" \
-     	-e "s%@srcLangs@%${lcnt_docSrcLangs}%g"
+        -e "s%@srcLangs@%${lcnt_docSrcLangs}%g"
 }
 
 
@@ -867,19 +867,19 @@ function vis_lcntBaseConfigMulti {
   
   if [ -z "${srcForms}" ] ; then
       if [ -f ${lcntInfoPath}/docSrcForms ] ; then
-	  srcForms=$( cat ${lcntInfoPath}/docSrcForms )
+          srcForms=$( cat ${lcntInfoPath}/docSrcForms )
       else
-	  EH_problem "Missing ${lcntInfoPath}/docSrcForms"
-	  lpReturn 1
+          EH_problem "Missing ${lcntInfoPath}/docSrcForms"
+          lpReturn 1
       fi
   fi
 
   if [ -z "${srcLangs}" ] ; then
       if [ -f ${lcntInfoPath}/docSrcLangs ] ; then
-	  srcLangs=$( cat ${lcntInfoPath}/docSrcLangs )
+          srcLangs=$( cat ${lcntInfoPath}/docSrcLangs )
       else
-	  EH_problem "Missing ${lcntInfoPath}/docSrcLangs"
-	  lpReturn 1
+          EH_problem "Missing ${lcntInfoPath}/docSrcLangs"
+          lpReturn 1
       fi
   fi
   
@@ -903,221 +903,221 @@ function vis_lcntBaseConfigMulti {
       "memo:en+fa")
             startTemplateArticle="memoMainEnFa.ttytex.start"
             startDocArticle="memoEnFa.ttytex"
-	    startArtSrcForms="memo"
+            startArtSrcForms="memo"
 
             startTemplatePresentation=""
             startDocPresentation=""
-	    startPresSrcForms=""
+            startPresSrcForms=""
 
             startTemplateBody=""
             startDocBody=""
-	    startBodySrcForms=""
-	    ;;
+            startBodySrcForms=""
+            ;;
 
       "memo:en")
             startTemplateArticle="memoMainEn.ttytex.start"
             startDocArticle="memoEn.ttytex"
-	    startArtSrcForms="memo"
+            startArtSrcForms="memo"
 
             startTemplatePresentation=""
             startDocPresentation=""
-	    startPresSrcForms=""
+            startPresSrcForms=""
 
             startTemplateBody=""
             startDocBody=""
-	    startBodySrcForms=""
-	    ;;
+            startBodySrcForms=""
+            ;;
 
       "memo:fa+en")
             startTemplateArticle="memoMainFaEn.ttytex.start"
             startDocArticle="memoFaEn.ttytex"
-	    startArtSrcForms="memo"
+            startArtSrcForms="memo"
 
             startTemplatePresentation=""
             startDocPresentation=""
-	    startPresSrcForms=""
+            startPresSrcForms=""
 
             startTemplateBody=""
             startDocBody=""
-	    startBodySrcForms=""
-	    ;;
+            startBodySrcForms=""
+            ;;
 
       "art+pres:en+fa"|"pres+art:en+fa")
             startTemplateArticle="artPresFrontEnFa.ttytex.start"
             startDocArticle="articleEnFa.ttytex"
-	    startArtSrcForms="art+pres"
+            startArtSrcForms="art+pres"
 
             startTemplatePresentation="presArtFrontEnFa.ttytex.start"
             startDocPresentation="presentationEnFa.ttytex"
-	    startPresSrcForms="pres+art"
+            startPresSrcForms="pres+art"
 
-	    # /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/presArtMainEnFa.ttytex.begin
+            # /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/presArtMainEnFa.ttytex.begin
             startTemplatePresArt="presArtMainEnFa.ttytex.begin"
             startDocPresArt="presArtEnFa.ttytex"
-	    startPresArtSrcForms="pres+art"
+            startPresArtSrcForms="pres+art"
 
-	    # /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/bodyArticleEnFa.tex.begin
+            # /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/bodyArticleEnFa.tex.begin
             startTemplateBodyArt="bodyArticleEnFa.tex.begin"
             startDocBodyArt="bodyArticleEnFa.tex"
-	    startBodyArtSrcForms="art+pres"
+            startBodyArtSrcForms="art+pres"
 
-	    # /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/bodyPresArtEnFa.tex.begin
+            # /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/bodyPresArtEnFa.tex.begin
             startTemplateBodyPres="bodyPresArtEnFa.tex.begin"
             startDocBodyPres="bodyPresArtEnFa.tex"
-	    startBodyPresSrcForms="pres+art"
-	    ;;
+            startBodyPresSrcForms="pres+art"
+            ;;
 
       "art:en+fa"|"art:en")
             startTemplateArticle="articleFrontEnFa.ttytex.start"
             startDocArticle="articleEnFa.ttytex"
-	    startArtSrcForms="art"
+            startArtSrcForms="art"
 
             startTemplatePresentation=""
             startDocPresentation=""
-	    startPresSrcForms=""
+            startPresSrcForms=""
 
-	    # /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/bodyArticleOnlyEnFa.tex.begin
+            # /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/bodyArticleOnlyEnFa.tex.begin
             startTemplateBody="bodyArticleOnlyEnFa.tex.begin"
             startDocBody="bodyArticleEnFa.tex"
-	    startBodySrcForms="art"
-	    ;;
+            startBodySrcForms="art"
+            ;;
       "art+pres:fa+en"|"pres+art:fa+en")
             startTemplateArticle="artPresFrontFaEn.ttytex.start"
             startDocArticle="articleFaEn.ttytex"
-	    startArtSrcForms="art+pres"
+            startArtSrcForms="art+pres"
 
             startTemplatePresentation="artPresFrontFaEn.ttytex.start"
             startDocPresentation="presentationFaEn.ttytex"
-	    startPresSrcForms="pres+art"
+            startPresSrcForms="pres+art"
 
             startTemplateBody="artPresBodyFaEn.tex.start"
             startDocBody="artPresBodyFaEn.tex"
-	    startBodySrcForms="art+pres"
-	    ;;
+            startBodySrcForms="art+pres"
+            ;;
       "art+pres:en"|"pres+art:en")
             startTemplateArticle="artPresFrontEn.ttytex.start"
             startDocArticle="articleEn.ttytex"
-	    startArtSrcForms="art+pres"
+            startArtSrcForms="art+pres"
 
             startTemplatePresentation="artPresFrontEn.ttytex.start"
             startDocPresentation="presentationEn.ttytex"
-	    startPresSrcForms="pres+art"
+            startPresSrcForms="pres+art"
 
             startTemplateBody="artPresBodyEn.tex.start"
             startDocBody="artPresBodyEn.tex"
-	    startBodySrcForms="art+pres"
-	    ;;
+            startBodySrcForms="art+pres"
+            ;;
       "art+pres:fa"|"pres+art:fa")
             startTemplateArticle="artPresFrontFa.ttytex.start"
             startDocArticle="articleFa.ttytex"
-	    startArtSrcForms="art+pres"
+            startArtSrcForms="art+pres"
 
             startTemplatePresentation="artPresFrontFa.ttytex.start"
             startDocPresentation="presentationFa.ttytex"
-	    startPresSrcForms="pres+art"
+            startPresSrcForms="pres+art"
 
             startTemplateBody="artPresBodyFa.tex.start"
             startDocBody="artPresBodyFa.tex"
-	    startBodySrcForms="art+pres"
-	    ;;
+            startBodySrcForms="art+pres"
+            ;;
       "webpage"|"webpage:fa"|"webpage:en"|"webpage:en+fa"|"webpage:fa+en")
-	    # /lcnt/lgpc/bystar/SOURCE-INFO/templates/webPage.lcntProc.start
+            # /lcnt/lgpc/bystar/SOURCE-INFO/templates/webPage.lcntProc.start
             startTemplateArticle="webpageMain.ttytex.start"
             startDocArticle="webpage.ttytex"
-	    startArtSrcForms="webpage"
+            startArtSrcForms="webpage"
 
             startTemplatePresentation=""
             startDocPresentation=""
-	    startPresSrcForms=""
+            startPresSrcForms=""
 
             startTemplateBody=""
             startDocBody=""
-	    startBodySrcForms=""
+            startBodySrcForms=""
 
-	    startLcntProcTemplate="webPage.lcntProc.start"
-	    startLcntProcFile="lcntProc.sh"
+            startLcntProcTemplate="webPage.lcntProc.start"
+            startLcntProcFile="lcntProc.sh"
 
-	    ;;
+            ;;
       "mailLcnt"|"mailLcnt:en"|"mailLcnt:en+fa")
-	  if [ "${lcntNu}" == "00000" ] ; then
-	      # /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/mailing00-mainEnFa.ttytex.begin
+          if [ "${lcntNu}" == "00000" ] ; then
+              # /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/mailing00-mainEnFa.ttytex.begin
               startTemplateArticle="mailing00-mainEnFa.ttytex.begin"
               startDocArticle="mailLcnt.ttytex"
-	      startArtSrcForms="art+pres"
+              startArtSrcForms="art+pres"
 
-	      # /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/mailing-bodyArticleEnFa.tex.begin
+              # /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/mailing-bodyArticleEnFa.tex.begin
               startTemplateBodyArt="mailing-bodyArticleEnFa.tex.begin"
               startDocBodyArt="bodyArticleEnFa.tex"
-	      startBodyArtSrcForms="art+pres"
-	  else
-	      # /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/mailing-mainEnFa.ttytex.begin
+              startBodyArtSrcForms="art+pres"
+          else
+              # /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/mailing-mainEnFa.ttytex.begin
               startTemplateArticle="mailing-mainEnFa.ttytex.begin"
               startDocArticle="webMailLcnt.ttytex"
-	      startArtSrcForms="art+pres"
+              startArtSrcForms="art+pres"
 
-	      # /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/mailing-bodyArticleEnFa.tex.begin
+              # /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/mailing-bodyArticleEnFa.tex.begin
               startTemplateBodyArt="mailing-bodyArticleEnFa.tex.begin"
               startDocBodyArt="bodyArticleEnFa.tex"
-	      startBodyArtSrcForms="art+pres"
-	  fi
+              startBodyArtSrcForms="art+pres"
+          fi
 
           startTemplatePresentation=""
           startDocPresentation=""
-	  startPresSrcForms=""
+          startPresSrcForms=""
 
           startTemplateBody=""
           startDocBody=""
-	  startBodySrcForms=""
-	  ;;
+          startBodySrcForms=""
+          ;;
 
       "mailLcnt:fa"|"mailLcnt:fa+en")
 
-	  if [ "${lcntNu}" == "00000" ] ; then
-	      # /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/mailing00-mainFaEn.ttytex.begin
+          if [ "${lcntNu}" == "00000" ] ; then
+              # /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/mailing00-mainFaEn.ttytex.begin
               startTemplateArticle="mailing00-mainFaEn.ttytex.begin"
               startDocArticle="mailLcnt.ttytex"
-	      startArtSrcForms="art+pres"
+              startArtSrcForms="art+pres"
 
-	      # /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/mailing-bodyArticleFaEn.tex.begin
+              # /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/mailing-bodyArticleFaEn.tex.begin
               startTemplateBodyArt="mailing-bodyArticleFaEn.tex.begin"
               startDocBodyArt="bodyArticleFaEn.tex"
-	      startBodyArtSrcForms="art+pres"
-	  else
-	      # /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/mailing-mainFaEn.ttytex.begin
+              startBodyArtSrcForms="art+pres"
+          else
+              # /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/mailing-mainFaEn.ttytex.begin
               startTemplateArticle="mailing-mainFaEn.ttytex.begin"
               startDocArticle="webMailLcnt.ttytex"
-	      startArtSrcForms="art+pres"
+              startArtSrcForms="art+pres"
 
-	      # /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/mailing-bodyArticleFaEn.tex.begin
+              # /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/mailing-bodyArticleFaEn.tex.begin
               startTemplateBodyArt="mailing-bodyArticleFaEn.tex.begin"
               startDocBodyArt="bodyArticleFaEn.tex"
-	      startBodyArtSrcForms="art+pres"
-	  fi
+              startBodyArtSrcForms="art+pres"
+          fi
 
           startTemplatePresentation=""
           startDocPresentation=""
-	  startPresSrcForms=""
+          startPresSrcForms=""
 
           startTemplateBody=""
           startDocBody=""
-	  startBodySrcForms=""
-	  ;;
+          startBodySrcForms=""
+          ;;
 
       
       "pdf:")
-	  ANT_cooked "StartTemplate not Applied To pdf"
-	  return 1
-	  ;;
+          ANT_cooked "StartTemplate not Applied To pdf"
+          return 1
+          ;;
 
       "html:")
-	  ANT_cooked "StartTemplate not Applied To html"
-	  return 1
-	  ;;
-	  
+          ANT_cooked "StartTemplate not Applied To html"
+          return 1
+          ;;
+          
       *)
-	 EH_problem "Unknown multiFormats: ${multiFormats}"
-	 return 1
-	 ;;
+         EH_problem "Unknown multiFormats: ${multiFormats}"
+         return 1
+         ;;
     esac
 
 
@@ -1128,8 +1128,8 @@ function vis_lcntBaseConfigMulti {
        classSrcForms=$3
 
        if [[ -z ${templateFile} ]] ; then
-	   ANT_raw "empty templateFile skipped"
-	   return
+           ANT_raw "empty templateFile skipped"
+           return
        fi
 
        # /lcnt/lgpc/bystar/SOURCE-INFO/templates/
@@ -1138,45 +1138,45 @@ function vis_lcntBaseConfigMulti {
 
        # /lcnt/lgpc/LGPC-INFO/templates
        if [[ -d ${lcntBaseDir}${lcntAttrGenPub}/LGPC-INFO/templatesOBSOLETED ]] ; then
-	   docLgpcStartTemplateBase=${lcntBaseDir}${lcntAttrGenPub}/LGPC-INFO/templates
-       elif [[ -d /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex ]] ; then
-	   # /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/
-	   docLgpcStartTemplateBase=/libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex
+           docLgpcStartTemplateBase=${lcntBaseDir}${lcntAttrGenPub}/LGPC-INFO/templates
+       elif [[ -d /bisos/apps/defaults/begin/templates/purposed/lcnt/latex ]] ; then
+           # /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/
+           docLgpcStartTemplateBase=/bisos/apps/defaults/begin/templates/purposed/lcnt/latex
        elif [ "${lcntNu}" = "00000" ] ; then
-	   # /lcnt/lgpc/bystar/SOURCE-INFO/templates/webpageMainStart.ttytex
-	   #docLgpcStartTemplateBase=${lcntBaseDir}${lcntAttrGenPub}/${lcntAttrSource}/SOURCE-INFO/templates
-	   #docLgpcStartTemplateBase="/lcnt/lgpc/bystar/SOURCE-INFO/templates"
-	   docLgpcStartTemplateBase="/libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex"
+           # /lcnt/lgpc/bystar/SOURCE-INFO/templates/webpageMainStart.ttytex
+           #docLgpcStartTemplateBase=${lcntBaseDir}${lcntAttrGenPub}/${lcntAttrSource}/SOURCE-INFO/templates
+           #docLgpcStartTemplateBase="/lcnt/lgpc/bystar/SOURCE-INFO/templates"
+           docLgpcStartTemplateBase="/bisos/apps/defaults/begin/templates/purposed/lcnt/latex"
        else
-	   EH_problem "Missing /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex"
-	   return 101
+           EH_problem "Missing /bisos/apps/defaults/begin/templates/purposed/lcnt/latex"
+           return 101
        fi
 
 
        if [[ ! -f ${docSourceStartTemplateBase}/${templateFile} ]] ; then 
-	   if [[ ! -f ${docLgpcStartTemplateBase}/${templateFile} ]] ; then 
-	       if [[ ! -f /lcnt/lgpc/bystar/SOURCE-INFO/templates/${templateFile} ]] ; then 
-		   EH_problem "${templateFile} Missing in ${docSourceStartTemplateBase} and ${docLgpcStartTemplateBase} and /lcnt/lgpc/LGPC-INFO/templates"
-		   return 1
-	       else
-		   templateFileFullPath=/lcnt/lgpc/bystar/SOURCE-INFO/templates/${templateFile}
-	       fi
-	   else
-	       templateFileFullPath=${docLgpcStartTemplateBase}/${templateFile}
-	   fi
+           if [[ ! -f ${docLgpcStartTemplateBase}/${templateFile} ]] ; then 
+               if [[ ! -f /lcnt/lgpc/bystar/SOURCE-INFO/templates/${templateFile} ]] ; then 
+                   EH_problem "${templateFile} Missing in ${docSourceStartTemplateBase} and ${docLgpcStartTemplateBase} and /lcnt/lgpc/LGPC-INFO/templates"
+                   return 1
+               else
+                   templateFileFullPath=/lcnt/lgpc/bystar/SOURCE-INFO/templates/${templateFile}
+               fi
+           else
+               templateFileFullPath=${docLgpcStartTemplateBase}/${templateFile}
+           fi
        else
-	   templateFileFullPath=${docSourceStartTemplateBase}/${templateFile}
+           templateFileFullPath=${docSourceStartTemplateBase}/${templateFile}
        fi
 
        if [[ -s ${destFile} ]] ; then
-	   FN_fileSafeKeep ${destFile}
+           FN_fileSafeKeep ${destFile}
        fi
 
        opDo eval "configFormsLangsTemplate ${templateFileFullPath} ${classSrcForms} > ${destFile}"
 
        # Capture What Template Was Used
        if [ ! -d ./LCNT-INFO/templates ] ; then
-	   opDo mkdir -p ./LCNT-INFO/templates
+           opDo mkdir -p ./LCNT-INFO/templates
        fi
        echo "${templateFileFullPath}" > ./LCNT-INFO/templates/${destFile}
    }
@@ -1207,7 +1207,8 @@ function vis_lcntBaseConfigMulti {
    fi
 
    # Generic -- Deprecated by startDocBodyArt and startDocBodyPres
-   if [ ! -z "${startDocBody}" ] ; then   
+   # MB: 2021 -- Needs to be revisited
+   if [ ! -z "${startDocBody:-}" ] ; then
        opDo applyTemplate "${startTemplateBody}" "${startDocBody}" "${startBodySrcForms}"
    fi
 
@@ -1301,7 +1302,7 @@ function vis_reNumber {
 
   if [[ "${newNumber}" == "next" ]] ; then
        newNumber=$( vis_getNextNuForRegistration . )
-	
+        
   fi     
   echo ${newNumber}
 
@@ -1420,7 +1421,7 @@ function vis_lcntRefresh {
   lcntDocNumber=`vis_regNuShow`
 
   if [[ "${lcntDocNumber}_" == "_" ]] ; then 
-    EH_problem "No Document Number has been assigned for ${here}"
+    EH_problem "No Document Number has been assigned for ${here:-}"
     EH_problem "Register a document number first"
     return
   fi
@@ -1443,9 +1444,9 @@ function vis_lcntRefresh {
 
   if [[ ! -s ${cntntRawHome}/lcntProc.sh ]]; then
       #opDo cp /opt/public/osmt/sysConfigInput/docProc/basicLcntProc.sh ./lcntProc.sh
-      opDo cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh ./lcntProc.sh
+      opDo cp /bisos/apps/defaults/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh ./lcntProc.sh
       opDo bx-dblock -i dblockUpdateFileOrIgnore ./lcntProc.sh
-      opDo cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/org/beginPanel.org ./Panel.org
+      opDo cp /bisos/apps/defaults/begin/templates/purposed/lcnt/org/beginPanel.org ./Panel.org
   else
       ANT_raw "lcntProc.sh -- Already In Place  -- Move it out of the way if you want it refreshed."
   fi
@@ -1465,7 +1466,7 @@ function vis_lcntNodeRefresh {
 
   if [[ ! -s ${cntntRawHome}/lcntProc.sh ]]; then
       #opDo cp /opt/public/osmt/sysConfigInput/docProc/basicLcntProc.sh ./lcntProc.sh
-      opDo cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/bash/lcntProc.Dirs.sh ./lcntProc.sh
+      opDo cp /bisos/apps/defaults/begin/templates/purposed/lcnt/bash/lcntProc.Dirs.sh ./lcntProc.sh
       opDo bx-dblock -i dblockUpdateFileOrIgnore ./lcntProc.sh
   else
       ANT_raw "lcntProc.sh -- Already In Place  -- Move it out of the way if you want it refreshed."
@@ -1503,26 +1504,26 @@ _EOF_
     lcnLcntPre
 
     if [ ! -d ./${lcntInfoDir} ] ; then 
-	EH_problem "Missing ./${lcntInfoDir}"
-	lpReturn 101
+        EH_problem "Missing ./${lcntInfoDir}"
+        lpReturn 101
     fi
 
     lcntInfoPath=./"${lcntInfoDir}"
 
     if [ -s "${lcntInfoPath}/docSrcForms" ]; then
-	srcForms=$( cat ${lcntInfoPath}/docSrcForms )
+        srcForms=$( cat ${lcntInfoPath}/docSrcForms )
     else
-	ANT_raw "ASSUMED:  srcForms=art"
-	srcForms="art"
+        ANT_raw "ASSUMED:  srcForms=art"
+        srcForms="art"
     fi
 
     if [ -s "${lcntInfoPath}/docSrcLangs" ]; then
-	srcLangs="$( cat ${lcntInfoPath}/docSrcLangs )"
+        srcLangs="$( cat ${lcntInfoPath}/docSrcLangs )"
     else
-	ANT_raw "ASSUMED:  srcLangs=en"
-	srcLangs="en"
+        ANT_raw "ASSUMED:  srcLangs=en"
+        srcLangs="en"
     fi
-	
+        
     opDo vis_lcntInfoGen
 
 }
@@ -1547,17 +1548,17 @@ function vis_lcntInfoGen {
   FN_dirCreatePathIfNotThere ${lcntInfoPath}
 
     function fvNameValueSet {
-	EH_assert [[ $# -eq 3 ]]
-	local baseDirPath=$1
-	local fvName=$2
-	local fvValue=$3
-	local fvNamePath="${baseDirPath}/${fvName}"
-	
-	if [[ ! -s "${fvNamePath}" ]]; then
-	    echo "${fvValue}" > "${fvNamePath}"
-	else
-	    ANT_cooked "Exists"
-	fi
+        EH_assert [[ $# -eq 3 ]]
+        local baseDirPath=$1
+        local fvName=$2
+        local fvValue=$3
+        local fvNamePath="${baseDirPath}/${fvName}"
+        
+        if [[ ! -s "${fvNamePath}" ]]; then
+            echo "${fvValue}" > "${fvNamePath}"
+        else
+            ANT_cooked "Exists"
+        fi
     }
 
     opDo fvNameValueSet "${lcntInfoPath}" "articleForm" "article"
@@ -1577,9 +1578,9 @@ function vis_lcntInfoGen {
      if [[ -n ${srcFilesList} ]] ; then
        typeset thisName
        for thisName in ${srcFilesList} ; do
-	 integer count=1
-	 echo "${thisName}" > ${lcntInfoPath}/publishable${count}
-	 count=`expr $count + 1`
+         integer count=1
+         echo "${thisName}" > ${lcntInfoPath}/publishable${count}
+         count=`expr $count + 1`
        done
      fi
      echo ${lcntDocNumber} > ${lcntInfoPath}/docSrcList
@@ -1593,31 +1594,31 @@ function vis_lcntInfoGen {
        typeset thisDoc
        integer count=1
        for thisDoc in ${srcFilesList_ttytex} ; do
-	 fileName=`FN_nonDirsPart ${thisDoc}`
-	 filePrefixName=$( FN_prefix "${fileName}" )
-	 echo "${filePrefixName}" >> ${lcntInfoPath}/docSrcList
-	 echo "${filePrefixName}.pdf" > ${lcntInfoPath}/publishable${count}
-	 count=`expr $count + 1`
+         fileName=`FN_nonDirsPart ${thisDoc}`
+         filePrefixName=$( FN_prefix "${fileName}" )
+         echo "${filePrefixName}" >> ${lcntInfoPath}/docSrcList
+         echo "${filePrefixName}.pdf" > ${lcntInfoPath}/publishable${count}
+         count=`expr $count + 1`
        done
      elif [[ -n ${srcFilesList_pdf} ]] ; then
        echo "pdf" > ${lcntInfoPath}/contentSrcFormat
        typeset thisDoc
        integer count=1
        for thisDoc in ${srcFilesList_pdf} ; do
-	 fileName=`FN_nonDirsPart ${thisDoc}`
-	 FN_prefix "${fileName}" >> ${lcntInfoPath}/docSrcList
-	 echo "${thisDoc}" > ${lcntInfoPath}/publishable${count}
-	 count=`expr $count + 1`
+         fileName=`FN_nonDirsPart ${thisDoc}`
+         FN_prefix "${fileName}" >> ${lcntInfoPath}/docSrcList
+         echo "${thisDoc}" > ${lcntInfoPath}/publishable${count}
+         count=`expr $count + 1`
        done
      elif [[ -n ${srcFilesList_odp} ]] ; then
        echo "odp" > ${lcntInfoPath}/contentSrcFormat
        integer count=1
        typeset thisDoc
        for thisDoc in ${srcFilesList_odp} ; do
-	 typeset fileName=`FN_nonDirsPart ${srcFilesList_odp}`
-	 FN_prefix "${fileName}" >> ${lcntInfoPath}/docSrcList
-	 echo "${fileName}.pdf" > ${lcntInfoPath}/publishable${count}
-	 count=`expr $count + 1`
+         typeset fileName=`FN_nonDirsPart ${srcFilesList_odp}`
+         FN_prefix "${fileName}" >> ${lcntInfoPath}/docSrcList
+         echo "${fileName}.pdf" > ${lcntInfoPath}/publishable${count}
+         count=`expr $count + 1`
 
        done
 
@@ -1631,9 +1632,9 @@ function vis_lcntInfoGen {
 
  if [[ ! -s ${lcntInfoPath}/accessPageInclusion ]]; then
      if [ "${srcForms}" == "pdf" ] ; then
-	 echo "pdf" > ${lcntInfoPath}/accessPageInclusion
+         echo "pdf" > ${lcntInfoPath}/accessPageInclusion
      else
-	 echo "html" > ${lcntInfoPath}/accessPageInclusion
+         echo "html" > ${lcntInfoPath}/accessPageInclusion
      fi
  fi
 
@@ -1668,21 +1669,21 @@ function vis_lcntInfoGen {
 
  case ${srcLangs} in 
    "enOnly")  # enOnly was introduced when xelatex fully replaced latex (MB:2018)
-	 docSrcProcessor=latex
-	 if [[ ! -s ${lcntInfoPath}/docSrcProcessor ]]; then
-	     echo "latex" > ${lcntInfoPath}/docSrcProcessor
-	 fi
-	 ;;
+         docSrcProcessor=latex
+         if [[ ! -s ${lcntInfoPath}/docSrcProcessor ]]; then
+             echo "latex" > ${lcntInfoPath}/docSrcProcessor
+         fi
+         ;;
    "fa"|"fa+en"|"en+fa"|"en")   
-	 docSrcProcessor=xelatex
-	 if [[ -s ${lcntInfoPath}/docSrcProcessor ]]; then
-	     FN_fileSafeKeep ${lcntInfoPath}/docSrcProcessor
-	 fi
-	 echo "xelatex" > ${lcntInfoPath}/docSrcProcessor	 
-	 ;;
+         docSrcProcessor=xelatex
+         if [[ -s ${lcntInfoPath}/docSrcProcessor ]]; then
+             FN_fileSafeKeep ${lcntInfoPath}/docSrcProcessor
+         fi
+         echo "xelatex" > ${lcntInfoPath}/docSrcProcessor        
+         ;;
    "")
-	 ANT_cooked "Unspecified Language"
-	 ;;
+         ANT_cooked "Unspecified Language"
+         ;;
    *)
       EH_problem "Unknown srcLangs: ${srcLangs}"
       return 1
@@ -1696,12 +1697,12 @@ function vis_lcntInfoGen {
  typeset this_srcFormat=`cat ${lcntInfoPath}/contentSrcFormat`
  if [ "${this_srcFormat}_" == "ttytex_" ] || [ "${this_srcFormat}_" == "odp_" ] ; then
      if [ "${docSrcProcessor}" == "latex" ] ; then
-	 echo "pdf+ps+tex4ht" > ${lcntInfoPath}/pubFormats
+         echo "pdf+ps+tex4ht" > ${lcntInfoPath}/pubFormats
      elif [ "${docSrcProcessor}" == "xelatex" ] ; then
-	 echo "pdf+heveaHtml" > ${lcntInfoPath}/pubFormats
+         echo "pdf+heveaHtml" > ${lcntInfoPath}/pubFormats
      else
-	 EH_problem "Unknown : docSrcProcessor ${docSrcProcessor}"
-	 return 1
+         EH_problem "Unknown : docSrcProcessor ${docSrcProcessor}"
+         return 1
      fi
  elif [[ "${this_srcFormat}_" == "pdf_" ]] ; then
      echo "pdf" > ${lcntInfoPath}/pubFormats
@@ -1709,47 +1710,47 @@ function vis_lcntInfoGen {
      echo "" > ${lcntInfoPath}/pubFormats
  fi
 
- if [ "${lcntNu}" = "00000" ] ; then
+ if [ "${lcntNu:-}" = "00000" ] ; then
      lcntAttrPermanence="permanent"
  fi
  
  case ${lcntAttrPermanence} in 
    "record")
-	     echo "Records" > ${lcntInfoPath}/pubCategory
-	     echo "${lcntAttrPermanence}" > ${lcntInfoPath}/type
-	     if [[ ! -s ${lcntInfoPath}/lcntQualifier ]] ; then
-	       echo "Presentation" > ${lcntInfoPath}/lcntQualifier
-	     fi
-	     ;;
+             echo "Records" > ${lcntInfoPath}/pubCategory
+             echo "${lcntAttrPermanence}" > ${lcntInfoPath}/type
+             if [[ ! -s ${lcntInfoPath}/lcntQualifier ]] ; then
+               echo "Presentation" > ${lcntInfoPath}/lcntQualifier
+             fi
+             ;;
    "permanent")
-		echo "PLPC" > ${lcntInfoPath}/pubCategory
-		echo "PLPC" > ${lcntInfoPath}/type
-		if [[ ! -s ${lcntInfoPath}/lcntQualifier ]] ; then
-		  echo "current" > ${lcntInfoPath}/lcntQualifier
-		fi
-		;;
+                echo "PLPC" > ${lcntInfoPath}/pubCategory
+                echo "PLPC" > ${lcntInfoPath}/type
+                if [[ ! -s ${lcntInfoPath}/lcntQualifier ]] ; then
+                  echo "current" > ${lcntInfoPath}/lcntQualifier
+                fi
+                ;;
    "draft")
-	    echo "DRAFT" > ${lcntInfoPath}/pubCategory
-	     echo "${lcntAttrPermanence}" > ${lcntInfoPath}/type
-	    if [[ ! -s ${lcntInfoPath}/lcntQualifier ]] ; then
-	      echo "current" > ${lcntInfoPath}/lcntQualifier
-	    fi
-	    ;;
+            echo "DRAFT" > ${lcntInfoPath}/pubCategory
+             echo "${lcntAttrPermanence}" > ${lcntInfoPath}/type
+            if [[ ! -s ${lcntInfoPath}/lcntQualifier ]] ; then
+              echo "current" > ${lcntInfoPath}/lcntQualifier
+            fi
+            ;;
 
    "repub")
-	     echo "Repub" > ${lcntInfoPath}/pubCategory
-	     echo "${lcntAttrPermanence}" > ${lcntInfoPath}/type
-	     if [[ ! -s ${lcntInfoPath}/lcntQualifier ]] ; then
-	       echo "Republish" > ${lcntInfoPath}/lcntQualifier
-	     fi
-	     ;;
+             echo "Repub" > ${lcntInfoPath}/pubCategory
+             echo "${lcntAttrPermanence}" > ${lcntInfoPath}/type
+             if [[ ! -s ${lcntInfoPath}/lcntQualifier ]] ; then
+               echo "Republish" > ${lcntInfoPath}/lcntQualifier
+             fi
+             ;;
    "sw")
-	     echo "SW" > ${lcntInfoPath}/pubCategory
-	     echo "${lcntAttrPermanence}" > ${lcntInfoPath}/type
-	     if [[ ! -s ${lcntInfoPath}/lcntQualifier ]] ; then
-	       echo "current" > ${lcntInfoPath}/lcntQualifier
-	     fi
-	     ;;
+             echo "SW" > ${lcntInfoPath}/pubCategory
+             echo "${lcntAttrPermanence}" > ${lcntInfoPath}/type
+             if [[ ! -s ${lcntInfoPath}/lcntQualifier ]] ; then
+               echo "current" > ${lcntInfoPath}/lcntQualifier
+             fi
+             ;;
    *)
       EH_problem "Unknown lcntAttrPermanence: ${lcntAttrPermanence}"
       return 1
@@ -1820,67 +1821,74 @@ function vis_lcntInfoGen {
      pathToArray ${baseDir}
      
      if [[ "${pathArray[0]}_" == "info_" ]] ; then 
-	 case ${pathArray[1]} in
-	     "externalLimited")
-		 echo "republished" > ${lcntInfoPath}/destPath1
-		 echo "doc.limited" > ${lcntInfoPath}/destPath2
-		 ;;
-	     "externalPublic")
-		 echo "republished" > ${lcntInfoPath}/destPath1
-		 echo "doc.public" > ${lcntInfoPath}/destPath2
-		 ;;
-	     *)
-		 EH_problem ""
-		 ;;
-	 esac
+         case ${pathArray[1]} in
+             "externalLimited")
+                 echo "republished" > ${lcntInfoPath}/destPath1
+                 echo "doc.limited" > ${lcntInfoPath}/destPath2
+                 ;;
+             "externalPublic")
+                 echo "republished" > ${lcntInfoPath}/destPath1
+                 echo "doc.public" > ${lcntInfoPath}/destPath2
+                 ;;
+             *)
+                 EH_problem ""
+                 ;;
+         esac
 
-	 echo "${pathArray[2]}" > ${lcntInfoPath}/destPath3
-	 echo "${pathArray[3]}" > ${lcntInfoPath}/destPath4
-	 echo "${pathArray[4]}" > ${lcntInfoPath}/destPath5
-	 echo "${pathArray[5]}" > ${lcntInfoPath}/destPath6
+         echo "${pathArray[2]}" > ${lcntInfoPath}/destPath3
+         echo "${pathArray[3]}" > ${lcntInfoPath}/destPath4
+         echo "${pathArray[4]}" > ${lcntInfoPath}/destPath5
+         echo "${pathArray[5]}" > ${lcntInfoPath}/destPath6
+     fi
+
+     if [ "${pathArray[0]}" == "de" ] ; then
+         pathArray=("${pathArray[@]:1}") # removes the first element
+     fi
+     if [ "${pathArray[0]}" == "sys" ] ; then
+         pathArray=("${pathArray[@]:1}") # removes the first element
      fi
 
      if [[ "${pathArray[0]}_" == "lcnt_" ]] ; then 
-	 case ${pathArray[3]} in
-	     "permanent"|"record"|"draft")
-	     echo "generated" > ${lcntInfoPath}/destPath1
-	     echo "doc.free" > ${lcntInfoPath}/destPath2
+         case ${pathArray[3]} in
+             "permanent"|"record"|"draft")
+             echo "generated" > ${lcntInfoPath}/destPath1
+             echo "doc.free" > ${lcntInfoPath}/destPath2
              cat  ${lcntInfoPath}/contentOrigin >${lcntInfoPath}/destPath3
              cat  ${lcntInfoPath}/pubCategory >${lcntInfoPath}/destPath4
              cat  ${lcntInfoPath}/lcntNu >${lcntInfoPath}/destPath5
-	     typeset this_Category=`cat  ${lcntInfoPath}/pubCategory`
-	     if [[ "${this_category}_" == "PLPC_" ]] ; then
-		 typeset this_moduleName="current"
-	     else
-		 typeset this_moduleName="`cat ${lcntInfoPath}/lcntQualifier`"
-	     fi
-	     echo "${this_moduleName}" >${lcntInfoPath}/destPath6
-	     ;;
-	     "repub")
-		 echo "republished" > ${lcntInfoPath}/destPath1
-		 echo "doc.public" > ${lcntInfoPath}/destPath2
-		 echo "${pathArray[4]}" > ${lcntInfoPath}/destPath3
-		 echo "${pathArray[5]}" > ${lcntInfoPath}/destPath4
-		 echo "${pathArray[6]}" > ${lcntInfoPath}/destPath5
-		 echo "${pathArray[7]}" > ${lcntInfoPath}/destPath6
-		 ;;
-	     *)
-		 if [[ "${pathArray[1]}_" == "sw_" ]] ; then
-		     echo "generated" > ${lcntInfoPath}/destPath1
-		     echo "sw.free" > ${lcntInfoPath}/destPath2
-		     echo "${pathArray[2]}" > ${lcntInfoPath}/destPath3
-		     echo "${pathArray[3]}" > ${lcntInfoPath}/destPath4
-		     echo "${pathArray[4]}" > ${lcntInfoPath}/destPath5
-		     echo "${pathArray[5]}" > ${lcntInfoPath}/destPath6
-		     typeset this_moduleName="`cat ${lcntInfoPath}/lcntQualifier`"
-		     echo "${this_moduleName}" >${lcntInfoPath}/destPath7
-		 else
-		     EH_problem "${pathArray[3]}: Unexpected"
-		 fi
-		 ;;
-	 esac
+             typeset this_category=`cat  ${lcntInfoPath}/pubCategory`
+             if [[ "${this_category}_" == "PLPC_" ]] ; then
+                 typeset this_moduleName="current"
+             else
+                 typeset this_moduleName="`cat ${lcntInfoPath}/lcntQualifier`"
+             fi
+             echo "${this_moduleName}" >${lcntInfoPath}/destPath6
+             ;;
+             "repub")
+                 echo "republished" > ${lcntInfoPath}/destPath1
+                 echo "doc.public" > ${lcntInfoPath}/destPath2
+                 echo "${pathArray[4]}" > ${lcntInfoPath}/destPath3
+                 echo "${pathArray[5]}" > ${lcntInfoPath}/destPath4
+                 echo "${pathArray[6]}" > ${lcntInfoPath}/destPath5
+                 echo "${pathArray[7]}" > ${lcntInfoPath}/destPath6
+                 ;;
+             *)
+                 if [[ "${pathArray[1]}_" == "sw_" ]] ; then
+                     echo "generated" > ${lcntInfoPath}/destPath1
+                     echo "sw.free" > ${lcntInfoPath}/destPath2
+                     echo "${pathArray[2]}" > ${lcntInfoPath}/destPath3
+                     echo "${pathArray[3]}" > ${lcntInfoPath}/destPath4
+                     echo "${pathArray[4]}" > ${lcntInfoPath}/destPath5
+                     echo "${pathArray[5]}" > ${lcntInfoPath}/destPath6
+                     typeset this_moduleName="`cat ${lcntInfoPath}/lcntQualifier`"
+                     echo "${this_moduleName}" >${lcntInfoPath}/destPath7
+                 else
+                     EH_problem "${pathArray[3]}: Unexpected"
+                 fi
+                 ;;
+         esac
      else
-	 ANT_raw "Not Based at /lcnt -- run pwd"
+         ANT_raw "Not Based at /lcnt -- run pwd"
      fi
  fi
 
@@ -1987,10 +1995,10 @@ _EOF_
       typeset figuresInclusion=`ls ${contentBaseDir}/${thisDocBaseName}/*.png 2> /dev/null`
       typeset oneFigure
       if [[ "${figuresInclusion}_" != "_" ]] ; then
-	for oneFigure in ${figuresInclusion}; do
-	  this_id=`FN_nonDirsPart ${oneFigure}`
-	  opDo lcaPloneAdmin.sh -p username=zopemanager -p password=zopemanager -p title="Figure+${this_id}" -p inputFile="${oneFigure}" -p id="${this_id}" -p siteurl=${thisDest}/PLPC -i addExternalFile  
-	done
+        for oneFigure in ${figuresInclusion}; do
+          this_id=`FN_nonDirsPart ${oneFigure}`
+          opDo lcaPloneAdmin.sh -p username=zopemanager -p password=zopemanager -p title="Figure+${this_id}" -p inputFile="${oneFigure}" -p id="${this_id}" -p siteurl=${thisDest}/PLPC -i addExternalFile  
+        done
       fi
     fi
 
@@ -2017,15 +2025,15 @@ function vis_lcntInfoRenewCustomize {
     lcntDocNumber=`vis_regNuShow`
 
     #if [[ ! -s ${lcntInfoPath}/author1 ]]; then
-	opDo eval echo REGISTRY/author/MohsenBanan \> ${lcntInfoPath}/author1
+        opDo eval echo REGISTRY/author/MohsenBanan \> ${lcntInfoPath}/author1
     #else
-	#ANT_cooked "${lcntSource_author1} -- Untouched"
+        #ANT_cooked "${lcntSource_author1} -- Untouched"
     #fi
 
     #if [[ ! -s ${lcntInfoPath}/organization ]]; then
-	opDo eval echo REGISTRY/organization/fpf \> ${lcntInfoPath}/organization
+        opDo eval echo REGISTRY/organization/fpf \> ${lcntInfoPath}/organization
     #else
-	#ANT_cooked "${lcntSource_organization} -- Untouched"
+        #ANT_cooked "${lcntSource_organization} -- Untouched"
     #fi
 }
 

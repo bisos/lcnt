@@ -40,7 +40,7 @@ _EOF_
 }
 
 # ./lcnLcntLib.sh 
-. ${opBinBase}/lcnLcntLib.sh
+. ${lcntBinBase}/lcnLcntLib.sh
 
 # PRE parameters
 typeset -t doc=""

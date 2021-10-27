@@ -19,15 +19,15 @@ __author__="
 "
 
 
-####+BEGIN: bx:dblock:lsip:bash:seed-spec :types "seedActions.bash"
+####+BEGIN: bx:bsip:bash:seed-spec :types "seedActions.bash"
 SEED="
-*  /[dblock]/ /Seed/ :: [[file:/opt/public/osmt/bin/seedActions.bash]] | 
+*  /[dblock]/ /Seed/ :: [[file:/bisos/core/bsip/bin/seedActions.bash]] |
 "
 FILE="
-*  /This File/ :: /opt/public/osmt/bin/seedMmUnite.sh 
+*  /This File/ :: /bisos/git/auth/bxRepos/bisos/lcnt/bin/seedMmUnite.sh
 "
 if [ "${loadFiles}" == "" ] ; then
-    /opt/public/osmt/bin/seedActions.bash -l $0 "$@" 
+    /bisos/core/bsip/bin/seedActions.bash -l $0 "$@"
     exit $?
 fi
 ####+END:
@@ -81,16 +81,14 @@ _CommentEnd_
 # ./bystarLib.sh
 . ${opBinBase}/bystarLib.sh
 . ${opBinBase}/mmaLib.sh
-. ${opBinBase}/mmaQmailLib.sh
-. ${opBinBase}/mmaDnsLib.sh
 
 # /opt/public/osmt/bin/lcnObjectTree.libSh
 . ${opBinBase}/lcnObjectTree.libSh
 
 # /opt/public/osmt/bin/bystarInfoBase.libSh 
-. ${opBinBase}/bystarInfoBase.libSh
+#. ${opBinBase}/bystarInfoBase.libSh
 
-. ${opBinBase}/lpCurrents.libSh
+#. ${opBinBase}/lpCurrents.libSh
 
 
 # PRE parameters
@@ -98,9 +96,10 @@ _CommentEnd_
 baseDir=""
 
 function G_postParamHook {
-    lpCurrentsGet
-    bystarUid=$( bueAcctCurrent.sh -i currentAssociatedShow 2> /dev/null )
-    bystarUidHome=$( FN_absolutePathGet ~${bystarUid} )
+    # lpCurrentsGet
+    #bystarUid=$( bueAcctCurrent.sh -i currentAssociatedShow 2> /dev/null )
+    # bystarUidHome=$( FN_absolutePathGet ~${bystarUid} )
+    return
 }
 
 G_myPanel="/libre/ByStar/InitialTemplates/activeDocs/blee/screencasting/fullUsagePanel-en.org"
@@ -282,74 +281,74 @@ _EOF_
     typeset presentationFile=${2}
 
     if [ ! -f "${presentationFile}" ] ; then
-	EH_problem "Missing Input: ${presentationFile}"
-	lpReturn 101
+        EH_problem "Missing Input: ${presentationFile}"
+        lpReturn 101
     fi
 
     if [ $# -eq 2 ] ; then
-	opDo impressive $(impressiveCommonArgs) --geometry ${sizeGeometry} ${presentationFile}
+        opDo impressive $(impressiveCommonArgs) --geometry ${sizeGeometry} ${presentationFile}
     else
-	presPurpose=${3}
-	typeset thisInfoFile=""
-	#typeset iimBeamerImpressiveEmacs="/de/bx/nne/dev-py/bin/iimBeamerImpressiveEmacs.py"
-	typeset iimBeamerImpressiveEmacs="beamerExternalExtensions.py"	
-	typeset impressiveInfoBaseDir="./impressive.gened"
+        presPurpose=${3}
+        typeset thisInfoFile=""
+        #typeset iimBeamerImpressiveEmacs="/de/bx/nne/dev-py/bin/iimBeamerImpressiveEmacs.py"
+        typeset iimBeamerImpressiveEmacs="beamerExternalExtensions.py"  
+        typeset impressiveInfoBaseDir="./impressive.gened"
 
-	opDo FN_dirCreatePathIfNotThere  ${impressiveInfoBaseDir}
+        opDo FN_dirCreatePathIfNotThere  ${impressiveInfoBaseDir}
 
-	case ${presPurpose} in
-	"interactive")
-		thisInfoFile=$( FN_absolutePathGet ./${impressiveInfoBaseDir}/interactive )
-		if [[ "${G_forceMode}_" == "force_" ]] ; then
-		    opDo eval "${iimBeamerImpressiveEmacs} -v 30 -i dispositionToImpressiveInfoStdout  interactive" \> "${thisInfoFile}"
-		else
-		    if [ ! -f "${thisInfoFile}" ] ; then
-			EH_problem "Missing Input: ${thisInfoFile}"
-			EH_problem "Perhaps Use '-f' option to create the info file"
-			lpReturn 101
-		    fi
-		fi
-		opDo impressive $(impressiveCommonArgs) -I ${thisInfoFile} --geometry ${sizeGeometry} ${presentationFile}
-		;;
-	"presenter")
-		thisInfoFile=$( FN_absolutePathGet ./${impressiveInfoBaseDir}/presenter )
-		if [[ "${G_forceMode}_" == "force_" ]] ; then
-		    opDo eval "${iimBeamerImpressiveEmacs} -v 30 -i dispositionToImpressiveInfoStdout  presenter" \> "${thisInfoFile}"
-		else
-		    if [ ! -f "${thisInfoFile}" ] ; then
-			EH_problem "Missing Input: ${thisInfoFile}"
-			EH_problem "Perhaps Use '-f' option to create the info file"
-			lpReturn 101
-		    fi
-		fi
-		opDo impressive $(impressiveCommonArgs) -I ${thisInfoFile} --geometry ${sizeGeometry} ${presentationFile}
-		;;
-	"voiceOver")
-		thisInfoFile=$( FN_absolutePathGet ./${impressiveInfoBaseDir}/voiceOver )
-		if [[ "${G_forceMode}_" == "force_" ]] ; then
-		    opDo eval "${iimBeamerImpressiveEmacs} -v 30 -i dispositionToImpressiveInfoStdout  voiceOver" \> "${thisInfoFile}"
-		else
-		    if [ ! -f "${thisInfoFile}" ] ; then
-			EH_problem "Missing Input: ${thisInfoFile}"
-			EH_problem "Perhaps Use '-f' option to create the info file"
-			lpReturn 101
-		    fi
-		fi
-		opDo impressive $(impressiveCommonArgs) -I ${thisInfoFile} --geometry ${sizeGeometry} ${presentationFile}
-		;;
-	"slideShow")
-		# Auto advance in 5 seconds
-		opDo impressive -a 5 -f --geometry ${sizeGeometry} ${presentationFile}
-		;;
-	"slideShowRepeat")
-		# Auto advance in 5 seconds
-		opDo impressive -a 5 -w -f ${sizeGeometry} ${presentationFile}
-		;;
-	*)
-		EH_problem "Unexpected this=${presPurpose}"
-		lpReturn 1
-		;;
-	esac
+        case ${presPurpose} in
+        "interactive")
+                thisInfoFile=$( FN_absolutePathGet ./${impressiveInfoBaseDir}/interactive )
+                if [[ "${G_forceMode}_" == "force_" ]] ; then
+                    opDo eval "${iimBeamerImpressiveEmacs} -v 30 -i dispositionToImpressiveInfoStdout  interactive" \> "${thisInfoFile}"
+                else
+                    if [ ! -f "${thisInfoFile}" ] ; then
+                        EH_problem "Missing Input: ${thisInfoFile}"
+                        EH_problem "Perhaps Use '-f' option to create the info file"
+                        lpReturn 101
+                    fi
+                fi
+                opDo impressive $(impressiveCommonArgs) -I ${thisInfoFile} --geometry ${sizeGeometry} ${presentationFile}
+                ;;
+        "presenter")
+                thisInfoFile=$( FN_absolutePathGet ./${impressiveInfoBaseDir}/presenter )
+                if [[ "${G_forceMode}_" == "force_" ]] ; then
+                    opDo eval "${iimBeamerImpressiveEmacs} -v 30 -i dispositionToImpressiveInfoStdout  presenter" \> "${thisInfoFile}"
+                else
+                    if [ ! -f "${thisInfoFile}" ] ; then
+                        EH_problem "Missing Input: ${thisInfoFile}"
+                        EH_problem "Perhaps Use '-f' option to create the info file"
+                        lpReturn 101
+                    fi
+                fi
+                opDo impressive $(impressiveCommonArgs) -I ${thisInfoFile} --geometry ${sizeGeometry} ${presentationFile}
+                ;;
+        "voiceOver")
+                thisInfoFile=$( FN_absolutePathGet ./${impressiveInfoBaseDir}/voiceOver )
+                if [[ "${G_forceMode}_" == "force_" ]] ; then
+                    opDo eval "${iimBeamerImpressiveEmacs} -v 30 -i dispositionToImpressiveInfoStdout  voiceOver" \> "${thisInfoFile}"
+                else
+                    if [ ! -f "${thisInfoFile}" ] ; then
+                        EH_problem "Missing Input: ${thisInfoFile}"
+                        EH_problem "Perhaps Use '-f' option to create the info file"
+                        lpReturn 101
+                    fi
+                fi
+                opDo impressive $(impressiveCommonArgs) -I ${thisInfoFile} --geometry ${sizeGeometry} ${presentationFile}
+                ;;
+        "slideShow")
+                # Auto advance in 5 seconds
+                opDo impressive -a 5 -f --geometry ${sizeGeometry} ${presentationFile}
+                ;;
+        "slideShowRepeat")
+                # Auto advance in 5 seconds
+                opDo impressive -a 5 -w -f ${sizeGeometry} ${presentationFile}
+                ;;
+        *)
+                EH_problem "Unexpected this=${presPurpose}"
+                lpReturn 1
+                ;;
+        esac
     fi
 
     lpReturn
@@ -429,8 +428,8 @@ _EOF_
     typeset here=$( pwd )
 
     if [ ! -d videoResults.fvd ] ; then
-	EH_problem "Missing videoResults.fvd"
-	lpReturn 101
+        EH_problem "Missing videoResults.fvd"
+        lpReturn 101
     fi
 
     echo ${here}/videoResults.fvd
@@ -451,20 +450,20 @@ _EOF_
     EH_assert [[ $# -gt 0 ]]
 
     for thisOne in ${@} ; do
-	typeset thisPrefix=$( FN_prefix ${thisOne} )
-	typeset thisExtension=$( FN_extension ${thisOne} )
-	
-	if [ ! -f ${thisPrefix}.pdf ] ; then
-	    ANT_raw "Missing ${thisPrefix}.pdf -- Skipped"
-	    continue
-	fi
-	
-	if lcntProc.sh -i isPresentation ${thisOne} ; then
-	    opDo impressive -o pdfOutImages-${thisPrefix} ${thisPrefix}.pdf
-	else
-	    ANT_raw "Will NOT process ${thisOne} -- Not A Presentation"
-	fi
-	
+        typeset thisPrefix=$( FN_prefix ${thisOne} )
+        typeset thisExtension=$( FN_extension ${thisOne} )
+        
+        if [ ! -f ${thisPrefix}.pdf ] ; then
+            ANT_raw "Missing ${thisPrefix}.pdf -- Skipped"
+            continue
+        fi
+        
+        if lcntProc.sh -i isPresentation ${thisOne} ; then
+            opDo impressive -o pdfOutImages-${thisPrefix} ${thisPrefix}.pdf
+        else
+            ANT_raw "Will NOT process ${thisOne} -- Not A Presentation"
+        fi
+        
     done
 
 }
@@ -482,16 +481,16 @@ _EOF_
     EH_assert [[ $# -gt 0 ]]
 
     for thisOne in ${@} ; do
-	typeset thisPrefix=$( FN_prefix ${thisOne} )
-	typeset thisExtension=$( FN_extension ${thisOne} )
-	
-	if [ -d pdfOutImages-${thisPrefix} ] ; then
-	    ANT_raw "Removing pdfOutImages-${thisPrefix} directory"
-	    opDo rm -r -f pdfOutImages-${thisPrefix}
-	else
-	    ANT_raw "pdfOutImages-${thisPrefix} Not Found -- Cleaning Skipped"
-	fi
-	
+        typeset thisPrefix=$( FN_prefix ${thisOne} )
+        typeset thisExtension=$( FN_extension ${thisOne} )
+        
+        if [ -d pdfOutImages-${thisPrefix} ] ; then
+            ANT_raw "Removing pdfOutImages-${thisPrefix} directory"
+            opDo rm -r -f pdfOutImages-${thisPrefix}
+        else
+            ANT_raw "pdfOutImages-${thisPrefix} Not Found -- Cleaning Skipped"
+        fi
+        
     done
 
 }
@@ -510,7 +509,7 @@ _EOF_
     typeset docsList=$( lcntProc.sh -i docsList )
 
     for thisOne in ${docsList} ; do
-	opDo vis_pdfOutImagesClean ${thisOne}
+        opDo vis_pdfOutImagesClean ${thisOne}
     done
 
     lpReturn
@@ -569,13 +568,13 @@ _EOF_
     #opDo ${iimBeamerImpressiveEmacs} -v 30 --load ./presentationEnFa-itags.py -i loadProc
 
     if [ ! -d ./audio ] ; then
-	opDo vis_startAudio
+        opDo vis_startAudio
     fi
 
     inBaseDirDo ./audio mmUniteAudio.sh -h -v -n showRun -i fullUpdate
     
     if [ ! -d ./video ] ; then
-	opDo vis_startVideo
+        opDo vis_startVideo
     fi
 
     inBaseDirDo ./video mmUniteVideo.sh -h -v -n showRun -i fullUpdate
@@ -608,16 +607,16 @@ _EOF_
     local effectiveFilesList=""
     local isGood=""
     for each in ${filesList} ; do
-	isGood=$( echo ${each} | egrep -v '\.vrb$' | egrep -v '\.out$'| egrep -v '\.bbl$'| egrep -v '\.nav$' | egrep -v '\.cut$'  )
-	if [ ! -z "${isGood}" ] ; then
-	    effectiveFilesList="${effectiveFilesList} ${isGood}"
-	fi
+        isGood=$( echo ${each} | egrep -v '\.vrb$' | egrep -v '\.out$'| egrep -v '\.bbl$'| egrep -v '\.nav$' | egrep -v '\.cut$'  )
+        if [ ! -z "${isGood}" ] ; then
+            effectiveFilesList="${effectiveFilesList} ${isGood}"
+        fi
     done
     
     echo "${effectiveFilesList}" 
 
     lpReturn
-}	
+}       
 
 
 

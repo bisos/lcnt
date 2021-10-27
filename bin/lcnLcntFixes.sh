@@ -162,10 +162,10 @@ function vis_fixDblockParams {
   
     typeset oneFile
     for oneFile in ${fileList} ; do
-	echo Processing ${oneFile}
-	opDo cp ${oneFile} ${oneFile}.$$
-	opDo eval "cat ${oneFile}.$$ | sed -e 's%bx:dblock:lcnt:latex-section :disabledP \"false\"%bx:dblock:lcnt:latex-section :mode \"auto\"%g' > ${oneFile}"
-	opDo /bin/rm ${oneFile}.$$
+        echo Processing ${oneFile}
+        opDo cp ${oneFile} ${oneFile}.$$
+        opDo eval "cat ${oneFile}.$$ | sed -e 's%bx:dblock:lcnt:latex-section :disabledP \"false\"%bx:dblock:lcnt:latex-section :mode \"auto\"%g' > ${oneFile}"
+        opDo /bin/rm ${oneFile}.$$
     done
 }
 
@@ -209,10 +209,10 @@ function vis_fixlcntDirsProc {
     opDoComplain cd ${currentDir} || return
     print "#### ${currentDir} ####"
     if [ -f lcntDirsProc.sh ] ; then
-	sed -e 's:seedLcntFullProc.sh:seedLcntProc.sh:g' lcntDirsProc.sh > lcntProc.sh
-	#FN_fileSafeKeep lcntDirsProc.sh 
-	opDo chmod 775 lcntProc.sh
-	opDo ls -l ${currentDir}/lcntProc.sh
+        sed -e 's:seedLcntFullProc.sh:seedLcntProc.sh:g' lcntDirsProc.sh > lcntProc.sh
+        #FN_fileSafeKeep lcntDirsProc.sh 
+        opDo chmod 775 lcntProc.sh
+        opDo ls -l ${currentDir}/lcntProc.sh
     else
       EH_assert [[ -f lcntProc.sh ]]
     fi
@@ -227,16 +227,16 @@ function vis_fixPubFormats {
     EH_assert [[ -f lcntProc.sh ]]
 
     if [ ! -f ./LCNT-INFO/pubFormats ] ; then 
-	return
+        return
     fi
 
     lcntPubFormats=`cat ./LCNT-INFO/pubFormats`
 
     if [ "${lcntPubFormats}_" == "html+pdf+ps_" ] ; then
-	echo "pdf+ps+tex4ht" > ./LCNT-INFO/pubFormats
-	ls -l ./LCNT-INFO/pubFormats
+        echo "pdf+ps+tex4ht" > ./LCNT-INFO/pubFormats
+        ls -l ./LCNT-INFO/pubFormats
     else
-	echo ${lcntPubFormats}
+        echo ${lcntPubFormats}
     fi
 
 }
@@ -248,14 +248,14 @@ function vis_fixAccessPageInclusion {
     EH_assert [[ -f lcntProc.sh ]]
 
     if [ ! -f ./LCNT-INFO/pubFormats ] ; then 
-	return
+        return
     fi
 
     lcntPubFormats=`grep tex4ht ./LCNT-INFO/pubFormats`
 
     if [ "${lcntPubFormats}_" != "_" ] ; then
-	echo "html" > ./LCNT-INFO/accessPageInclusion
-	opDo ls -l ./LCNT-INFO/accessPageInclusion
+        echo "html" > ./LCNT-INFO/accessPageInclusion
+        opDo ls -l ./LCNT-INFO/accessPageInclusion
     fi
 
 }
@@ -267,7 +267,7 @@ function vis_fixType {
     EH_assert [[ -f lcntProc.sh ]]
 
     if [ ! -f ./LCNT-INFO/type ] ; then 
-	return
+        return
     fi
 
     echo "document" > ./LCNT-INFO/type
@@ -281,15 +281,15 @@ function vis_fixDescHtmlFormat {
     EH_assert [[ -f lcntProc.sh ]]
 
     if [ ! -f ./LCNT-INFO/description ] ; then 
-	return
+        return
     fi
 
     lcntDescFormats=`grep -i html  ./LCNT-INFO/description`
 
     if [ "${lcntDescFormats}_" == "_" ] ; then
-	opDo mv ./LCNT-INFO/description ./LCNT-INFO/description.$$
-	txt2html ./LCNT-INFO/description.$$ > ./LCNT-INFO/description
-	opDo ls -l ./LCNT-INFO/description
+        opDo mv ./LCNT-INFO/description ./LCNT-INFO/description.$$
+        txt2html ./LCNT-INFO/description.$$ > ./LCNT-INFO/description
+        opDo ls -l ./LCNT-INFO/description
     fi
 
 }
@@ -301,7 +301,7 @@ function vis_fixAuthorsFormat {
     EH_assert [[ -f lcntProc.sh ]]
 
     if [ ! -f ./LCNT-INFO/author1 ] ; then 
-	return
+        return
     fi
     
     typeset authorRegistry="REGISTRY/author"
@@ -323,7 +323,7 @@ function vis_fixOrgFormat {
     EH_assert [[ -f lcntProc.sh ]]
 
     if [ ! -f ./LCNT-INFO/organization ] ; then 
-	return
+        return
     fi
     
     typeset orgRegistry="REGISTRY/organization"
@@ -343,12 +343,12 @@ function vis_fixAddFpfOrg {
     typeset orgRegistry="REGISTRY/organization"
 
     if [ ! -f ./LCNT-INFO/organization ] ; then 
-	return
+        return
     fi
     
 
     wordNu=$( /usr/bin/wc -w LCNT-INFO/organization | cut -d ' ' -f 1 )
     if [ "${wordNu}_" == "0_" ] ; then 
-	echo ${orgRegistry}/fpf > ./LCNT-INFO/organization
+        echo ${orgRegistry}/fpf > ./LCNT-INFO/organization
     fi
 }
