@@ -80,7 +80,7 @@ _CommentEnd_
 
 
 # ./lcnLcntLib.sh 
-. ${opBinBase}/lcnLcntLib.sh
+. ${lcntBinBase}/lcnLcntLib.sh
 
 . ${opBinBase}/bystarHook.libSh
 
@@ -153,7 +153,7 @@ ${G_myName} ${extraInfo} -i lcntBasesFullSetup
 $( examplesSeperatorChapter "BISOS LCNT BinsPreps" )
 ${G_myName} ${extraInfo} -i bisosLcntBinsPrep   # invokes lcaLaTexBinsPrep.sh and others
 $( examplesSeperatorChapter "LCNT Bases Setup" )
-${G_myName} ${extraInfo} -i lcntBaseVcGet # activate the public BISOS pip_lcntBases BPO
+${G_myName} ${extraInfo} -i lcntBaseBpoActivate # activate the public BISOS pip_lcntBases BPO
 ${G_myName} ${extraInfo} -i lcntBasesSetup  # Uses pip_lcntBases BPO and creats links to /de/sys/lcnt and /lcnt
 ${G_myName} ${extraInfo} -i usgBpos_lcntBases_bxoPath  # Passive -- BPO Path containing link to /de/sys/lcnt/lgpc etc
 ${G_myName} ${extraInfo} -i usgBposLcntBasesSetup # 
@@ -223,7 +223,7 @@ _EOF_
     }
     EH_assert [[ $# -eq 0 ]]
 
-    lpDo vis_lcntBaseVcGet
+    lpDo vis_lcntBaseBpoActivate
     lpDo vis_lcntBasesSetup
     lpDo vis_usgBposLcntBasesSetup
 
@@ -249,7 +249,7 @@ function vis_lcntBaseGetPrep%% {
 }
 
 
-function vis_lcntBaseVcGet {
+function vis_lcntBaseBpoActivate {
     EH_assert [[ $# -eq 0 ]]
 
     lpDo bpoActivate.sh -h -v -n showRun -p privacy="priv" -p bpoId="pip_lcntBases" -i bpoActivate

@@ -81,7 +81,7 @@ _CommentEnd_
 
 
 # ./lcnLcntLib.sh 
-. ${opBinBase}/lcnLcntLib.sh
+. ${lcntBinBase}/lcnLcntLib.sh
 
 # . ${opBinBase}/bystarHook.libSh
 

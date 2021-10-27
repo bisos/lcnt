@@ -91,9 +91,9 @@ lcnt_shortTitle=""
 
 . ${opBinBase}/lpInBaseDirDo.libSh
 
-. ${opBinBase}/lcnLcntLib.sh
-. ${opBinBase}/lcnLcntBuildLib.sh
-. ${opBinBase}/lcnLcntExportLib.sh
+. ${lcntBinBase}/lcnLcntLib.sh
+. ${lcntBinBase}/lcnLcntBuildLib.sh
+. ${lcntBinBase}/lcnLcntExportLib.sh
 
 
 # PRE parameters

@@ -410,7 +410,7 @@ _EOF_
     return 1
   fi
 
-  #echo ${lcntBaseDir}
+  #echo ${lcntBaseDir} ZZZZ
   # ASSERT that things are deep enough
 
   lcntAttrGenPub=$1  # One of: lgcc, lgpc, lpxc, sw
@@ -429,6 +429,8 @@ _EOF_
   esac
 
   lcntAttrSource=$2   # One of: mohsen, neda, payk.  In the case of repub (/info), one of: finance, politics, technology
+
+  # echo ${1} ${2} YYYY
 
   if [[ -d ${lcntBaseDir}${lcntAttrGenPub}/${lcntAttrSource}/SOURCE-INFO ]] ; then
    if [[ -f ${lcntBaseDir}${lcntAttrGenPub}/${lcntAttrSource}/SOURCE-INFO/lcntSourceInfo.sh ]] ; then
@@ -561,7 +563,7 @@ function lcntNuBaseVerifyAndFix {
     return 101
   fi
 
-  hereLcntLine=$( ${opBinBase}/lcnLcntOutputs.sh  -p cntntRawHome=${hereDir} -i lcntNuStdout )
+  hereLcntLine=$( ${lcntBinBase}/lcnLcntOutputs.sh  -p cntntRawHome=${hereDir} -i lcntNuStdout )
 
   if [[ -z "${hereLcntLine}" ]] ; then
     EH_problem "Missing content ${hereDir}"

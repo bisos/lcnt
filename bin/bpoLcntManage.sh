@@ -122,8 +122,7 @@ function vis_examples {
 
     typeset examplesInfo="${extraInfo} ${runInfo}"
 
-    # local oneServerBpo=$(vis_siteSynergyServersAvailable | head -1)
-    # local oneClientBpo=$(vis_siteSynergyClientsAvailable | head -1)    
+    local oneBpoId="pip_lcnt_bystarCommon"
 
     visLibExamplesOutput ${G_myName} 
   cat  << _EOF_
@@ -133,6 +132,12 @@ ${G_myName} ${extraInfo} -i moduleDescription | emlVisit
 $( examplesSeperatorChapter "Activate LCNT BPOs" )
 ${G_myName} -i lcntBposAvailable
 ${G_myName} -i lcntBposAvailable | bpoActivate.sh -i bpoActivate
+$( examplesSeperatorChapter "Realize A New LCNT-BPO" )
+bxieProvision.sh -h -v -n showRun -p privacy="priv" -p kind="info" -p type="project" -p parent="pip_bystar" -p name="lcnt_bystarOverview"  -i startToPrivRealize
+$( examplesSeperatorChapter "LCNT Repos Manage" )
+echo bpoReposManage.sh -h -v -n showRun -i repoCreateAndPushBasedOnPath .  # From new repos
+${G_myName} ${extraInfo} -p bpoId="${oneBpoId}" -i repoBaseCreate_lcnt lgpc/permanent/bystar/
+${G_myName} ${extraInfo} -p bpoId="${oneBpoId}" -i repoBasePush_lcnt
 _EOF_
 }
 
@@ -156,6 +161,75 @@ _EOF_
 
     lpDo eval bxoGitlab.py -v 30 -i acctList  \| grep lcnt
 
+}
+
+function vis_repoBasePush_lcnt {
+   G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -eq 0 ]]
+    EH_assert bpoIdAssert
+
+    EH_assert  vis_userAcctExists "${bpoId}"
+
+    local bpoHome=$( FN_absolutePathGet ~${bpoId} )
+    local repoBase="${bpoHome}/lcnt"
+
+    lpDo vis_repoCreateAndPushBasedOnPath "${repoBase}"
+
+    lpReturn
+}
+
+
+function vis_repoBaseCreate_lcnt {
+   G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert bpoIdAssert
+
+    EH_assert  vis_userAcctExists "${bpoId}"
+
+    local bpoHome=$( FN_absolutePathGet ~${bpoId} )
+    local repoBase="${bpoHome}/lcnt"
+
+     lpDo bx-gitRepos -h -v -n showRun -i baseUpdateDotIgnore "${repoBase}"
+
+    function processEach {
+        EH_assert [[ $# -eq 1 ]]
+        local baseName=$1
+
+        local basePath="${repoBase}/${baseName}"
+
+        lpDo mkdir -p "${basePath}"
+        if [ ! -f "${basePath}/readme.org" ] ; then
+            lpDo touch "${basePath}/readme.org"
+        fi
+    }
+
+####+BEGIN: bx:bsip:bash/processArgsAndStdin
+     function processArgsAndStdin {
+        local effectiveArgs=( "$@" )
+        local stdinArgs=()
+        local each
+        if [ ! -t 0 ]; then # FD 0 is not opened on a terminal, there is a pipe
+            readarray stdinArgs < /dev/stdin
+            effectiveArgs=( "$@" "${stdinArgs[@]}" )
+        fi
+        if [ ${#effectiveArgs[@]} -eq 0 ] ; then
+            ANT_raw "No Args And Stdin Is Empty"
+            lpReturn
+        fi
+        for each in "${effectiveArgs[@]}"; do
+            lpDo processEach "${each%$'\n'}"
+        done
+    }
+    lpDo processArgsAndStdin "$@"
+####+END:
+
+
+    lpReturn 0
 }
 
 
