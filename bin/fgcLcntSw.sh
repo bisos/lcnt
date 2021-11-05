@@ -54,6 +54,7 @@ _CommentEnd_
 
 itemsOrderedList=( 
     lcaLaTexBinsPrep.sh
+    lcaJsRevealBinsPrep.sh
     lcaObsStudioBinsPrep.sh
 )
 
