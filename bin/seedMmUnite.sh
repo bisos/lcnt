@@ -33,7 +33,7 @@ fi
 ####+END:
 
 _CommentBegin_
-####+BEGIN: bx:dblock:global:file-insert-cond :cond "./blee.el" :file "/libre/ByStar/InitialTemplates/software/plusOrg/dblock/inserts/topControls.org"
+####+BEGIN: bx:dblock:global:file-insert-cond :cond "./blee.el" :file "/bisos/apps/defaults/software/plusOrg/dblock/inserts/topControls.org"
 *      ================
 *  /Controls/ ::  [[elisp:(org-cycle)][| ]]  [[elisp:(show-all)][Show-All]]  [[elisp:(org-shifttab)][Overview]]  [[elisp:(progn (org-shifttab) (org-content))][Content]] | [[file:Panel.org][Panel]] | [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] | [[elisp:(bx:org:run-me)][Run]] | [[elisp:(bx:org:run-me-eml)][RunEml]] | [[elisp:(delete-other-windows)][(1)]] | [[elisp:(progn (save-buffer) (kill-buffer))][S&Q]]  [[elisp:(save-buffer)][Save]]  [[elisp:(kill-buffer)][Quit]] [[elisp:(org-cycle)][| ]]
 ** /Version Control/ ::  [[elisp:(call-interactively (quote cvs-update))][cvs-update]]  [[elisp:(vc-update)][vc-update]] | [[elisp:(bx:org:agenda:this-file-otherWin)][Agenda-List]]  [[elisp:(bx:org:todo:this-file-otherWin)][ToDo-List]] 
@@ -48,7 +48,7 @@ _CommentEnd_
 
 function vis_moduleDescription {  cat  << _EOF_
 *  [[elisp:(org-cycle)][| ]]  Xrefs         :: *[Related/Xrefs:]*  <<Xref-Here->>  -- External Documents  [[elisp:(org-cycle)][| ]]
-**  [[elisp:(org-cycle)][| ]]  Panel        :: [[file:/libre/ByStar/InitialTemplates/activeDocs/bxServices/versionControl/fullUsagePanel-en.org::Xref-VersionControl][Panel Roadmap Documentation]] [[elisp:(org-cycle)][| ]]
+**  [[elisp:(org-cycle)][| ]]  Panel        :: [[file:/bisos/apps/defaults/activeDocs/bxServices/versionControl/fullUsagePanel-en.org::Xref-VersionControl][Panel Roadmap Documentation]] [[elisp:(org-cycle)][| ]]
 *  [[elisp:(org-cycle)][| ]]  Info          :: *[Module Description:]* [[elisp:(org-cycle)][| ]]
 
 _EOF_
@@ -102,7 +102,7 @@ function G_postParamHook {
     return
 }
 
-G_myPanel="/libre/ByStar/InitialTemplates/activeDocs/blee/screencasting/fullUsagePanel-en.org"
+G_myPanel="/bisos/apps/defaults/activeDocs/blee/screencasting/fullUsagePanel-en.org"
 
 
 _CommentBegin_
@@ -118,19 +118,11 @@ function vis_examples {
     typeset examplesInfo="${extraInfo} ${runInfo}"
 
     visLibExamplesOutput ${G_myName} 
-  cat  << _EOF_
-$( examplesSeperatorTopLabel "${G_myName}" )
-$( examplesSeperatorChapter "Chapter Title" )
-$( examplesSeperatorSection "Section Title" )
-${G_myName} ${extraInfo} -i doTheWork
-_EOF_
 
   typeset presPdfFile="./presentationEnFa.pdf"
 
-  visLibExamplesOutput ${G_myName} 
   cat  << _EOF_
 ---  Documentation / How-To  ---
-${G_myName} ${extraInfo}  -i howTo
 $( examplesSeperatorTopLabel "Presentation Dispositions" )
 $( examplesSeperatorChapter "Build / Prepare The Presentation And Disposition Base" )
 $( examplesSeperatorSection "ScreenCasting Preparations And Execution" )
@@ -553,8 +545,8 @@ _EOF_
 
     #typeset iimBeamerImpressiveEmacs=/de/bx/nne/dev-py/bin/iimBeamerImpressiveEmacs.py
     
-    #typeset iimBeamerImpressiveEmacs="beamerExternalExtensions.py"
-    typeset iimBeamerImpressiveEmacs="/de/bx/nne/dev-py/pypi/pkgs/bisos/lcnt/dev/bin/beamerExternalExtensions.py"
+    typeset iimBeamerImpressiveEmacs="beamerExternalExtensions.py"
+    #typeset iimBeamerImpressiveEmacs="/de/bx/nne/dev-py/pypi/pkgs/bisos/lcnt/dev/bin/beamerExternalExtensions.py"
 
     opDo lcntProc.sh -i fullClean
 
@@ -652,9 +644,9 @@ _EOF_
 
     opDo mkdir ./audio
 
-    #opDo cp /libre/ByStar/InitialTemplates/lcnt/dispositions/audioPresProc.sh ./audio
+    #opDo cp /bisos/apps/defaults/lcnt/dispositions/audioPresProc.sh ./audio
     
-    opDo cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/bash/mmUniteAudio.sh ./audio/mmUniteAudio.sh
+    opDo cp /bisos/apps/defaults/begin/templates/purposed/lcnt/bash/mmUniteAudio.sh ./audio/mmUniteAudio.sh
 
     lpReturn
 }
@@ -673,7 +665,7 @@ _EOF_
 
     opDo mkdir ./video
     
-    opDo cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/bash/mmUniteVideo.sh ./video/mmUniteVideo.sh
+    opDo cp /bisos/apps/defaults/begin/templates/purposed/lcnt/bash/mmUniteVideo.sh ./video/mmUniteVideo.sh
     
     lpReturn
 }

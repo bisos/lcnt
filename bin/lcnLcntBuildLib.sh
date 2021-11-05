@@ -164,6 +164,7 @@ _EOF_
                     ;;
                 "presentationEnFa"|"presentationFaEn")
                     enabledList="${enabledList} presPdf"
+                    enabledList="${enabledList} pres-reveal"                    
                     ;;
                 "presArtEnFa"|"presArtFaEn")
                     enabledList="${enabledList} presArt-8.5x11"
@@ -411,7 +412,7 @@ _EOF_
         opDo fvNameValueSpecificSet ${buildDirPath} "buildName" "$( buildNameGet ${buildDirName} ${lcntName} )" 
         opDo fvNameValueSpecificSet ${buildDirPath} "docSrc"  "${presentationSrcFile}"
         opDo fvNameValueSpecificSet ${buildDirPath} "paperSize" "html"
-        opDo fvNameValueSpecificSet ${buildDirPath} "results" "pdf"
+        opDo fvNameValueSpecificSet ${buildDirPath} "results" "html"
         opDo fvNameValueSpecificSet ${buildDirPath} "sides" "2" 
     }
 

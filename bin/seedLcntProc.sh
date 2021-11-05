@@ -33,7 +33,7 @@ fi
 ####+END:
 
 _CommentBegin_
-####+BEGIN: bx:dblock:global:file-insert-cond :cond "./blee.el" :file "/libre/ByStar/InitialTemplates/software/plusOrg/dblock/inserts/topControls.org"
+####+BEGIN: bx:dblock:global:file-insert-cond :cond "./blee.el" :file "/bisos/apps/defaults/software/plusOrg/dblock/inserts/topControls.org"
 *      ================
 *  /Controls/ ::  [[elisp:(org-cycle)][| ]]  [[elisp:(show-all)][Show-All]]  [[elisp:(org-shifttab)][Overview]]  [[elisp:(progn (org-shifttab) (org-content))][Content]] | [[file:Panel.org][Panel]] | [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] | [[elisp:(bx:org:run-me)][Run]] | [[elisp:(bx:org:run-me-eml)][RunEml]] | [[elisp:(delete-other-windows)][(1)]] | [[elisp:(progn (save-buffer) (kill-buffer))][S&Q]]  [[elisp:(save-buffer)][Save]]  [[elisp:(kill-buffer)][Quit]] [[elisp:(org-cycle)][| ]]
 ** /Version Control/ ::  [[elisp:(call-interactively (quote cvs-update))][cvs-update]]  [[elisp:(vc-update)][vc-update]] | [[elisp:(bx:org:agenda:this-file-otherWin)][Agenda-List]]  [[elisp:(bx:org:todo:this-file-otherWin)][ToDo-List]] 
@@ -64,7 +64,7 @@ _CommentEnd_
 
 function vis_moduleDescription {  cat  << _EOF_
 *  [[elisp:(org-cycle)][| ]]  Xrefs         :: *[Related/Xrefs:]*  <<Xref-Here->>  -- External Documents  [[elisp:(org-cycle)][| ]]
-**  [[elisp:(org-cycle)][| ]]  Panel        :: [[file:/libre/ByStar/InitialTemplates/activeDocs/blee/lcntPublications/lcntModel/fullUsagePanel-en.org::seedLcntProc.sh][Panel Roadmap Documentation]] [[elisp:(org-cycle)][| ]]
+**  [[elisp:(org-cycle)][| ]]  Panel        :: [[file:/bisos/apps/defaults/activeDocs/blee/lcntPublications/lcntModel/fullUsagePanel-en.org::seedLcntProc.sh][Panel Roadmap Documentation]] [[elisp:(org-cycle)][| ]]
 *  [[elisp:(org-cycle)][| ]]  Info          :: *[Module Description:]* [[elisp:(org-cycle)][| ]]
 
 _EOF_
@@ -2190,7 +2190,7 @@ _EOF_
     }
     EH_assert [[ $# -eq 0 ]]
 
-    opDo cp /libre/ByStar/InitialTemplates/lcnt/dispositions/presProc.sh .
+    opDo cp /bisos/apps/defaults/lcnt/dispositions/presProc.sh .
 
     lpReturn
 }
@@ -2237,9 +2237,16 @@ _EOF_
 
     typeset baseDir="$1"
 
-    #inBaseDirDo ${baseDir} ln -s /usr/local/lib/node_modules  .
-    inBaseDirDo ${baseDir} FN_fileSymlinkUpdate /rsync/node_modules ./node_modules
-    inBaseDirDo ${baseDir} ln -s /pub  .
+    if [ -d /rsync/node_modules ] ; then
+      inBaseDirDo ${baseDir} FN_fileSymlinkUpdate /rsync/node_modules ./node_modules
+    elif [ -d /usr/local/lib/node_modules ] ; then
+      inBaseDirDo ${baseDir} ln -s /usr/local/lib/node_modules  .
+    else
+      EH_problem "Missing node_modules"
+    fi  
+    
+    inBaseDirDo ${baseDir} ln -s /pub  .  # MB-2021: NOTYET, Should this be deleted?
+    
     inBaseDirDo ${baseDir} ln -s ../audio .
     inBaseDirDo ${baseDir} ln -s ../video  .
     inBaseDirDo ${baseDir} ln -s ../image  .
@@ -2268,7 +2275,7 @@ function vis_heveaRevealFixups {
 
   FN_fileRmIfThere ${outFileName}
 
-  opDo ${opBinBase}/elispFilterHtml.sh -v -n showRun  ${extraInfo} -p el="${elispScriptFile}" -p exec=mainRevealHevea -p inFile="${inFileName}" -p outFile="${outFileName}" -i emacs ${fileBaseName}
+  opDo ${opBinBase}/elispFilterHtml.sh -v -n showRun  ${extraInfo:-} -p el="${elispScriptFile}" -p exec=mainRevealHevea -p inFile="${inFileName}" -p outFile="${outFileName}" -i emacs ${fileBaseName}
 }
 
 
@@ -2370,7 +2377,7 @@ _EOF_
                     opDo cp ${imagesList} ./revealJsBase
                 fi
                 
-                opDo cp /libre/ByStar/InitialTemplates/web/revealJs/begin/contentStart.html  ./revealJsBase/${inFilePrefix}.html
+                opDo cp /bisos/apps/defaults/web/revealJs/begin/contentStart.html  ./revealJsBase/${inFilePrefix}.html
 
                 opDo bx-dblock -h -v -n showRun -i dblockUpdateFiles  ./revealJsBase/${inFilePrefix}.html
             fi
@@ -2588,20 +2595,20 @@ _EOF_
         if [ -f ./presDispose.sh ] ; then
             ANT_raw "./presDispose.sh alread in place -- Update Skipped"        
         else
-            opDo cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/bash/presProc.leaf.sh ./presDispose.sh
+            opDo cp /bisos/apps/defaults/begin/templates/purposed/lcnt/bash/presProc.leaf.sh ./presDispose.sh
             opDo vis_dblockUpdateFile ./presDispose.sh
         fi
         if [ -f ./PresPanel.org ] ; then
             ANT_raw "./PresPanel.org alread in place -- Update Skipped" 
         else
-            opDo cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/org/beginPresPanel.org ./PresPanel.org
+            opDo cp /bisos/apps/defaults/begin/templates/purposed/lcnt/org/beginPresPanel.org ./PresPanel.org
             opDo vis_dblockUpdateFile ./PresPanel.org
         fi
     else
-        opDo cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/bash/presProc.leaf.sh ./presDispose.sh
+        opDo cp /bisos/apps/defaults/begin/templates/purposed/lcnt/bash/presProc.leaf.sh ./presDispose.sh
         opDo vis_dblockUpdateFile ./presDispose.sh
         
-        opDo cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/org/beginPresPanel.org ./PresPanel.org
+        opDo cp /bisos/apps/defaults/begin/templates/purposed/lcnt/org/beginPresPanel.org ./PresPanel.org
         opDo vis_dblockUpdateFile ./PresPanel.org
     fi
 
@@ -2621,7 +2628,7 @@ It should be repeatable.
 _EOF_
     }
 
-    opDo vis_bxtPanel
+    #opDo vis_bxtPanel
 
     opDo ln -s /pub ./pub
 
@@ -2691,20 +2698,20 @@ _EOF_
         if [ -f ./mmUnite.sh ] ; then
             ANT_raw "./mmUnite.sh alread in place -- Update Skipped"    
         else
-            opDo cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/bash/mmUnite.leaf.sh ./mmUnite.sh
+            opDo cp /bisos/apps/defaults/begin/templates/purposed/lcnt/bash/mmUnite.leaf.sh ./mmUnite.sh
             opDo vis_dblockUpdateFile ./mmUnite.sh
         fi
         if [ -f ./MmUnitePanel.org ] ; then
             ANT_raw "./MmUnitePanel.org alread in place -- Update Skipped"      
         else
-            opDo cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/org/beginMmUnitePanel.org ./MmUnitePanel.org
+            opDo cp /bisos/apps/defaults/begin/templates/purposed/lcnt/org/beginMmUnitePanel.org ./MmUnitePanel.org
             opDo vis_dblockUpdateFile ./MmUnitePanel.org
         fi
     else
-        opDo cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/bash/mmUnite.leaf.sh ./mmUnite.sh
+        opDo cp /bisos/apps/defaults/begin/templates/purposed/lcnt/bash/mmUnite.leaf.sh ./mmUnite.sh
         opDo vis_dblockUpdateFile ./mmUnite.sh
         
-        opDo cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/org/beginMmUnitePanel.org ./MmUnitePanel.org
+        opDo cp /bisos/apps/defaults/begin/templates/purposed/lcnt/org/beginMmUnitePanel.org ./MmUnitePanel.org
         opDo vis_dblockUpdateFile ./MmUnitePanel.org
     fi
 
@@ -3106,42 +3113,47 @@ _EOF_
                 "html")
                     resultsPathDest=$( resultsDestinationPath html )
 
-                    if LIST_isIn "build" "${extentList}"  ; then                    
+                    if LIST_isIn "build" "${extentList}"  ; then
+                      # reveal presetation is processed differently
+                      if [ "${lcntBuild_docSrc}" == "$(vis_getPresentationSrcFile .)" ] ; then
+                        local storedExtent=${extent}
+                        extent="build"
+                        lpDo vis_buildHtmlPreview "${lcntBuild_docSrc}"
+                        extent=${storedExtent}
+                      else
                         opDo lcnLcntInputProc.sh -p inFormat=xelatex -p outputs=heveaHtml -i buildDocs  ${lcntBuild_docSrc}
                         if [ -d "${resultsPathDest}" ] ; then
                             opDo mv "${resultsPathDest}" "${resultsPathDest}"-${dateTag}
                         fi
                         opDo mv heveaHtml-${docSrcPrefix} "${resultsPathDest}"
+                      fi
                     fi
 
                     htmlIndexFile="${resultsPathDest}/index.html"
 
+                    viewCommand=""
                     if LIST_isIn "view" "${extentList}"  ; then
-                        if [ "${lcntBuild_docSrc}" == "$(vis_getPresentationSrcFile .)" ] ; then            
-                            if [ -s ${htmlIndexFile} ] ; then
-                                opDo echo eoe-browser ${htmlIndexFile}
-                            else
-                                EH_problem "Missing ${htmlIndexFile}"
-                            fi
-            
-                            if [ -s  ./revealJsBase/${inFilePrefix}.html ] ; then
-                                opDo eoe-browser ./revealJsBase/${inFilePrefix}.html 
-                            else
-                                EH_problem "Missing ./revealJsBase/${inFilePrefix}.html "
-                            fi
-                        else
-                            if [ -s ${htmlIndexFile} ] ; then
-                                opDo eoe-browser ${htmlIndexFile}
-                            else
-                                EH_problem "Missing ${htmlIndexFile}"
-                            fi
-                        fi              
+                      viewCommand="eoe-browser"
                     else
                         # When view was not specified, we still want the run line
                         if LIST_isIn "build" "${extentList}"  ; then                                                        
-                            echo eoe-browser ${htmlIndexFile}
+                            viewCommand="echo eoe-browser"
                         fi
                     fi
+
+                    if [ "${lcntBuild_docSrc}" == "$(vis_getPresentationSrcFile .)" ] ; then            
+                      if [ -s  ./revealJsBase/${docSrcPrefix}.html ] ; then
+                        opDo ${viewCommand} ./revealJsBase/${docSrcPrefix}.html &
+                      else
+                        EH_problem "Missing ./revealJsBase/${docSrcPrefix}.html "
+                      fi
+                    else
+                      if [ -s ${htmlIndexFile} ] ; then
+                        opDo ${viewCommand} ${htmlIndexFile} &
+                      else
+                        EH_problem "Missing ${htmlIndexFile}"
+                      fi
+                    fi              
                     
                     
                     if LIST_isIn "release" "${extentList}"  ; then
@@ -3649,15 +3661,15 @@ _EOF_
     cat  << _EOF_
 =====================================
 ---- EnFa - lcntProc.sh -- Initial Templates Development ----
-bx-dblock -i diffBlankedFiles ./lcntProc.sh  /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh
-diff ./lcntProc.sh  /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh
-cp   ./lcntProc.sh  /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh
-cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh ./lcntProc.sh
+bx-dblock -i diffBlankedFiles ./lcntProc.sh  /bisos/apps/defaults/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh
+diff ./lcntProc.sh  /bisos/apps/defaults/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh
+cp   ./lcntProc.sh  /bisos/apps/defaults/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh
+cp /bisos/apps/defaults/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh ./lcntProc.sh
 ---- EnFa - Panel.org -- Initial Templates Development ----
-bx-dblock -i diffBlankedFiles ./Panel.org /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/org/beginPanel.org
-diff ./Panel.org /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/org/beginPanel.org
-cp   ./Panel.org /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/org/beginPanel.org
-cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/org/beginPanel.org ./Panel.org 
+bx-dblock -i diffBlankedFiles ./Panel.org /bisos/apps/defaults/begin/templates/purposed/lcnt/org/beginPanel.org
+diff ./Panel.org /bisos/apps/defaults/begin/templates/purposed/lcnt/org/beginPanel.org
+cp   ./Panel.org /bisos/apps/defaults/begin/templates/purposed/lcnt/org/beginPanel.org
+cp /bisos/apps/defaults/begin/templates/purposed/lcnt/org/beginPanel.org ./Panel.org
 _EOF_
 
     lpReturn
@@ -3690,13 +3702,13 @@ _EOF_
         fi
 
         if [ ! -f ./headSectionInsert.html ] ; then
-            opDo cp /libre/ByStar/InitialTemplates/mailing/starts/headSectionInsert.html .
+            opDo cp /bisos/apps/defaults/mailing/starts/headSectionInsert.html .
         fi
     }
 
     function perhasAddMailLcnt {
         if [ ! -f ./mailLcnt.ttytex ] ; then
-            opDo cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/mailing00-mainEnFa.ttytex.begin ./mailLcnt.ttytex
+            opDo cp /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/mailing00-mainEnFa.ttytex.begin ./mailLcnt.ttytex
             opDo echo "mailLcnt" >> ./LCNT-INFO/docSrcList
         fi
     }
@@ -3755,42 +3767,42 @@ function vis_templatesDevelopmentPreModern {
     cat  << _EOF_
 =====================================
 ---- EnFa - articleEnFa.ttytex -- Initial Templates Development ----
-bx-dblock -i diffBlankedFiles ./articleEnFa.ttytex /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/artPresFrontEnFa.ttytex.start
-diff ./articleEnFa.ttytex /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/artPresFrontEnFa.ttytex.start
-cp ./articleEnFa.ttytex /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/artPresFrontEnFa.ttytex.start
-cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/artPresFrontEnFa.ttytex.start ./articleEnFa.ttytex 
+bx-dblock -i diffBlankedFiles ./articleEnFa.ttytex /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/artPresFrontEnFa.ttytex.start
+diff ./articleEnFa.ttytex /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/artPresFrontEnFa.ttytex.start
+cp ./articleEnFa.ttytex /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/artPresFrontEnFa.ttytex.start
+cp /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/artPresFrontEnFa.ttytex.start ./articleEnFa.ttytex
 ---- EnFa - presentationEnFa.ttytex -- Initial Templates Development ----
-bx-dblock -i diffBlankedFiles ./presentationEnFa.ttytex /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/presArtFrontEnFa.ttytex.start
-diff ./presentationEnFa.ttytex /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/presArtFrontEnFa.ttytex.start
-cp ./presentationEnFa.ttytex /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/presArtFrontEnFa.ttytex.start
-cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/presArtFrontEnFa.ttytex.start ./presentationEnFa.ttytex
+bx-dblock -i diffBlankedFiles ./presentationEnFa.ttytex /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/presArtFrontEnFa.ttytex.start
+diff ./presentationEnFa.ttytex /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/presArtFrontEnFa.ttytex.start
+cp ./presentationEnFa.ttytex /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/presArtFrontEnFa.ttytex.start
+cp /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/presArtFrontEnFa.ttytex.start ./presentationEnFa.ttytex
 ---- EnFa - presArtEnFa.ttytex -- Initial Templates Development ----
-bx-dblock -i diffBlankedFiles ./presArtEnFa.ttytex /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/presArtMainEnFa.ttytex.begin
-diff ./presArtEnFa.ttytex /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/presArtMainEnFa.ttytex.begin
-cp ./presArtEnFa.ttytex /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/presArtMainEnFa.ttytex.begin
-cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/presArtMainEnFa.ttytex.begin ./presArtEnFa.ttytex 
+bx-dblock -i diffBlankedFiles ./presArtEnFa.ttytex /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/presArtMainEnFa.ttytex.begin
+diff ./presArtEnFa.ttytex /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/presArtMainEnFa.ttytex.begin
+cp ./presArtEnFa.ttytex /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/presArtMainEnFa.ttytex.begin
+cp /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/presArtMainEnFa.ttytex.begin ./presArtEnFa.ttytex
 =====================================
 ---- EnFa - bodyArticleEnFa.tex -- Initial Templates Development ----
-bx-dblock -i diffBlankedFiles ./bodyArticleEnFa.tex /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/bodyArticleEnFa.tex.begin
-diff ./bodyArticleEnFa.tex /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/bodyArticleEnFa.tex.begin
-cp ./bodyArticleEnFa.tex /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/bodyArticleEnFa.tex.begin
-cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/bodyArticleEnFa.tex.begin ./bodyArticleEnFa.tex 
+bx-dblock -i diffBlankedFiles ./bodyArticleEnFa.tex /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/bodyArticleEnFa.tex.begin
+diff ./bodyArticleEnFa.tex /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/bodyArticleEnFa.tex.begin
+cp ./bodyArticleEnFa.tex /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/bodyArticleEnFa.tex.begin
+cp /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/bodyArticleEnFa.tex.begin ./bodyArticleEnFa.tex
 ---- EnFa - bodyPresArtEnFa.tex -- Initial Templates Development ----
-bx-dblock -i diffBlankedFiles ./bodyPresArtEnFa.tex /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/bodyPresArtEnFa.tex.begin
-diff ./bodyPresArtEnFa.tex /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/bodyPresArtEnFa.tex.begin
-cp ./bodyPresArtEnFa.tex /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/bodyPresArtEnFa.tex.begin
-cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/latex/bodyPresArtEnFa.tex.begin ./bodyPresArtEnFa.tex
+bx-dblock -i diffBlankedFiles ./bodyPresArtEnFa.tex /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/bodyPresArtEnFa.tex.begin
+diff ./bodyPresArtEnFa.tex /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/bodyPresArtEnFa.tex.begin
+cp ./bodyPresArtEnFa.tex /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/bodyPresArtEnFa.tex.begin
+cp /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/bodyPresArtEnFa.tex.begin ./bodyPresArtEnFa.tex
 =====================================
 ---- EnFa - lcntProc.sh -- Initial Templates Development ----
-bx-dblock -i diffBlankedFiles ./lcntProc.sh  /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh
-diff ./lcntProc.sh  /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh
-cp   ./lcntProc.sh  /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh
-cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh ./lcntProc.sh
+bx-dblock -i diffBlankedFiles ./lcntProc.sh  /bisos/apps/defaults/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh
+diff ./lcntProc.sh  /bisos/apps/defaults/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh
+cp   ./lcntProc.sh  /bisos/apps/defaults/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh
+cp /bisos/apps/defaults/begin/templates/purposed/lcnt/bash/lcntProc.leaf.sh ./lcntProc.sh
 ---- EnFa - Panel.org -- Initial Templates Development ----
-bx-dblock -i diffBlankedFiles ./Panel.org /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/org/beginPanel.org
-diff ./Panel.org /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/org/beginPanel.org
-cp   ./Panel.org /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/org/beginPanel.org
-cp /libre/ByStar/InitialTemplates/begin/templates/purposed/lcnt/org/beginPanel.org ./Panel.org 
+bx-dblock -i diffBlankedFiles ./Panel.org /bisos/apps/defaults/begin/templates/purposed/lcnt/org/beginPanel.org
+diff ./Panel.org /bisos/apps/defaults/begin/templates/purposed/lcnt/org/beginPanel.org
+cp   ./Panel.org /bisos/apps/defaults/begin/templates/purposed/lcnt/org/beginPanel.org
+cp /bisos/apps/defaults/begin/templates/purposed/lcnt/org/beginPanel.org ./Panel.org
 $( examplesSeperatorChapter "Initial Templates Development" )
 ${G_myName} ${extraInfo} -i templatesDevelopment
 _EOF_

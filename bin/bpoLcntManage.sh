@@ -194,7 +194,11 @@ _EOF_
     local bpoHome=$( FN_absolutePathGet ~${bpoId} )
     local repoBase="${bpoHome}/lcnt"
 
-     lpDo bx-gitRepos -h -v -n showRun -i baseUpdateDotIgnore "${repoBase}"
+    if [ ! -d "${repoBase}" ] ; then
+        lpDo mkdir "${repoBase}"
+    fi
+
+    lpDo bx-gitRepos -h -v -n showRun -i baseUpdateDotIgnore "${repoBase}"
 
     function processEach {
         EH_assert [[ $# -eq 1 ]]

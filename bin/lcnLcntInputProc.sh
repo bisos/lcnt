@@ -43,9 +43,8 @@ extraLatexOptions=""
 
 . ${opBase}/lib/ocp-lib.sh
 . ${opBinBase}/opDoAtAsLib.sh
-. ${opBinBase}/bibTex.libSh
+. ${lcntBinBase}/bibTex.libSh
 
-typeset frameMakerHost="192.168.0.103"
 vis_examples () {
   typeset visLibExamples=`visLibExamplesOutput ${G_myName}`
  cat  << _EOF_

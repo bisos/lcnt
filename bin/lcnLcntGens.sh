@@ -1692,7 +1692,7 @@ function vis_lcntInfoGen {
 
  if [[ -s ${lcntInfoPath}/pubFormats ]]; then
      ANT_raw "Over Writing ${lcntInfoPath}/pubFormats"
-     FN_fileSafeKeep ${destFile}
+     echo Inactive FN_fileSafeKeep ${destFile:-}  # destFile: unbound variable
  fi
  typeset this_srcFormat=`cat ${lcntInfoPath}/contentSrcFormat`
  if [ "${this_srcFormat}_" == "ttytex_" ] || [ "${this_srcFormat}_" == "odp_" ] ; then
