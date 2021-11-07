@@ -261,7 +261,7 @@ _EOF_
     }
     EH_assert [[ $# -eq 0 ]]
 
-    inBaseDirDo  .. /de/bx/nne/dev-py/bin/iimBeamerImpressiveEmacs.py -v 30 -i frameNamesList ./presentationEnFa.pdf
+    inBaseDirDo  .. beamerExternalExtensions.py -v 30 -i frameNamesList ./presentationEnFa.pdf
 
     lpReturn
 }
@@ -278,7 +278,7 @@ _EOF_
     }
     EH_assert [[ $# -eq 0 ]]
 
-    g_resultsCapture /de/bx/nne/dev-py/bin/iimBeamerImpressiveEmacs.py -v 30 -i frameNamesList ../presentationEnFa.pdf
+    g_resultsCapture beamerExternalExtensions.py -v 30 -i frameNamesList ../presentationEnFa.pdf
 
     if [ "${g_resultsExitValue}" != 0 ] ; then
 	EH_problem_g_resultsShow 
