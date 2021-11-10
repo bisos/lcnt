@@ -273,7 +273,11 @@ _EOF_
                        }
     EH_assert [[ $# -eq 0 ]]
 
+    lpDo sudo mkdir -p /de/sys
+    lpDo sudo chown bisos:bisos /de/sys
+
     lpDo mkdir -p /de/sys/lcnt
+    
     if [ ! -h /lcnt ] ; then
       lpDo sudo ln -s /de/sys/lcnt /lcnt
     fi
