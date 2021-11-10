@@ -141,11 +141,10 @@ ${G_myName} ${extraInfo} -f -i presPlaySize 1280x720 ${presPdfFile} voiceOver
 $( examplesSeperatorSection "Presentation Play And Record (impressive)" )
 ${G_myName} ${extraInfo} -i presPlayRecSize topLeft720 1280x720 ${presPdfFile} voiceOver
 $( examplesSeperatorChapter "Disposition Setup/Set/Update" )
-/de/bx/nne/dev-py/bin/iimBeamerImpressiveEmacs.py
-iimBeamerImpressiveEmacs.py
-iimBeamerImpressiveEmacs.py -v 30 -i latexSrcToDispositionUpdate ${presPdfFile}
-impiimBeamerImpressiveEmacs.py -v 30 -i dispositionToImpressiveInfoStdout  voiceOver presenter         # Args specify purpose
-iimBeamerImpressiveEmacs.py -v 30 -i dispositionToImpressiveInfoStdout  voiceOver
+beamerExternalExtensions.py
+beamerExternalExtensions.py -v 30 -i latexSrcToDispositionUpdate ${presPdfFile}
+beamerExternalExtensions.py -v 30 -i dispositionToImpressiveInfoStdout  voiceOver presenter         # Args specify purpose
+beamerExternalExtensions.py -v 30 -i dispositionToImpressiveInfoStdout  voiceOver
 $( examplesSeperatorChapter "Screen Capture Preparations And Control" )
 bx-vlcRecScreen
 bx-vlcRecScreen -h -v -n showRun -p apps=blee -p locSize=topLeft720 -i  prepareApps
@@ -164,7 +163,7 @@ $( examplesSeperatorTopLabel "Audio Base Setup" )
 ${G_myName} ${extraInfo} -i startAudio
 $( examplesSeperatorSection "Process Impressive Tags Of LaTeX Input" )
 ${G_myName} ${extraInfo} -i impressiveTagsUpdate
-iimBeamerImpressiveEmacs.py -v 30 --load ./presentationEnFa-itags.py -i loadProc
+beamerExternalExtensions.py -v 30 --load ./presentationEnFa-itags.py -i loadProc
 $( examplesSeperatorSection "Developer Examples" ) 
 ${G_myName} ${extraInfo} -i devExamples
 $( examplesSeperatorSection "Release / Stage For Publication/Export" ) 
@@ -282,8 +281,7 @@ _EOF_
     else
         presPurpose=${3}
         typeset thisInfoFile=""
-        #typeset iimBeamerImpressiveEmacs="/de/bx/nne/dev-py/bin/iimBeamerImpressiveEmacs.py"
-        typeset iimBeamerImpressiveEmacs="beamerExternalExtensions.py"  
+        typeset iimBeamerImpressiveEmacs="beamerExternalExtensions.py"
         typeset impressiveInfoBaseDir="./impressive.gened"
 
         opDo FN_dirCreatePathIfNotThere  ${impressiveInfoBaseDir}
@@ -543,7 +541,7 @@ _EOF_
     }
     EH_assert [[ $# -eq 0 ]]
 
-    #typeset iimBeamerImpressiveEmacs=/de/bx/nne/dev-py/bin/iimBeamerImpressiveEmacs.py
+    #typeset iimBeamerImpressiveEmacs=/de/bx/nne/dev-py/bin/beamerExternalExtensions.py
     
     typeset iimBeamerImpressiveEmacs="beamerExternalExtensions.py"
     #typeset iimBeamerImpressiveEmacs="/de/bx/nne/dev-py/pypi/pkgs/bisos/lcnt/dev/bin/beamerExternalExtensions.py"

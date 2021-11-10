@@ -74,6 +74,9 @@ _EOF_
 
     itemOrderedList=( 
         "sox"
+        "scrot"
+        "imagemagick"
+        "gifsicle"
     )
 
     itemOptionalOrderedList=()
@@ -102,6 +105,36 @@ _CommentEnd_
 item_sox () { distFamilyGenerationHookRun binsPrep_sox; }
 
 binsPrep_sox_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "sox"; }
+
+####+END:
+
+####+BEGIN: bx:dblock:lsip:binsprep:apt :module "scrot"
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Apt-Pkg       :: scrot [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+item_scrot () { distFamilyGenerationHookRun binsPrep_scrot; }
+
+binsPrep_scrot_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "scrot"; }
+
+####+END:
+
+####+BEGIN: bx:dblock:lsip:binsprep:apt :module "imagemagick"
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Apt-Pkg       :: imagemagick [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+item_imagemagick () { distFamilyGenerationHookRun binsPrep_imagemagick; }
+
+binsPrep_imagemagick_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "imagemagick"; }
+
+####+END:
+
+####+BEGIN: bx:dblock:lsip:binsprep:apt :module "gifsicle"
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Apt-Pkg       :: gifsicle [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+item_gifsicle () { distFamilyGenerationHookRun binsPrep_gifsicle; }
+
+binsPrep_gifsicle_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "gifsicle"; }
 
 ####+END:
 
