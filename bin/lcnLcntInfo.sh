@@ -136,7 +136,8 @@ function vis_get {
           ;;
 
       *)
-          varName="lcnt_${1}"
+        varName="lcnt_${1}"
+        #echo ${varName}
           if ! varIsSetPredicate ${varName} ; then
               EH_problem "lcnt_${1} is unSet -- Unknown ${1}"
           else

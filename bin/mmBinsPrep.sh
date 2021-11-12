@@ -77,6 +77,8 @@ _EOF_
         "scrot"
         "imagemagick"
         "gifsicle"
+        "mp3info"
+        "mp3gain"
     )
 
     itemOptionalOrderedList=()
@@ -135,6 +137,26 @@ _CommentEnd_
 item_gifsicle () { distFamilyGenerationHookRun binsPrep_gifsicle; }
 
 binsPrep_gifsicle_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "gifsicle"; }
+
+####+END:
+
+####+BEGIN: bx:dblock:lsip:binsprep:apt :module "mp3info"
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Apt-Pkg       :: mp3info [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+item_mp3info () { distFamilyGenerationHookRun binsPrep_mp3info; }
+
+binsPrep_mp3info_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "mp3info"; }
+
+####+END:
+
+####+BEGIN: bx:dblock:lsip:binsprep:apt :module "mp3gain"
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Apt-Pkg       :: mp3gain [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+item_mp3gain () { distFamilyGenerationHookRun binsPrep_mp3gain; }
+
+binsPrep_mp3gain_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "mp3gain"; }
 
 ####+END:
 

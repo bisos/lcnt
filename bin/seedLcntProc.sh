@@ -2987,8 +2987,7 @@ _EOF_
         opDo FN_dirCreatePathIfNotThere "${lcntBuild_releaseBaseDir}"   
     fi
 
-    #opDoComplain FN_dirCreatePathIfNotThere ./Results
-    opDo FN_dirCreatePathIfNotThere ./Results
+    #opDoComplain FN_dirCreatePathIfNotThere ./Results    opDo FN_dirCreatePathIfNotThere ./Results
 
     function resultsDestinationPath {
         EH_assert [[ $# -eq 1 ]]
@@ -3060,9 +3059,13 @@ _EOF_
         
         # 2) Runing dblock on all needed files -- For Dev we don't dblocks update
         if [ "${1}" != "dev" ] ; then
-            if ! LIST_isIn "name" "${extentList}"  ; then                   
-                opDo vis_dblockUpdateFile ${lcntBuild_docSrc}
+          if ! LIST_isIn "name" "${extentList}"  ; then
+            if [ ! -z "${lcntBuild_docSrc}" ] ; then
+              opDo vis_dblockUpdateFile ${lcntBuild_docSrc}
+            else
+              EH_problem "Blank lcntBuild_docSrc -- skipped"
             fi
+          fi
             # NOTYET, also do other files that need to be dblocked.
         fi
         

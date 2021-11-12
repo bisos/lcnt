@@ -73,19 +73,19 @@ _EOF_
     }
 
     itemOrderedList=( 
-	#mp3gain        look at easymp3gain-gtk instead
-	mp3info
-	lame
-	#mp3cd
-	ripit
-	pavucontrol
-	# libav_tools
-	#libav_tools:i386
-	recordmydesktop 
-	impressive
-	mencoder
-	audacity
-	mplayer_gui
+        #mp3gain        look at easymp3gain-gtk instead
+        mp3info
+        lame
+        #mp3cd
+        ripit
+        pavucontrol
+        # libav_tools
+        #libav_tools:i386
+        recordmydesktop 
+        impressive
+        mencoder
+        audacity
+        mplayer_gui
     )
 }
 
@@ -96,18 +96,18 @@ _EOF_
     }
 
     itemOrderedList=( 
-	mp3gain                   #
-	mp3info
-	lame
-	mp3cd
-	ripit
-	pavucontrol
-	libav_tools
-	libavcodec_extra_53
-	recordmydesktop 
-	impressive
-	mencoder
-	audacity
+        mp3gain                   #
+        mp3info
+        lame
+        mp3cd
+        ripit
+        pavucontrol
+        libav_tools
+        libavcodec_extra_53
+        recordmydesktop 
+        impressive
+        mencoder
+        audacity
     )
 }
 

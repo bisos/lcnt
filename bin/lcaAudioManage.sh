@@ -218,9 +218,9 @@ _EOF_
 
     typeset integer i=0
     while (( $i < ${samples} )) ; do
-	typeset thisSample=$(echo "$i / 8000" | bc -l)
-	echo -e "${thisSample}\t0"
-	((i++))
+        typeset thisSample=$(echo "$i / 8000" | bc -l)
+        echo -e "${thisSample}\t0"
+        ((i++))
     done
 
     lpReturn
@@ -254,17 +254,17 @@ _EOF_
     }
 
     if [ $# -gt 0 ] ; then
-	typeset thisOne=""
-	for thisOne in ${@} ; do
-	    opDo mp3info -p "%S\n" ${thisOne}
-	done
+        typeset thisOne=""
+        for thisOne in ${@} ; do
+            opDo mp3info -p "%S\n" ${thisOne}
+        done
     else
-	typeset thisLine=""
-	while read thisLine ; do
-	    if [ "${thisLine}" != "" ] ; then
-		opDo mp3info -p "%S\n" ${thisLine}
-	    fi
-	done
+        typeset thisLine=""
+        while read thisLine ; do
+            if [ "${thisLine}" != "" ] ; then
+                opDo mp3info -p "%S\n" ${thisLine}
+            fi
+        done
     fi
 
     lpReturn
@@ -278,21 +278,21 @@ _EOF_
     typeset integer lenSecs=""
 
     if [ $# -gt 0 ] ; then
-	typeset thisOne=""
-	for thisOne in ${@} ; do
-	    lenSecs=$( opDo mp3info -p "%S\n" ${thisOne} )
-	    lenMilliSecs=$((${lenSecs} * 1000))
-	    echo ${lenMilliSecs}
-	done
+        typeset thisOne=""
+        for thisOne in ${@} ; do
+            lenSecs=$( opDo mp3info -p "%S\n" ${thisOne} )
+            lenMilliSecs=$((${lenSecs} * 1000))
+            echo ${lenMilliSecs}
+        done
     else
-	typeset thisLine=""
-	while read thisLine ; do
-	    if [ "${thisLine}" != "" ] ; then
-		lenSecs=$( opDo mp3info -p "%S\n" ${thisLine} )
-		lenMilliSecs=$((${lenSecs} * 1000))
-		echo ${lenMilliSecs}
-	    fi
-	done
+        typeset thisLine=""
+        while read thisLine ; do
+            if [ "${thisLine}" != "" ] ; then
+                lenSecs=$( opDo mp3info -p "%S\n" ${thisLine} )
+                lenMilliSecs=$((${lenSecs} * 1000))
+                echo ${lenMilliSecs}
+            fi
+        done
     fi
 
     lpReturn
@@ -304,24 +304,24 @@ _EOF_
     }
 
     function procOne {
-	EH_assert [[ $# -eq 1 ]]
-	opDo soxi "$1"
+        EH_assert [[ $# -eq 1 ]]
+        opDo soxi "$1"
     }
 
     # NOTYET, Common Pattern, 
     # Put it in a library or make it be dblock or both
     if [ $# -gt 0 ] ; then
-	typeset thisOne=""
-	for thisOne in ${@} ; do
-	    procOne ${thisOne}
-	done
+        typeset thisOne=""
+        for thisOne in ${@} ; do
+            procOne ${thisOne}
+        done
     else
-	typeset thisLine=""
-	while read thisLine ; do
-	    if [ "${thisLine}" != "" ] ; then
-		procOne ${thisLine}
-	    fi
-	done
+        typeset thisLine=""
+        while read thisLine ; do
+            if [ "${thisLine}" != "" ] ; then
+                procOne ${thisLine}
+            fi
+        done
     fi
 
     lpReturn
@@ -404,15 +404,15 @@ _EOF_
       cdrom="/dev/cdrw"
   else # eq 1
       if [[ $1 == "dashN" ]] ; then 
-	  dashN="-n"
-	  cdrom="/dev/cdrw"
+          dashN="-n"
+          cdrom="/dev/cdrw"
       else
-	  #if [[ -f $1 ]] ; then
-	      cdrom=$1
-	  # else
-	  #     EH_problem "$1 does not exist"
-	  #     return 101
-	  #fi
+          #if [[ -f $1 ]] ; then
+              cdrom=$1
+          # else
+          #     EH_problem "$1 does not exist"
+          #     return 101
+          #fi
       fi
   fi
   
@@ -435,20 +435,20 @@ _EOF_
 
     
     if [[ $# -eq 0 ]] ; then
-	cdrom="/dev/cdrw1"
+        cdrom="/dev/cdrw1"
     else # eq 1
-	#if [[ -f $1 ]] ; then
-	    cdrom=$1
-	#else
-	    #EH_problem "$1 does not exist"
-	    #return 101
-	#fi
+        #if [[ -f $1 ]] ; then
+            cdrom=$1
+        #else
+            #EH_problem "$1 does not exist"
+            #return 101
+        #fi
     fi
 
     thisPlaylist=$( FN_absolutePathGet ${playlist} )
 
     if [ -d /tmp/mp3cd-lsipusr ] ; then
-	opDo rm -r -f /tmp/mp3cd-lsipusr
+        opDo rm -r -f /tmp/mp3cd-lsipusr
     fi
 
     #opDo mp3cd -n -v -d ${cdrom} ${thisPlaylist}
@@ -470,30 +470,30 @@ _EOF_
 
     
     if [[ $# -eq 0 ]] ; then
-	cdrom="/dev/cdrw1"
+        cdrom="/dev/cdrw1"
     else # eq 1
-	if [[ -f $1 ]] ; then
-	    cdrom=$1
-	else
-	    EH_problem "$1 does not exist"
-	    return 101
-	fi
+        if [[ -f $1 ]] ; then
+            cdrom=$1
+        else
+            EH_problem "$1 does not exist"
+            return 101
+        fi
     fi
     
     typeset thisDestDir=""
     
     if [ "${destDir}" != "INVALID" ] ; then
-	thisDestDir=$( FN_absolutePathGet ${destDir} )
+        thisDestDir=$( FN_absolutePathGet ${destDir} )
     fi
 
     if [ "${thisDestDir}" == "" ] ; then
-	if [ ! -d /uniform/Audio ] ; then
-	    EH_problem "Missing /uniform/Audio -- Skipped"
-	    lpReturn 101
-	fi
-	#typeset dateTag=$( date +%y%m%d%H%M%S )
-	#thisDestDir="/uniform/Audio/Incoming/${dateTag}"
-	thisDestDir="/uniform/Audio/Incoming"
+        if [ ! -d /uniform/Audio ] ; then
+            EH_problem "Missing /uniform/Audio -- Skipped"
+            lpReturn 101
+        fi
+        #typeset dateTag=$( date +%y%m%d%H%M%S )
+        #thisDestDir="/uniform/Audio/Incoming/${dateTag}"
+        thisDestDir="/uniform/Audio/Incoming"
     fi
 
     opDo echo mkdir -p ${thisDestDir}
@@ -511,18 +511,18 @@ _EOF_
   }
 
     if [ $# -gt 0 ] ; then
-	typeset thisOne=""
-	for thisOne in ${@} ; do
-	    opDo vis_convertOggToMp3OneFile "${thisOne}"
-	done
+        typeset thisOne=""
+        for thisOne in ${@} ; do
+            opDo vis_convertOggToMp3OneFile "${thisOne}"
+        done
     else
-	typeset thisLine=""
+        typeset thisLine=""
     
-	while read thisLine ; do
-	    if [ "${thisLine}" != "" ] ; then
-		opDo vis_convertOggToMp3OneFile "${thisLine}"
-	    fi
-	done
+        while read thisLine ; do
+            if [ "${thisLine}" != "" ] ; then
+                opDo vis_convertOggToMp3OneFile "${thisLine}"
+            fi
+        done
     fi
 
     lpReturn
@@ -549,9 +549,9 @@ _EOF_
     echo dirsPart="${dirsPart}" nonDirsPart="${nonDirsPart}" thisPrefix="${thisPrefix}" thisExtension="${thisExtension}"
 
     if [ -f "${dirsPart}"/"${thisPrefix}".mp3 ] ; then
-	ANT_cooked " "${dirsPart}"/${thisPrefix}.mp3 exists -- skipping it"
+        ANT_cooked " "${dirsPart}"/${thisPrefix}.mp3 exists -- skipping it"
     else
-	opDo avconv -i "${thisFile}" -acodec libmp3lame -ab 128k "${dirsPart}"/"${thisPrefix}".mp3
+        opDo avconv -i "${thisFile}" -acodec libmp3lame -ab 128k "${dirsPart}"/"${thisPrefix}".mp3
     fi
 
     lpReturn
