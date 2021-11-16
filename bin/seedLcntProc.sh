@@ -2987,7 +2987,8 @@ _EOF_
         opDo FN_dirCreatePathIfNotThere "${lcntBuild_releaseBaseDir}"   
     fi
 
-    #opDoComplain FN_dirCreatePathIfNotThere ./Results    opDo FN_dirCreatePathIfNotThere ./Results
+    #opDoComplain FN_dirCreatePathIfNotThere ./Results
+    opDo FN_dirCreatePathIfNotThere ./Results
 
     function resultsDestinationPath {
         EH_assert [[ $# -eq 1 ]]
@@ -3075,12 +3076,12 @@ _EOF_
                 "pdf")
                     resultsFileDest=$( resultsDestinationPath pdf )
                     if LIST_isIn "name" "${extentList}"  ; then             
-                        echo "${resultsFileDest}"
+                        lpDo echo "${resultsFileDest}"
                         continue
                     fi
                     if LIST_isIn "build" "${extentList}"  ; then                    
                         opDo lcnLcntInputProc.sh -p inFormat=xelatex -p outputs=pdf -i buildDocs  ${lcntBuild_docSrc}
-                        opDo mv ${docSrcPrefix}.pdf ${resultsFileDest}
+                        opDo cp ${docSrcPrefix}.pdf ${resultsFileDest}
                     fi
                     if LIST_isIn "view" "${extentList}"  ; then
                         opDo acroread ${resultsFileDest} &
@@ -3101,7 +3102,7 @@ _EOF_
                         else
                             if LIST_isIn "build" "${extentList}"  ; then                                                            
                                 opDo lcnLcntInputProc.sh -p inFormat=xelatex -p outputs=pdf -i buildDocs  ${lcntBuild_docSrc}
-                                opDo mv ${docSrcPrefix}.pdf ${resultsFileDest}
+                                opDo cp ${docSrcPrefix}.pdf ${resultsFileDest}
                                 
                                 opDo cp -p ${resultsFileDest} ${releaseDestinationPath}
                                 opDo ls -l ${releaseDestinationPath}
@@ -3125,14 +3126,21 @@ _EOF_
                         extent=${storedExtent}
                       else
                         opDo lcnLcntInputProc.sh -p inFormat=xelatex -p outputs=heveaHtml -i buildDocs  ${lcntBuild_docSrc}
-                        if [ -d "${resultsPathDest}" ] ; then
-                            opDo mv "${resultsPathDest}" "${resultsPathDest}"-${dateTag}
-                        fi
-                        opDo mv heveaHtml-${docSrcPrefix} "${resultsPathDest}"
+                        #
+                        # We are not going to move to results for html.
+
+                        # if [ -d "${resultsPathDest}" ] ; then
+                        #     opDo mv "${resultsPathDest}" "${resultsPathDest}"-${dateTag}
+                        # fi
+                        # opDo mv heveaHtml-${docSrcPrefix} "${resultsPathDest}"
+
+                        htmlIndexFile="heveaHtml-${docSrcPrefix}/index.html"
                       fi
                     fi
 
-                    htmlIndexFile="${resultsPathDest}/index.html"
+                    if [ -z "${htmlIndexFile}" ] ; then
+                      htmlIndexFile="${resultsPathDest}/index.html"
+                    fi
 
                     viewCommand=""
                     if LIST_isIn "view" "${extentList}"  ; then
