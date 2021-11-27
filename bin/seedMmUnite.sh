@@ -150,6 +150,7 @@ bx-vlcRecScreen
 bx-vlcRecScreen -h -v -n showRun -p apps=blee -p locSize=topLeft720 -i  prepareApps
 bx-vlcRecScreen -h -v -n showRun -p locSize=topLeft720 -i  recordStart
 bx-desktopCapture -h -v -n showRun -i  recordEnd
+${G_myName} ${extraInfo} -i thumbnailMake
 $( examplesSeperatorChapter "Play the Just Recorded Video" )
 mplayer ./out.ogv
 totem ./out.ogv
@@ -158,7 +159,7 @@ ls -dt out*.ogv | head -1
 $( examplesSeperatorTopLabel "pdfpc Notes Generator (Pdf Presentation Console)" )
 sed -i -e  's/\\\\/\n/g' -e  's/\\par/\n\n/g'  presentationEnFa.pdfpc 
 pdfpc presentationEnFa.pdf  # Two Screens
-pdfpc -S presentationEnFa.pdf  # One Screen
+pdfpc -s -S presentationEnFa.pdf  # One Screen, pres screen
 $( examplesSeperatorTopLabel "Audio Base Setup" )
 ${G_myName} ${extraInfo} -i startAudio
 $( examplesSeperatorSection "Process Impressive Tags Of LaTeX Input" )
@@ -606,8 +607,7 @@ _EOF_
     echo "${effectiveFilesList}" 
 
     lpReturn
-}       
-
+}
 
 
 _CommentBegin_
@@ -772,6 +772,30 @@ _EOF_
     EH_assert [[ $# -gt 0 ]]
 
     opDo vis_presPlaySize 1280x720 $@
+
+    lpReturn
+}
+
+
+function vis_thumbnailMake {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -eq 0 ]]
+
+    lpDo pdftk ./presentationEnFa.pdf cat 1 output thumbnail.pdf
+
+    lpDo pdftoppm -jpeg -jpegopt quality=100 -r 600 thumbnail.pdf thumbnail
+
+    if [ ! -f "thumbnail-1.jpg" ] ; then
+        EH_problem "Missing thumbnail-1.jpg"
+        lpReturn 101
+    fi
+
+    lpDo mv thumbnail-1.jpg thumbnail.jpg
+
+    lpDo echo eog thumbnail.jpg
 
     lpReturn
 }
