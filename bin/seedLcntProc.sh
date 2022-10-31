@@ -201,7 +201,7 @@ function noArgsHook {
                 vis_devExamples
                 ;;
             mm)            # Multi-Media
-                vis_buildExamples
+                vis_multiMedia
                 ;;
             *)
                 EH_problem "unknown examples grouping -- arg: ${eachArg}"
@@ -482,6 +482,27 @@ echo "doNotPublish" > ./LCNT-INFO/activation
 echo "private" > ./LCNT-INFO/activation
 _EOF_
 }
+
+
+function vis_multiMedia {
+ typeset plpdNu=`cat ./LCNT-INFO/lcntNu`
+ typeset plpdCategory=`cat ./LCNT-INFO/pubCategory`
+ local extraInfo=""
+
+
+
+cat  << _EOF_
+$( examplesSeperatorChapter "mmDoc and mmUnite Preps" )
+${G_myName} ${extraInfo} -i mmUniteStart   # Obtains ./mmUnite.sh and ./MmUnitePanel.org
+${G_myName} ${extraInfo} -i mmUnitePrep    # Runs mmUnite.sh, after mmUniteStart
+${G_myName} ${extraInfo} -i mmUniteGens    # Auto Generate Audio/Video Inputs
+${G_myName} ${extraInfo} -i mmUniteClean   # Clean Auto Generated Audio/Video Inputs
+_EOF_
+#
+#Obsoleted:
+# ${G_myName} ${extraInfo} -i mmDocPrep      # Prepare LCNT's environment (symlinks setup)
+}
+
 
 
 _CommentBegin_
@@ -2630,7 +2651,7 @@ _EOF_
 
     #opDo vis_bxtPanel
 
-    opDo ln -s /pub ./pub
+    # opDo ln -s /pub ./pub # Probably unnecessary MB-2022
 
     lpReturn
 }
