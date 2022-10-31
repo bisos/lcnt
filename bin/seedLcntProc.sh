@@ -260,7 +260,8 @@ ${G_myName} dev                # Review warning logs, cleanup, step-by-step buil
 ${G_myName} ${extraInfo}  -i fullClean
 $( examplesSeperatorChapter "Build" )
 ${G_myName} build              # build, build+view, build+release
-${G_myName} ${extraInfo} -p extent="build+view" -i lcntBuild cur
+${G_myName} ${extraInfo} -p extent="build+view" -i lcntBuild cur  # Runs dblock
+${G_myName} ${extraInfo} -p extent="build+view" -i lcntBuild all  # Using enabled list
 $( examplesSeperatorChapter "Export After Building" )
 ${G_myName} export            
 _EOF_
