@@ -521,7 +521,7 @@ _EOF_
 
     opDo FN_fileRmIfThere ./screenCasting.el
 
-    opDo FN_dirDeleteIfThere ./disposition.gened
+    #opDo FN_dirDeleteIfThere ./disposition.gened
     opDo FN_dirDeleteIfThere ./impressive.gened
 
     inBaseDirDo ./audio mmUniteAudio.sh -h -v -n showRun -i fullClean
