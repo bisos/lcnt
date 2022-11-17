@@ -2245,6 +2245,30 @@ _EOF_
     lpReturn
 }
 
+function vis_revealJsDerivedPrepOBSOLETED {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+If G_forceMode is not selected and ./revealJsBase directory exists,
+the base is assumed to be current.
+Otherwise, create the base directory and create the symlinks.
+_EOF_
+    }
+    EH_assert [[ $# -eq 0 ]]
+
+    if [[ "${G_forceMode}" != "force" ]] ; then
+        if [ -d ./revealJsDerived ] ; then
+            lpReturn
+        fi
+    fi
+
+    opDo FN_dirCreatePathIfNotThere ./revealJsDerived
+
+    opDo vis_outputBaseDirLinks ./revealJsDerived
+
+    lpReturn
+}
+
+
 
 _CommentBegin_
 *  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || IIF       ::  vis_outputBaseDirLinks    [[elisp:(org-cycle)][| ]]
@@ -2272,7 +2296,8 @@ _EOF_
     inBaseDirDo ${baseDir} ln -s ../audio .
     inBaseDirDo ${baseDir} ln -s ../video  .
     inBaseDirDo ${baseDir} ln -s ../image  .
-    inBaseDirDo ${baseDir} ln -s ../figures  .        
+    inBaseDirDo ${baseDir} ln -s ../figures  .
+    inBaseDirDo ${baseDir} ln -s ../disposition.gened  .
 
     lpReturn
 }
