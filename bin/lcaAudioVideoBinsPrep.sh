@@ -81,11 +81,18 @@ _EOF_
         pavucontrol
         # libav_tools
         #libav_tools:i386
-        recordmydesktop 
-        impressive
+        #recordmydesktop
+        #impressive
         mencoder
         audacity
         mplayer_gui
+        vlc
+        gimp
+        ffmpeg
+        kdenlive
+        mpv
+        pdfpc
+        pdftk
     )
 }
 
@@ -137,6 +144,77 @@ _EOF_
 
     lpReturn
 }
+
+####+BEGIN: bx:dblock:lsip:binsprep:apt :module "vlc"
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Apt-Pkg       :: vlc [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+item_vlc () { distFamilyGenerationHookRun binsPrep_vlc; }
+
+binsPrep_vlc_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "vlc"; }
+
+####+END:
+
+####+BEGIN: bx:dblock:lsip:binsprep:apt :module "gimp"
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Apt-Pkg       :: gimp [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+item_gimp () { distFamilyGenerationHookRun binsPrep_gimp; }
+
+binsPrep_gimp_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "gimp"; }
+
+####+END:
+
+####+BEGIN: bx:dblock:lsip:binsprep:apt :module "ffmpeg"
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Apt-Pkg       :: ffmpeg [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+item_ffmpeg () { distFamilyGenerationHookRun binsPrep_ffmpeg; }
+
+binsPrep_ffmpeg_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "ffmpeg"; }
+
+####+END:
+
+####+BEGIN: bx:dblock:lsip:binsprep:apt :module "kdenlive"
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Apt-Pkg       :: kdenlive [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+item_kdenlive () { distFamilyGenerationHookRun binsPrep_kdenlive; }
+
+binsPrep_kdenlive_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "kdenlive"; }
+
+####+END:
+
+####+BEGIN: bx:dblock:lsip:binsprep:apt :module "pdfpc"
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Apt-Pkg       :: pdfpc [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+item_pdfpc () { distFamilyGenerationHookRun binsPrep_pdfpc; }
+
+binsPrep_pdfpc_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "pdfpc"; }
+
+####+END:
+
+####+BEGIN: bx:dblock:lsip:binsprep:apt :module "pdftk"
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Apt-Pkg       :: pdftk [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+item_pdftk () { distFamilyGenerationHookRun binsPrep_pdftk; }
+
+binsPrep_pdftk_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "pdftk"; }
+
+####+END:
+
+
+####+BEGIN: bx:dblock:lsip:binsprep:apt :module "mpv"
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Apt-Pkg       :: mpv [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+item_mpv () { distFamilyGenerationHookRun binsPrep_mpv; }
+
+binsPrep_mpv_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "mpv"; }
+
+####+END:
 
 
 
