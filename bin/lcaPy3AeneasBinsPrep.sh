@@ -83,34 +83,19 @@ _EOF_
         "libxml2_dev"
         "libxslt_dev"
         "zlib1g_dev"
+
+        "py3Bisos3PipInstalls"
+        # pipxInstalls
     )
 
     itemOptionalOrderedList=()
     itemLaterOrderedList=()
 
     itemPy3Bisos3PipOrderedList=(
-        "pipx"
-        "unisos.gcipher"       #
-        "yolk3k"               # Did not work with pipx
-        # "twine"                #
+        "aeneas"
     )
 
     itemPipxOrderedList=(
-        "twine"       # for pypi uploading
-        "pipreqs"     # for requirements creation
-        "johnnydep"    # dependency tree
-        "pipdeptree"  # dependency tree
-        # See github.com/hlissner/doom-emacs/blob/develop/modules/lang/python/README.org
-        "pytest"      # Used by blee and doom
-        "nose"        # Used by blee and doom
-        "black"       # Used by blee and doom
-        "isort"       # Used by blee and doom
-        #
-        "mypy"        # Used in python mode
-        "pylint"      # Used in python mode
-        "flake8"      # Used in python mode
-        "pyflakes"
-        "pep8"
     )
 }
 
@@ -311,7 +296,7 @@ vis_py3Bisos3PipInstalls () {
     ANT_raw "Here we process py3Bisos3PipInstalls one by one."
     local each
     for each in ${itemPy3Bisos3PipOrderedList[@]} ; do
-        lpDo sudo -u bisos /bisos/bsip/bin/bisosPyVenvSetup.sh -h -v -n showRun -f -i venvDo py3 reInstall "${each}"
+        lpDo sudo -u bisos /bisos/bsip/bin/bisosPyVenvSetup.sh -h -v -n showRun -f -i venvDo py3/dev reInstall "${each}"
     done
     print
 }
