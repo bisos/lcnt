@@ -99,6 +99,10 @@ lcnt_shortTitle=""
 # PRE parameters
 
 baseDir=""
+incOnly=""
+pre=""
+
+bisosPdfViewer="evince"
 
 _CommentBegin_
 *  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(beginning-of-buffer)][|^]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]] || G-        ::  G_postParamHook    [[elisp:(org-cycle)][| ]]
@@ -260,7 +264,9 @@ ${G_myName} dev                # Review warning logs, cleanup, step-by-step buil
 ${G_myName} ${extraInfo}  -i fullClean
 $( examplesSeperatorChapter "Build" )
 ${G_myName} build              # build, build+view, build+release
-${G_myName} ${extraInfo} -p extent="build+view" -i lcntBuild cur  # Runs dblock
+${G_myName} ${extraInfo} -i beamerDerivedFullBuild  # Updates disposition.gened and
+${G_myName} ${extraInfo} -p pre="clean" -p incOnly="./common/aboutThisDoc" -p extent="build+view" -i lcntBuild cur  # Runs dblock
+${G_myName} ${extraInfo} -p pre="clean" -p extent="build+view" -i lcntBuild cur  # Runs dblock
 ${G_myName} ${extraInfo} -p extent="build+view" -i lcntBuild all  # Using enabled list
 $( examplesSeperatorChapter "Export After Building" )
 ${G_myName} export            
@@ -495,9 +501,12 @@ function vis_multiMedia {
 cat  << _EOF_
 $( examplesSeperatorChapter "mmDoc and mmUnite Preps" )
 ${G_myName} ${extraInfo} -i mmUniteStart   # Obtains ./mmUnite.sh and ./MmUnitePanel.org
-${G_myName} ${extraInfo} -i mmUnitePrep    # Runs mmUnite.sh, after mmUniteStart
-${G_myName} ${extraInfo} -i mmUniteGens    # Auto Generate Audio/Video Inputs
-${G_myName} ${extraInfo} -i mmUniteClean   # Clean Auto Generated Audio/Video Inputs
+mmUnite.sh ${extraInfo} -i screenCastingFullUpdate  # after mmUniteStart, updates disposition
+mmUnite.sh ${extraInfo} -i screenCastingGens  # Auto Generate Audio/Video Inputs
+mmUnite.sh ${extraInfo} -i screenCastingFullClean  # Clean Auto Generated Audio/Video Inputs
+${G_myName} ${extraInfo} -i beamerPdfPages
+${G_myName} ${extraInfo} -i interimFullClean
+${G_myName} ${extraInfo} -i beamerDerivedFullBuild
 _EOF_
 #
 #Obsoleted:
@@ -2507,7 +2516,7 @@ _EOF_
         fi
         if [ "${extent}" == "view" -o "${extent}" == "build+view" ] ; then
             if [ -s  ./${thisPrefix}.pdf ] ; then    
-                opDo acroread ./${thisPrefix}.pdf &
+                opDo ${bisosPdfViewer} ./${thisPrefix}.pdf &
             else
                 EH_problem "Missing ./${thisPrefix}.pdf"
             fi
@@ -2770,7 +2779,7 @@ _CommentBegin_
 *  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || IIF       ::  vis_mmUnitePrep    [[elisp:(org-cycle)][| ]]
 _CommentEnd_
 
-function vis_mmUnitePrep {
+function vis_mmUnitePrep_obsoleted {
     G_funcEntry
     function describeF {  cat  << _EOF_
 Create the Mm Unite Environment
@@ -2791,7 +2800,7 @@ _CommentBegin_
 *  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || IIF       ::  vis_mmUniteGens    [[elisp:(org-cycle)][| ]]
 _CommentEnd_
 
-function vis_mmUniteGens {
+function vis_mmUniteGens_obsoleted {
     G_funcEntry
     function describeF {  cat  << _EOF_
 Create the Mm Unite Environment
@@ -2816,7 +2825,7 @@ _CommentBegin_
 *  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || IIF       ::  vis_mmUniteClean    [[elisp:(org-cycle)][| ]]
 _CommentEnd_
 
-function vis_mmUniteClean {
+function vis_mmUniteClean_obsoleted {
     G_funcEntry
     function describeF {  cat  << _EOF_
 Create the Mm Unite Environment
@@ -2970,8 +2979,6 @@ _EOF_
     lpReturn
 }       
 
-
-
 _CommentBegin_
 *  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(beginning-of-buffer)][|^]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]] || IIC       ::  vis_lcntBuild    [[elisp:(org-cycle)][| ]]
 _CommentEnd_
@@ -2984,6 +2991,8 @@ Get articleEnFa.ttytex name from curBuild.
 -p extent=build || extent=release || extent=build+release  (DEFAULT=build+release)
 -p extent=build || extent=view || extent=build+view  (DEFAULT=build+view)
 -p extent=name
+-p pre=none || pre=clean (default=none)
+-p incOnly=commaSepStr || incOnly="" (default="")
 _EOF_
                        }
 
@@ -3037,6 +3046,53 @@ _EOF_
     #opDoComplain FN_dirCreatePathIfNotThere ./Results
     opDo FN_dirCreatePathIfNotThere ./Results
 
+    function preProc {
+      if [ -z "${pre}" ] ; then
+        pre="none"
+      else
+        # pre is a comma separated string
+        local preArray=(${pre//,/})
+        local eachCmnd=""
+        for eachCmnd in ${preArray[@]}; do
+          case ${eachCmnd} in
+            "clean")
+              lpDo vis_fullClean
+              ;;
+            "none")
+              doNothing
+              ;;
+            *)
+              EH_problem "${eachCmnd} -- Unexpected"
+              return
+              ;;
+          esac
+        done
+      fi
+    } ; lpDo preProc
+
+    function incOnlyProc {
+      local here=$(pwd)
+      local incOnlyBaseDir="${here}/LCNT-INFO/Builds/includeOnly"
+      local incOnlyFile_filesList="${here}/LCNT-INFO/Builds/includeOnly/filesList"
+
+      if [ ! -d "${incOnlyBaseDir}" ] ; then
+        lpDo mkdir -p "${incOnlyBaseDir}"
+      fi
+
+      if [ -z "${incOnly}" ] ; then
+        lpDo cp /dev/null "${incOnlyFile_filesList}"
+      else
+        # incOnly is a comma separated string
+        local incOnlyArray=(${incOnly//,/})
+        local eachFile=""
+        lpDo cp /dev/null "${incOnlyFile_filesList}"
+        for eachFile in ${incOnlyArray[@]}; do
+          echo "${eachFile}" >> "${incOnlyFile_filesList}"
+        done
+      fi
+      lpDo ls -l "${incOnlyFile_filesList}"
+    } ; lpDo incOnlyProc
+
     function resultsDestinationPath {
         EH_assert [[ $# -eq 1 ]]
         local resultType="$1"
@@ -3084,6 +3140,12 @@ _EOF_
         esac
     }
 
+    if [ -f "./curBuild" ] ; then
+      if [ ! -f "./curBuild.saved" ] ; then
+        lpDo mv ./curBuild ./curBuild.saved
+      fi
+    fi
+
     for inFile in ${inFilesList}; do
         #opDo ls -l ${inFile}
         #
@@ -3109,6 +3171,8 @@ _EOF_
         if [ "${1}" != "dev" ] ; then
           if ! LIST_isIn "name" "${extentList}"  ; then
             if [ ! -z "${lcntBuild_docSrc}" ] ; then
+              opDo vis_lcntBuildSetCur ${inFile}
+              lpDo ls -l ./curBuild ${inFile}
               opDo vis_dblockUpdateFile ${lcntBuild_docSrc}
             else
               EH_problem "Blank lcntBuild_docSrc -- skipped"
@@ -3126,16 +3190,16 @@ _EOF_
                         lpDo echo "${resultsFileDest}"
                         continue
                     fi
-                    if LIST_isIn "build" "${extentList}"  ; then                    
+                    if LIST_isIn "build" "${extentList}"  ; then
                         opDo lcnLcntInputProc.sh -p inFormat=xelatex -p outputs=pdf -i buildDocs  ${lcntBuild_docSrc}
                         opDo cp ${docSrcPrefix}.pdf ${resultsFileDest}
                     fi
                     if LIST_isIn "view" "${extentList}"  ; then
-                        opDo acroread ${resultsFileDest} &
+                        opDo ${bisosPdfViewer} ${resultsFileDest} &
                     else
                         # When view was not specified, we still want the run line
                         if LIST_isIn "build" "${extentList}"  ; then                                                        
-                            echo acroread ${resultsFileDest}
+                            echo ${bisosPdfViewer} ${resultsFileDest}
                         fi
                     fi
                     
@@ -3313,6 +3377,11 @@ _EOF_
             esac
         done
     done
+
+    if [ -f "./curBuild.saved" ] ; then
+        lpDo mv ./curBuild.saved ./curBuild
+    fi
+
 
     #
     # 4) Create accessPages for both html and md
@@ -3700,6 +3769,61 @@ _EOF_
     
     lpReturn
 }
+
+
+function vis_beamerPdfPages {
+    G_funcEntry
+    function describeF {  cat  << _EOF_
+Will run the python file that splits the presPdf into pages corresponding to pages.
+beamerPdfPages.cs does that work using pdftk.
+_EOF_
+    }
+
+    lpDo beamerPdfPages.cs -v 20  -i updatePages ./presentationEnFa.pdf
+
+    lpReturn
+}
+
+
+function vis_interimFullClean {
+    G_funcEntry
+    function describeF {  cat  << _EOF_
+
+_EOF_
+    }
+
+    lpDo lcntProc.sh  -i fullClean
+    lpDo lcntProc.sh  -i mmUniteClean   # Clean Auto Generated Audio/Video Inputs
+
+    lpReturn
+}
+
+
+function vis_beamerDerivedFullBuild {
+    G_funcEntry
+    function describeF {  cat  << _EOF_
+
+_EOF_
+    }
+
+    lpDo lcntProc.sh  -i fullClean
+
+    #lpDo mmUnite.sh ${extraInfo} -i screenCastingFullUpdate # Obsoleted
+
+    opDo lcntProc.sh -i dblockUpdateFile presentationEnFa.ttytex
+    opDo lcnLcntInputProc.sh -p inFormat=xelatex -p outputs=pdf -i buildDocs presentationEnFa.ttytex
+
+    opDo FN_dirDeleteIfThere ./disposition.gened
+
+    opDo beamerExternalExtensions.py -v 20 -i latexSrcToDispositionUpdate ./presentationEnFa.pdf
+
+    lpDo beamerPdfPages.cs -v 20  -i updatePages ./presentationEnFa.pdf
+
+    lpDo lcntProc.sh -h -v -n showRun -p extent="build+view" -i lcntBuild cur  # Runs dblock
+
+    lpReturn
+}
+
 
 
 _CommentBegin_

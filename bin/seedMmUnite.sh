@@ -131,23 +131,17 @@ ${G_myName} ${extraInfo} -i screenCastingFullUpdate
 $( examplesSeperatorChapter "Dispositions/Playing/Recording Examples" )
 $( examplesSeperatorSection "Presentation Play Raw Commands" )
 acroread ${presPdfFile}
-pdfpc ${presPdfFile}
-impressive ${presPdfFile}
-$( examplesSeperatorSection "Presentation Play (impressive)" )
-${G_myName} ${extraInfo} -f -i presPlaySize 1280x720 ${presPdfFile} slideShowRepeat
-${G_myName} ${extraInfo} -f -i presPlaySize 1280x720 ${presPdfFile} presenter
-${G_myName} ${extraInfo} -i presPlaySize 1280x720 ${presPdfFile} voiceOver
-${G_myName} ${extraInfo} -f -i presPlaySize 1280x720 ${presPdfFile} voiceOver
-$( examplesSeperatorSection "Presentation Play And Record (impressive)" )
-${G_myName} ${extraInfo} -i presPlayRecSize topLeft720 1280x720 ${presPdfFile} voiceOver
+xpdf ${presPdfFile}
+evince ${presPdfFile}
+$( examplesSeperatorTopLabel "pdfpc Notes Generator (Pdf Presentation Console)" )
+sed -i -e  's/\\\\/\n/g' -e  's/\\par/\n\n/g'  presentationEnFa.pdfpc
+pdfpc presentationEnFa.pdf  # Two Screens
+pdfpc -s -S presentationEnFa.pdf  # One Screen, pres screen
 $( examplesSeperatorChapter "Disposition Setup/Set/Update" )
 beamerExternalExtensions.py
-beamerExternalExtensions.py -v 30 -i latexSrcToDispositionUpdate ${presPdfFile}
-beamerExternalExtensions.py -v 30 -i dispositionToImpressiveInfoStdout  voiceOver presenter         # Args specify purpose
-beamerExternalExtensions.py -v 30 -i dispositionToImpressiveInfoStdout  voiceOver
-$( examplesSeperatorChapter "Screen Capture Preparations And Control" )
-bx-vlcRecScreen
-bx-vlcRecScreen -h -v -n showRun -p apps=blee -p locSize=topLeft720 -i  prepareApps
+beamerExternalExtensions.py -v 20 -i latexSrcToDispositionUpdate ${presPdfFile}
+beamerExternalExtensions.py -v 30 -i dispositionToImpressiveInfoStdout  voiceOver presenter         # Obsoleted -- Args specify purpose
+$( examplesSeperatorChapter "Screen Capture Preparations And Control --- To be evolved for OBS" )
 bx-vlcRecScreen -h -v -n showRun -p locSize=topLeft720 -i  recordStart
 bx-desktopCapture -h -v -n showRun -i  recordEnd
 ${G_myName} ${extraInfo} -i thumbnailMake
@@ -156,18 +150,20 @@ mplayer ./out.ogv
 totem ./out.ogv
 vlc ./out.ogv
 ls -dt out*.ogv | head -1
-$( examplesSeperatorTopLabel "pdfpc Notes Generator (Pdf Presentation Console)" )
-sed -i -e  's/\\\\/\n/g' -e  's/\\par/\n\n/g'  presentationEnFa.pdfpc 
-pdfpc presentationEnFa.pdf  # Two Screens
-pdfpc -s -S presentationEnFa.pdf  # One Screen, pres screen
 $( examplesSeperatorTopLabel "Audio Base Setup" )
 ${G_myName} ${extraInfo} -i startAudio
-$( examplesSeperatorSection "Process Impressive Tags Of LaTeX Input" )
+${G_myName} ${extraInfo} -i startAudioVideo
+${G_myName} ${extraInfo} -i baseSetup
 ${G_myName} ${extraInfo} -i impressiveTagsUpdate
 beamerExternalExtensions.py -v 30 --load ./presentationEnFa-itags.py -i loadProc
 $( examplesSeperatorSection "Developer Examples" ) 
 ${G_myName} ${extraInfo} -i devExamples
-$( examplesSeperatorSection "Release / Stage For Publication/Export" ) 
+$( examplesSeperatorSection "ScreenCasting Preparations And Execution" )
+${G_myName} ${extraInfo} -i screenCastingFullClean
+${G_myName} ${extraInfo} -i screenCastingFullUpdate
+$( examplesSeperatorSection "Initial Templates Development" )
+${G_myName} ${extraInfo} -i buildRevealPreview ./presentationEnFa.ttytex
+$( examplesSeperatorSection "Release / Stage For Publication/Export" )
 ${G_myName} ${extraInfo} -i pdfOutImages \$( lcntProc.sh -i  docsList )
 ${G_myName} ${extraInfo} -i videoResultFiles
 ${G_myName} ${extraInfo} -i videoResultFilesStart  # Prepare videoResults.fvd
@@ -202,6 +198,78 @@ ${G_myName} ${extraInfo} -i presenterBrowser                    # Play -- Full S
 _EOF_
 
 }
+
+
+function vis_examplesPreImpressive {
+    typeset extraInfo="-h -v -n showRun"
+    #typeset extraInfo=""
+    typeset runInfo="-p ri=lsipusr:passive"
+
+    typeset examplesInfo="${extraInfo} ${runInfo}"
+
+    visLibExamplesOutput ${G_myName}
+
+  typeset presPdfFile="./presentationEnFa.pdf"
+
+  cat  << _EOF_
+---  Documentation / How-To  ---
+$( examplesSeperatorTopLabel "Presentation Dispositions" )
+$( examplesSeperatorChapter "Build / Prepare The Presentation And Disposition Base" )
+$( examplesSeperatorSection "ScreenCasting Preparations And Execution" )
+${G_myName} ${extraInfo} -i screenCastingFullClean
+${G_myName} ${extraInfo} -i screenCastingFullUpdate
+$( examplesSeperatorChapter "Dispositions/Playing/Recording Examples" )
+$( examplesSeperatorSection "Presentation Play Raw Commands" )
+acroread ${presPdfFile}
+pdfpc ${presPdfFile}
+impressive ${presPdfFile}
+$( examplesSeperatorSection "Presentation Play (impressive)" )
+${G_myName} ${extraInfo} -f -i presPlaySize 1280x720 ${presPdfFile} slideShowRepeat
+${G_myName} ${extraInfo} -f -i presPlaySize 1280x720 ${presPdfFile} presenter
+${G_myName} ${extraInfo} -i presPlaySize 1280x720 ${presPdfFile} voiceOver
+${G_myName} ${extraInfo} -f -i presPlaySize 1280x720 ${presPdfFile} voiceOver
+$( examplesSeperatorSection "Presentation Play And Record (impressive)" )
+${G_myName} ${extraInfo} -i presPlayRecSize topLeft720 1280x720 ${presPdfFile} voiceOver
+$( examplesSeperatorChapter "Disposition Setup/Set/Update" )
+beamerExternalExtensions.py
+beamerExternalExtensions.py -v 30 -i latexSrcToDispositionUpdate ${presPdfFile}
+beamerExternalExtensions.py -v 30 -i dispositionToImpressiveInfoStdout  voiceOver presenter         # Args specify purpose
+beamerExternalExtensions.py -v 30 -i dispositionToImpressiveInfoStdout  voiceOver
+$( examplesSeperatorChapter "Screen Capture Preparations And Control" )
+bx-vlcRecScreen
+bx-vlcRecScreen -h -v -n showRun -p apps=blee -p locSize=topLeft720 -i  prepareApps
+bx-vlcRecScreen -h -v -n showRun -p locSize=topLeft720 -i  recordStart
+bx-desktopCapture -h -v -n showRun -i  recordEnd
+${G_myName} ${extraInfo} -i thumbnailMake
+$( examplesSeperatorChapter "Play the Just Recorded Video" )
+mplayer ./out.ogv
+totem ./out.ogv
+vlc ./out.ogv
+ls -dt out*.ogv | head -1
+$( examplesSeperatorTopLabel "pdfpc Notes Generator (Pdf Presentation Console)" )
+sed -i -e  's/\\\\/\n/g' -e  's/\\par/\n\n/g'  presentationEnFa.pdfpc
+pdfpc presentationEnFa.pdf  # Two Screens
+pdfpc -s -S presentationEnFa.pdf  # One Screen, pres screen
+$( examplesSeperatorTopLabel "Audio Base Setup" )
+${G_myName} ${extraInfo} -i startAudio
+$( examplesSeperatorSection "Process Impressive Tags Of LaTeX Input" )
+${G_myName} ${extraInfo} -i impressiveTagsUpdate
+beamerExternalExtensions.py -v 30 --load ./presentationEnFa-itags.py -i loadProc
+$( examplesSeperatorSection "Developer Examples" )
+${G_myName} ${extraInfo} -i devExamples
+$( examplesSeperatorSection "Release / Stage For Publication/Export" )
+${G_myName} ${extraInfo} -i pdfOutImages \$( lcntProc.sh -i  docsList )
+${G_myName} ${extraInfo} -i videoResultFiles
+${G_myName} ${extraInfo} -i videoResultFilesStart  # Prepare videoResults.fvd
+$( examplesSeperatorSection "Full Actions" )
+${G_myName} ${extraInfo} -i fullClean
+_EOF_
+
+  hookRun "examplesHookPost"
+
+}
+
+
 
 
 noArgsHook() {

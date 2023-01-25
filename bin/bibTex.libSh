@@ -60,20 +60,20 @@ _EOF_
     local bibtexProgram=$( which bibtex )
     local biberProgram=$( which biber )
 
-    if  grep -q '^\\usepackage{biblatex}' "${thisOne}" ; then
+    if  grep -q '\\usepackage.*{biblatex}' "${thisOne}" ; then
         if [ -z "${biberProgram}" ] ; then
             EH_problem "Missing biber program"
             lpReturn 101
         fi
         opDo "${biberProgram}" "${thisPrefix}"
-    elif grep -q '^\\bibliographystyle{' "${thisOne}" ; then
+    elif grep -q '\\bibliographystyle{' "${thisOne}" ; then
         if [ -z "${bibtexProgram}" ] ; then
             EH_problem "Missing bibtex program"
             lpReturn 101
         fi
         opDo "${bibtexProgram}" "${thisPrefix}"
     else
-        ANT_cooked "No bib features detected -- running of bibtex SKIPPED"
+        ANT_cooked "No bib features detected in ${thisOne} -- running of bibtex SKIPPED"
     fi
 
     lpReturn

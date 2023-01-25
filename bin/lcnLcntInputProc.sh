@@ -339,7 +339,10 @@ function doing_realclean {
    ${1}.xdy \
    ${1}.tty \
    ${1}.*.vrb \
+   ${1}.vrb \
    ${1}.bcf \
+   ${1}.mtc* \
+   ${1}.maf \
    ${1}.run.xml \
    ${1}.ps \
    ${1}.pdf missfont.log comment.cut *~
@@ -489,6 +492,9 @@ function ttytexToPdf {
           pdflatex ${extraLatexOptions} $1.tex
           ;;
       "xelatex")
+             if [ "$1" == "presentationEnFa" ] ; then
+                 opDo xelatex  ${extraLatexOptions} $1.tex
+             else
           opDo xelatex  ${extraLatexOptions} $1.tex
           #opDo echo SKIPPED: bibtex $1
           opDo vis_bibTexProvider_run $1.ttytex   
@@ -496,6 +502,7 @@ function ttytexToPdf {
           opDo makeglossaries $1          
           opDo xelatex  ${extraLatexOptions} $1.tex
           opDo xelatex  ${extraLatexOptions} $1.tex
+             fi
           ;;
       *)
           EH_problem "Unknown inFormat ${inFormat}"

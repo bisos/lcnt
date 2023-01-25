@@ -898,7 +898,11 @@ function vis_lcntBaseConfigMulti {
 
   startLcntProcTemplate=""
   startLcntProcFile=""
-  
+
+  startDocPresArt=""
+  startDocBodyArt=""
+  startDocBodyPres=""
+
   case ${multiFormats} in 
       "memo:en+fa")
             startTemplateArticle="memoMainEnFa.ttytex.start"
@@ -1537,6 +1541,8 @@ function vis_lcntInfoGen {
   EH_assert [[ $# -eq 0 ]]
   EH_assert [[ "${srcForms}_" != "INVALID_" ]]
   EH_assert [[ "${srcLangs}_" != "INVALID_" ]]
+
+  local lcntSource_bystarUid=$(id -u -n)
 
   #set -x
   lcnLcntPre
