@@ -90,7 +90,13 @@ function vis_enabledBuildsDirsList {
     local inFile="./LCNT-INFO/Builds/enabledList"
     local enabledDirsList=""
     local each=""
-    
+
+    if [ -z "${enabled}" ] ; then
+        inFile="./LCNT-INFO/Builds/enabledList"
+    else
+        inFile="${enabled}"
+    fi
+
     if [ -f "${inFile}" ] ; then
         enabledDirsList=$( cat "${inFile}" )
         for each in ${enabledDirsList}; do

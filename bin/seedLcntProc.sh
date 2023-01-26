@@ -101,6 +101,7 @@ lcnt_shortTitle=""
 baseDir=""
 incOnly=""
 pre=""
+enabled=""
 
 bisosPdfViewer="evince"
 
@@ -267,7 +268,7 @@ ${G_myName} build              # build, build+view, build+release
 ${G_myName} ${extraInfo} -i beamerDerivedFullBuild  # Updates disposition.gened and
 ${G_myName} ${extraInfo} -p pre="clean" -p incOnly="./common/aboutThisDoc" -p extent="build+view" -i lcntBuild cur  # Runs dblock
 ${G_myName} ${extraInfo} -p pre="clean" -p extent="build+view" -i lcntBuild cur  # Runs dblock
-${G_myName} ${extraInfo} -p extent="build+view" -i lcntBuild all  # Using enabled list
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view" -i lcntBuild all  # Using enabled list
 $( examplesSeperatorChapter "Export After Building" )
 ${G_myName} export            
 _EOF_
@@ -703,8 +704,13 @@ ${G_myName} ${extraInfo} -p extent="build+release" -i lcntBuild dev          # D
 $( examplesSeperatorChapter "Build Info" )
 ${G_myName} ${extraInfo} -i lcntBuildInfo
 ls -l ./curBuild; grep . ./curBuild/*
-cat ./LCNT-INFO/Builds/enabledList
+cat ./LCNT-INFO/Builds/enabledList./LCNT-INFO/Builds/enabledList
 find  ./LCNT-INFO/Builds -type f -print | grep -v '~' | xargs grep .
+$( examplesSeperatorChapter "Build With Enabled Lists" )
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view" -i lcntBuild all  # Using enabled list
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList.full" -p extent="build+view" -i lcntBuild all  # Using enabled list
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList.covers" -p extent="build+view" -i lcntBuild all  # Using enabled list
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList.books" -p extent="build+view" -i lcntBuild all  # Using enabled list
 $( examplesSeperatorChapter "Export Info" )
 ${G_myName} ${extraInfo} -i lcntExportInfo
 ls -l ./curExport; grep . ./curExport/*
@@ -3140,9 +3146,9 @@ _EOF_
         esac
     }
 
-    if [ -f "./curBuild" ] ; then
-      if [ ! -f "./curBuild.saved" ] ; then
-        lpDo mv ./curBuild ./curBuild.saved
+    if [ -e "./curBuild" ] ; then
+      if [ ! -e "./curBuild.saved" ] ; then
+        lpDo cp -p -r ./curBuild ./curBuild.saved
       fi
     fi
 
@@ -3171,8 +3177,10 @@ _EOF_
         if [ "${1}" != "dev" ] ; then
           if ! LIST_isIn "name" "${extentList}"  ; then
             if [ ! -z "${lcntBuild_docSrc}" ] ; then
-              opDo vis_lcntBuildSetCur ${inFile}
-              lpDo ls -l ./curBuild ${inFile}
+              if [ "${1}" != "cur" ] ; then
+                opDo vis_lcntBuildSetCur ${inFile}
+              fi
+              lpDo ls -l ./curBuild ${inFile} ./curBuild.saved
               opDo vis_dblockUpdateFile ${lcntBuild_docSrc}
             else
               EH_problem "Blank lcntBuild_docSrc -- skipped"
@@ -3378,10 +3386,10 @@ _EOF_
         done
     done
 
-    if [ -f "./curBuild.saved" ] ; then
+    if [ -e "./curBuild.saved" ] ; then
         lpDo mv ./curBuild.saved ./curBuild
+        lpDo ls -l ./curBuild
     fi
-
 
     #
     # 4) Create accessPages for both html and md
