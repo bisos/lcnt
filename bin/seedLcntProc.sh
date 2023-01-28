@@ -238,6 +238,8 @@ _EOF_
     #typeset extraInfo=""
     typeset runInfo="-p ri=lsipusr:passive"
 
+    typeset curBuildEndLink=$( FN_nonDirsPart $(  FN_absolutePathGet ./curBuild ))
+
     typeset examplesInfo="${extraInfo} ${runInfo}"
 
  cat  << _EOF_
@@ -263,7 +265,7 @@ ${G_myName} audio
 $( examplesSeperatorChapter "Develop" )
 ${G_myName} dev                # Review warning logs, cleanup, step-by-step builds, debug
 ${G_myName} ${extraInfo}  -i fullClean
-$( examplesSeperatorChapter "Build" )
+$( examplesSeperatorChapter "Build --- curBuild=${curBuildEndLink}" )
 ${G_myName} build              # build, build+view, build+release
 ${G_myName} ${extraInfo} -i beamerDerivedFullBuild  # Updates disposition.gened and
 ${G_myName} ${extraInfo} -p pre="clean" -p incOnly="./common/aboutThisDoc" -p extent="build+view" -i lcntBuild cur  # Runs dblock
