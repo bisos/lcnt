@@ -196,6 +196,7 @@ ${G_myName} ${extraInfo} -i getLcntNuBaseInfo PLPC-120025
 ${G_myName} ${extraInfo}  -i allPlpcBib
 --- Bib Item ---
 ${G_myName} ${extraInfo} -p cntntRawHome=. -i bibItemStdout
+${G_myName} ${extraInfo} -p cntntRawHome=. -i latexbibItemStdout
 ${G_myName} ${extraInfo} -p cntntRawHome=.  -p urlFormat="url" -i bibItemStdout > ./lcnt.bib.gened
 ${G_myName} ${extraInfo} -p cntntRawHome=. -i bibHtmlShortStdout
 ${G_myName} ${extraInfo} -p cntntRawHome=. -i bibHtmlLongStdout
@@ -204,6 +205,7 @@ ${G_myName} ${extraInfo} -p cntntRawHome=. -i lcntNuStdout
 ${G_myName} ${extraInfo} -p cntntRawHome=. -i bibDescription
 --- inList / Output: .bib
 ${G_myName} ${extraInfo} -p inListLcntNu="/lcnt/outputs/all/lists/nuBaseDir" -i inListFullBibOut all
+${G_myName} ${extraInfo} -p inListLcntNu="/lcnt/outputs/all/lists/nuBaseDir" -i inListFullBibOutLatex all
 ${G_myName} ${extraInfo} -p inListLcntNu="/lcnt/outputs/all/lists/nuBaseDir" -p urlFormat="url" -i inListFullBibOut all
 ${G_myName} ${extraInfo} -p inListLcntNu=${one_inListLcntNu} -i inListDotBibOut all
 ${G_myName} ${extraInfo}  -i inListDotBibOut PLPC-100011
@@ -481,6 +483,103 @@ _EOF_
   #configTheTemplate ${docStartTemplate} > ${docFileName}
   
 }
+
+function vis_latexbibItemStdout {
+
+  EH_assert [[ $# -eq 0 ]]
+
+  if [ -s  "./lcnt.bib" ] ; then
+      opDo cat ./lcnt.bib
+      lpReturn
+  fi
+
+  #docType=$1
+
+  lcnLcntPre
+
+  lcntInfoPrep ${cntntRawHome}
+
+  lcntPathAnalyze ${cntntRawHome}
+
+
+  case ${lcnt_pubCategory} in
+    "Permanent"|"LCNT"|"PLPC")
+            bibType="Permanent Libre Published Content"
+       ;;
+    "Records"|"RLCNT"|"record")
+            bibType="Published Libre Record"
+       ;;
+    "DRAFT"|"DLCNT"|"draft")
+            bibType="Draft Libre Published Content"
+       ;;
+    "Private")
+            bibType="Private Libre Generated Content"
+       ;;
+    "Repub")
+            bibType="Re-Published Content"
+       ;;
+    "SW")
+            bibType="Software Content"
+       ;;
+    *)
+       EH_problem "${lcnt_pubCategory} -- Unexpected"
+       return
+       ;;
+  esac
+
+  typeset lcnt_authors=""
+  typeset thisAuthor=""
+  for (( i=1;i<=${author_count};i++ )) ; do
+      if [ "${lcnt_author_lang[$i]}" = "fa" ] ; then
+          thisAuthor="\begin{fa} ${lcnt_author_name[$i]} \end{fa}"
+      else
+          thisAuthor="${lcnt_author_name[$i]}"
+      fi
+      if [[ "${lcnt_authors}_" == "_" ]] ; then
+          lcnt_authors="${thisAuthor}"
+      else
+          lcnt_authors="${lcnt_authors}, ${thisAuthor}"
+      fi
+  done
+
+  set -- $(IFS="+"; echo ${lcnt_docSrcLangs})
+  typeset docSrcLangsList=$*
+  typeset primarySrcLang=$1
+
+
+  if [ "${primarySrcLang}" = "fa" ] ; then
+      bibTitle="\begin{fa} ${lcnt_mainTitle} ${lcnt_subTitle} ${lcnt_subSubTitle} \end{fa}"
+  else
+      bibTitle="${lcnt_mainTitle} ${lcnt_subTitle} ${lcnt_subSubTitle}"
+  fi
+
+  echo ${lcnt_description} > /tmp/descriptionFile.$$
+  html2text  /tmp/descriptionFile.$$ >  /tmp/descriptionFile_text.$$
+  bibAbstract=`cat /tmp/descriptionFile_text.$$ | sed -e 's:":\\\\":g'`
+  /bin/rm /tmp/descriptionFile.$$ /tmp/descriptionFile_text.$$
+
+  bibLocation=`pwd`
+
+  bibMonth=`date -d "${lcnt_date}" +%m`
+  bibYear=`date -d "${lcnt_date}" +%G`
+
+      cat  << _EOF_
+
+@techreport{${lcnt_pubCategory}-${lcnt_lcntNu},
+   author        = {${lcnt_authors}},
+   title         = {${bibTitle}},
+   type          = {${bibType}},
+   number        = {${lcnt_lcntNu}},
+   institution   = {Autonomously Self-Published},
+   month         = {${bibMonth}},
+   year          = {${bibYear}},
+   location      = {${bibLocation}}
+}
+
+_EOF_
+
+}
+
 
 _CommentBegin_
 *  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(beginning-of-buffer)][|^]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]] || IIC       ::  vis_lcntNuStdout    [[elisp:(org-cycle)][| ]]
@@ -911,6 +1010,46 @@ function vis_inListDotBibOut {
   done
 }
 
+function vis_inListDotBibOutLatex {
+
+  EH_assert [[ $# -gt 0 ]]
+
+  typeset docEntries="$@"
+  typeset outputFile=""    #existed before -p outFile was added -- should be cleaned up.
+
+  if [ "${outFile}" == "MANDATORY" ] ; then
+      outFile=""
+  fi
+
+  typeset oneDocEntry
+  for oneDocEntry in ${docEntries}; do
+    if [[ "${oneDocEntry}_" == "all_" ]]; then
+      EH_assert [ -f  ${inListLcntNu} ]
+      goThroughList ${inListLcntNu} ${visibleFunction}
+      return
+    fi
+    opDo getLcntNuBase ${oneDocEntry}
+    typeset this_cntntRawHome="${cntntRawHome}"
+    lcntInfoPrep ${this_cntntRawHome}
+
+    print "####### Generate .bib for ${lcntNu} ##############"
+
+    if [ -z "${outFile}" ] ; then
+        outputFile="${docModulePath}/${lcnt_pubCategory}-${lcnt_lcntNu}.bib"
+    else
+        outputFile="${outFile}"
+    fi
+
+    FN_dirCreatePathIfNotThere `dirname ${outputFile}`
+    #${G_myName} -p cntntRawHome="${this_cntntRawHome}" -i bibItemStdout 2> /dev/null > ${outputFile}
+    ${G_myName} -p cntntRawHome="${this_cntntRawHome}" -i latexbibItemStdout 2> /dev/null > ${outputFile}
+    opDo ls -l ${outputFile}
+  done
+}
+
+
+
+
 _CommentBegin_
 *  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(beginning-of-buffer)][|^]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]] || IIC       ::  vis_inListFullBibOut    [[elisp:(org-cycle)][| ]]
 _CommentEnd_
@@ -949,6 +1088,43 @@ function vis_inListFullBibOut {
 
   opDo ls -l ${outFile}
 }
+
+
+function vis_inListFullBibOutLatex {
+
+  EH_assert [[ $# -gt 0 ]]
+
+  if [ "${outFile}_" == "MANDATORY_" ] ; then
+      if [ "${urlFormat}" = "url" ] ; then
+          outFile="/lcnt/outputs/all/plpcUrl.bib"
+      else
+          outFile="/lcnt/outputs/all/plpc.bib"
+      fi
+  fi
+
+  typeset docEntries="$@"
+
+  typeset oneDocEntry
+  for oneDocEntry in ${docEntries}; do
+    if [[ "${oneDocEntry}_" == "all_" ]]; then
+      FN_fileSafeKeep ${outFile}
+
+      EH_assert [ -f  ${inListLcntNu} ]
+      goThroughList ${inListLcntNu} ${visibleFunction}
+      return
+    fi
+    opDo getLcntNuBase ${oneDocEntry}
+    typeset this_cntntRawHome="${cntntRawHome}"
+    lcntInfoPrep ${this_cntntRawHome}
+
+    #print "####### Generate .bib for ${lcntNu} ##############"
+
+    ${G_myName} -p cntntRawHome="${this_cntntRawHome}" -p urlFormat=${urlFormat} -i latexbibItemStdout 2> /dev/null >> ${outFile}
+  done
+
+  opDo ls -l ${outFile}
+}
+
 
 
 

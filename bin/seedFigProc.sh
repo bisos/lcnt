@@ -13,6 +13,7 @@ if [ "${loadFiles}" == "" ] ; then
 fi
 ####+END:
 
+. ${opBinBase}/bleeLib.sh
 
 function vis_examples {
   typeset extraInfo="-v -n showRun"
@@ -50,6 +51,7 @@ ${G_myName} ${extraInfo} -i odgToPng ${latestOdg}
 ${G_myName} ${extraInfo} -i srcConvert ${latestOdg}
 ${G_myName} ${extraInfo} -i genFigTex ${latestOdgSansOdg}
 ${G_myName} ${extraInfo} -i genStartFigInfoFiles ${latestOdgSansOdg}
+${G_myName} ${extraInfo} -i figInfoFilesEdit ${latestOdgSansOdg}
 _EOF_
 figsListCmdLines
 hookRun "examplesHookPost"
@@ -293,22 +295,25 @@ function vis_genStartFigInfoFiles {
 function vis_figInfoFilesEdit {
   EH_assert [[ $# -gt 0 ]]
 
+  local thisEmacsClient=$( vis_thisEmacsClient )
+
+
   for thisOne in $@ ; do
 
       if [ -f ${thisOne}.title ] ; then
-	  opDo emacsclient  "${thisOne}.title"
+	  opDo ${thisEmacsClient}  "${thisOne}.title"
       else
 	  EH_problem "${thisOne}.title"
       fi
 
       if [ -f ${thisOne}.caption ] ; then
-	  opDo emacsclient  "${thisOne}.caption"
+	  opDo ${thisEmacsClient}  "${thisOne}.caption"
       else
 	  EH_problem "${thisOne}.caption"
       fi
 
       if [ -f ${thisOne}.style ] ; then
-	  opDo emacsclient   "${thisOne}.style"
+	  opDo ${thisEmacsClient}   "${thisOne}.style"
       else
 	  EH_problem  ${thisOne}.style
       fi

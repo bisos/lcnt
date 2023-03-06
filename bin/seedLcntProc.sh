@@ -193,6 +193,9 @@ function noArgsHook {
             convert)        
                 vis_convertExamples
                 ;;
+            "recurse")
+                vis_recurseExamples
+                ;;
             "export")         # Build, release, export
                 vis_exportExamples
                 ;;
@@ -828,6 +831,41 @@ cat ./LCNT-INFO/Exports/enabledList
 find  ./LCNT-INFO/Exports -type f -print | grep -v '~' | xargs grep .
 _EOF_
     
+    lpReturn
+}
+
+
+function vis_recurseExamples {
+    G_funcEntry
+    function describeF {  cat  << _EOF_
+_EOF_
+                       }
+    local extraInfo="-v -n showRun"
+    local inFilesList=""
+    local inFile=""
+
+
+    cat  << _EOF_
+$( examplesSeperatorTopLabel "${G_myName} :: NOTYET Recurse Activity Groupings" )
+--- Recurse Dirs (Local) ---
+${G_myName} ${extraInfo}  -i dirsRecurse fullClean
+${G_myName} ${extraInfo}  -i dirsRecurse fullRefresh
+${G_myName} ${extraInfo}  -i dirsRecurse dblockUpdateFile
+${G_myName} ${extraInfo}  -i dirsRecurse fullBuild
+${G_myName} ${extraInfo}  -i dirsRecurse localContentPrep
+${G_myName} ${extraInfo}  -i dirsRecurse fullUpdate
+${G_myName} ${extraInfo}  -i dirsRecurse "runFunc lcnLcntGens.sh -n showRun -p cntntRawHome=. -i lcntInfoRenew"
+${G_myName} ${extraInfo}  -i dirsRecurse "runFunc lcnLcntGens.sh -n showRun -p cntntRawHome=. -i lcntInfoRenewCustomize"
+--- Plone3 dirsRecurse (Publish / External) ---
+${G_myName} ${extraInfo} -p bystarUid=${bystarUid} -i dirsRecurse plone3ContentPublish
+${G_myName} ${extraInfo} -p bystarUid=${bystarUid} -i dirsRecurse plone3AccessPagePublish
+${G_myName} ${extraInfo} -p bystarUid=${bystarUid} -i dirsRecurse plone3Publish
+${G_myName} ${extraInfo} -p bystarUid=${bystarUid} -i dirsRecurse plone3FullPublish
+--- Plone2.5 dirsRecurse (Publish / External) ---
+${G_myName} ${extraInfo}  -i dirsRecurse fullPublish
+${G_myName} ${extraInfo}  -i dirsRecurse plone3PublishDestUrls
+_EOF_
+
     lpReturn
 }
 
