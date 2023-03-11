@@ -1479,6 +1479,17 @@ function vis_fullClean {
         /bin/rm tables
     fi
 
+    if [[ -L ./common ]] ; then
+       typeset auxFiles=$( inBaseDirDo ./common ls *.aux 2> /dev/null )
+       #echo ${auxFiles}
+       if [ ! -z "${auxFiles}" ] ; then
+         echo "Cleaning In aux files in ./common"
+         lpDo inBaseDirDo ./common /bin/rm  *.aux
+       else
+         echo "Cleaning of aux files skipped in ./common"
+       fi
+    fi
+
     if [[ -L seedDesc ]] ; then
         /bin/rm seedDesc
     fi
@@ -3103,6 +3114,7 @@ _EOF_
           case ${eachCmnd} in
             "clean")
               lpDo vis_fullClean
+              lpDo ${G_myName} -i fullClean
               ;;
             "none")
               doNothing
