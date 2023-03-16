@@ -82,7 +82,7 @@ _CommentEnd_
 lcnt_docSrcList=""
 lcnt_lcntNu=""
 lcnt_shortTitle=""
-
+cntntRawHome=""
 
 . ${opBinBase}/opAcctLib.sh
 . ${opBinBase}/opDoAtAsLib.sh
@@ -3636,7 +3636,8 @@ _EOF_
         EH_assert [[ $# -eq 0 ]]
         local gitLocalBasePath=""
 
-        gitLocalBasePath="${lcntExport_gitLocalBase}/${lcnt_pubCategory}/${lcnt_lcntNu}"
+        #gitLocalBasePath="${lcntExport_gitLocalBase}/${lcnt_pubCategory}/${lcnt_lcntNu}"
+        gitLocalBasePath="${lcntExport_gitLocalBase}"
 
         if [ ! -d "${gitLocalBasePath}" ] ; then
             opDo mkdir -p "${gitLocalBasePath}"
@@ -3652,6 +3653,10 @@ _EOF_
         local eachPath=""
         local gitDest=""
 
+        local pdfFiles=""
+        local coverFiles=""
+        local bibFiles=""
+
         opDo lcntBuildsBaseFVsPrep      
 
         gitDest=$( gitLocalBasePathObtain )
@@ -3662,20 +3667,39 @@ _EOF_
             opDoRet pushd "${lcntBuild_releaseBaseDir}"
 
             for eachPath in $(ls | grep -v CVS) ; do
-                if [ -d "${eachPath}" ] ; then
-                    opDo cp -r ${eachPath} ${gitDest}
-                elif [ -f "${eachPath}" ] ; then
-                    if [ "${eachPath}" == "accessPage.html" ] ; then
-                        continue
-                    elif [ "${eachPath}" == "accessPage.md" ] ; then
-                        opDo cp ${eachPath} ${gitDest}/readme.md
-                        inBaseDirDo ${gitDest} git add ${gitDest}/readme.md
-                    fi
-                    opDo cp ${eachPath} ${gitDest}
+              echo "Processing ${eachPath}"
+              if [ -d "${eachPath}" ] ; then
+                opDo echo skiping cp -r ${eachPath} ${gitDest}
+              elif [ -f "${eachPath}" ] ; then
+                if [ "${eachPath}" == "accessPage.html" ] ; then
+                  continue
+                elif [ "${eachPath}" == "accessPage.md" ] ; then
+                  opDo cp ${eachPath} ${gitDest}/readme.md
+                  inBaseDirDo ${gitDest} git add ${gitDest}/readme.md
+                elif [[ "${eachPath}" == *"cover"* ]] ; then
+                  lpDo mkdir -p ${gitDest}/covers
+                  lpDo cp ${eachPath} ${gitDest}/covers
+                elif [[ "${eachPath}" == *"pdf" ]] ; then
+                  lpDo mkdir -p ${gitDest}/pdf
+                  lpDo cp ${eachPath} ${gitDest}/pdf
+                elif [[ "${eachPath}" == *"bib" ]] ; then
+                  lpDo mkdir -p ${gitDest}/cite
+                  lpDo cp ${eachPath} ${gitDest}/cite
                 fi
-                inBaseDirDo ${gitDest} git add ${gitDest}/$( FN_nonDirsPart ${eachPath} )
+              fi
+              inBaseDirDo ${gitDest} git add ${gitDest}/$( FN_nonDirsPart ${eachPath} )
             done
-            
+
+            if [ -d "${gitDest}/covers" ] ; then
+              inBaseDirDo ${gitDest} git add ${gitDest}/covers
+            fi
+            if [ -d "${gitDest}/pdf" ] ; then
+              inBaseDirDo ${gitDest} git add ${gitDest}/pdf
+            fi
+            if [ -d "${gitDest}/cite" ] ; then
+              inBaseDirDo ${gitDest} git add ${gitDest}/cite
+            fi
+
             opDo popd
             
         done
