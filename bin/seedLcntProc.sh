@@ -3667,7 +3667,7 @@ _EOF_
             opDoRet pushd "${lcntBuild_releaseBaseDir}"
 
             for eachPath in $(ls | grep -v CVS) ; do
-              echo "Processing ${eachPath}"
+              echo "==> Exporting ${eachPath} towards ${gitDest}"
               if [ -d "${eachPath}" ] ; then
                 opDo echo skiping cp -r ${eachPath} ${gitDest}
               elif [ -f "${eachPath}" ] ; then
@@ -3682,9 +3682,17 @@ _EOF_
                 elif [[ "${eachPath}" == *"pdf" ]] ; then
                   lpDo mkdir -p ${gitDest}/pdf
                   lpDo cp ${eachPath} ${gitDest}/pdf
+                  if [[ "${eachPath}" == *"8.5x11"* ]] ; then
+                    local eachPathPrefix=$(  FN_prefix ${eachPath} )
+                    lpDo ebook-convert ${eachPath} ${eachPathPrefix}.epub
+                    lpDo mkdir -p ${gitDest}/ebook
+                    lpDo cp ${eachPathPrefix}.epub ${gitDest}/ebook
+                  fi
                 elif [[ "${eachPath}" == *"bib" ]] ; then
                   lpDo mkdir -p ${gitDest}/cite
                   lpDo cp ${eachPath} ${gitDest}/cite
+                else
+                  echo "==> Unexpected ${eachPath} -- skipped over"
                 fi
               fi
               inBaseDirDo ${gitDest} git add ${gitDest}/$( FN_nonDirsPart ${eachPath} )
@@ -3698,6 +3706,9 @@ _EOF_
             fi
             if [ -d "${gitDest}/cite" ] ; then
               inBaseDirDo ${gitDest} git add ${gitDest}/cite
+            fi
+            if [ -d "${gitDest}/ebook" ] ; then
+              inBaseDirDo ${gitDest} git add ${gitDest}/ebook
             fi
 
             opDo popd
