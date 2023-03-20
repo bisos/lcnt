@@ -640,6 +640,18 @@ _EOF_
     else
         lcntBuild_sides=""
     fi
+
+    if [ -f "${lcntBuildInfoPath}/spineWidth" ] ; then
+        lcntBuild_spineWidth=$( head -1 "${lcntBuildInfoPath}/spineWidth" )
+    else
+        lcntBuild_spineWidth=""
+    fi
+
+    if [ -f "${lcntBuildInfoPath}/paperGsm" ] ; then
+        lcntBuild_paperGsm=$( head -1 "${lcntBuildInfoPath}/paperGsm" )
+    else
+        lcntBuild_paperGsm=""
+    fi
 }
 
 

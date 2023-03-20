@@ -272,6 +272,7 @@ $( examplesSeperatorChapter "Build --- curBuild=${curBuildEndLink}" )
 ${G_myName} build              # build, build+view, build+release
 ${G_myName} ${extraInfo} -i beamerDerivedFullBuild  # Updates disposition.gened and
 ${G_myName} ${extraInfo} -p pre="clean" -p incOnly="./common/aboutThisDoc" -p extent="build+view" -i lcntBuild cur  # Runs dblock
+${G_myName} ${extraInfo} -i lcntBuildFpsRefresh cur  # Updates spineWidth
 ${G_myName} ${extraInfo} -p pre="clean" -p extent="build+view" -i lcntBuild cur  # Runs dblock
 ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view" -i lcntBuild all  # Using enabled list
 $( examplesSeperatorChapter "Export After Building" )
@@ -3450,6 +3451,122 @@ _EOF_
         opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/accessPage.html -i accessPageGen "PLPC-${lcnt_lcntNu}"
         opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/accessPage.md -i accessPageGen_md "PLPC-${lcnt_lcntNu}"
         opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/PLPC-${lcnt_lcntNu}.bib -i inListDotBibOut "PLPC-${lcnt_lcntNu}"             
+    fi
+
+    lpReturn
+}
+
+
+function vis_lcntBuildFpsRefresh {
+    G_funcEntry
+    function describeF {  cat  << _EOF_
+_EOF_
+                       }
+
+    EH_assert [[ $# -gt 0 ]]
+
+    local inFilesList=$@
+    local inFile=""
+    local eachResult=""
+    local lcntNu=$( cat ./LCNT-INFO/lcntNu )
+    local lcntVersion=$( cat ./LCNT-INFO/version )
+
+    local resultsFileDest=""
+    local releaseFileDest=""
+
+    local resultsPathDest=""
+    local releasePathDest=""
+
+    local dateTag=$( DATE_nowTag )
+
+    local htmlIndexFile=""
+
+    if [ "$1" == "all" ] ; then
+        inFilesList=$( vis_enabledBuildsDirsList )
+    fi
+
+    if [ "$1" == "cur" ] ; then
+        inFilesList="cur"
+    fi
+
+    if [ "$1" == "dev" ] ; then
+        inFilesList="dev"
+    fi
+
+    opDo lcntBuildsBaseFVsPrep
+
+    function resultsDestinationPath {
+        EH_assert [[ $# -eq 1 ]]
+        local resultType="$1"
+
+        case ${resultType} in
+            "pdf")
+                echo ${lcntBuild_resultsBaseDir}/c-${lcntNu}-${lcntBuild_buildName}.${resultType}
+                ;;
+            "odt")
+                echo ${lcntBuild_resultsBaseDir}/c-${lcntNu}-${lcntBuild_buildName}.${resultType}
+                ;;
+            "markdown")
+                echo ${lcntBuild_resultsBaseDir}/c-${lcntNu}-${lcntBuild_buildName}.md
+                ;;
+            "html")
+                echo ${lcntBuild_resultsBaseDir}/c-${lcntNu}-${lcntBuild_buildName}-${resultType}
+                ;;
+            *)
+                EH_problem "Unknown ${eachResult}"
+                lpReturn
+        esac
+    }
+
+    if [ -e "./curBuild" ] ; then
+      if [ ! -e "./curBuild.saved" ] ; then
+        lpDo cp -p -r ./curBuild ./curBuild.saved
+      fi
+    fi
+
+    for inFile in ${inFilesList}; do
+        #opDo ls -l ${inFile}
+        #
+        # 1) Update symlink for curBuild
+        if [ "${inFile}" == "cur" ] ; then
+            inFile=./curBuild
+        fi
+        if [ "${inFile}" == "dev" ] ; then
+            inFile=./curBuild
+        fi
+
+        #
+        # curBuild is now properly set. We can use it.
+        #
+
+        # Read in curBuild params
+        opDo lcntBuildInfoPrep "${inFile}"
+
+        local docSrcPrefix=$(  FN_prefix ${lcntBuild_docSrc} )
+        local docSrcExtension=$( FN_extension ${lcntBuild_docSrc} )
+
+        # echo ${docSrcPrefix}
+        # echo ${lcntBuild_spineWidth}
+
+        local pdfResultPath=$( resultsDestinationPath "pdf" )
+        # echo ${pdfResultPath}
+
+        # echo ${lcntBuild_paperGsm}
+
+        calculatedSpineWidth=$( lpDo bookSpineCalc.cs -v 30 --gsm="${lcntBuild_paperGsm}" -i pdfSpineWidthSoft ${pdfResultPath} )
+        # echo ${calculatedSpineWidth}
+        if [ -z  "${calculatedSpineWidth}" ] ; then
+          ANT_raw "Blank calculatedSpineWidth -- Update Skipped"
+        else
+          lpDo eval echo ${calculatedSpineWidth}mm \> ${inFile}/spineWidth
+        fi
+        lcntBuild_spineWidth=$(cat ${inFile}/spineWidth)
+        ANT_raw "${inFile}/spineWidth is: ${lcntBuild_spineWidth}"
+    done
+
+    if [ -e "./curBuild.saved" ] ; then
+        lpDo mv ./curBuild.saved ./curBuild
+        lpDo ls -l ./curBuild
     fi
 
     lpReturn
