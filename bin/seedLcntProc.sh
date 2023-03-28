@@ -684,7 +684,8 @@ _EOF_
     local inFilesList=""
     local inFile=""
 
-   
+    typeset curBuildEndLink=$( FN_nonDirsPart $(  FN_absolutePathGet ./curBuild ))
+
     cat  << _EOF_
 $( examplesSeperatorTopLabel "${G_myName} :: Build Activity Groupings" )
 $( examplesSeperatorChapter "Build+View Available buildSpecs" )
@@ -722,6 +723,10 @@ ${G_myName} ${extraInfo} -i lcntExportInfo
 ls -l ./curExport; grep . ./curExport/*
 cat ./LCNT-INFO/Exports/enabledList
 find  ./LCNT-INFO/Exports -type f -print | grep -v '~' | xargs grep .
+$( examplesSeperatorChapter "Build --- curBuild=${curBuildEndLink}" )
+${G_myName} ${extraInfo}  -i fullClean
+${G_myName} ${extraInfo} -p pre="clean" -p incOnly="./common/aboutThisDoc" -p extent="build+view" -i lcntBuild cur  # Runs dblock
+${G_myName} ${extraInfo} -p pre="clean" -p extent="build+view" -i lcntBuild cur  # Runs dblock
 _EOF_
     
     lpReturn
@@ -3552,6 +3557,16 @@ _EOF_
         # echo ${pdfResultPath}
 
         # echo ${lcntBuild_paperGsm}
+
+        pdfNuOfPages=$( lpDo bookSpineCalc.cs -v 30 -i pdfNuOfPages ${pdfResultPath} )
+        # echo ${pdfNuOfPages}
+        if [ -z  "${pdfNuOfPages}" ] ; then
+          ANT_raw "Blank pdfNuOfPages -- Update Skipped"
+        else
+          lpDo eval echo ${pdfNuOfPages} \> ${inFile}/pdfNuOfPages
+        fi
+        lcntBuild_pdfNuOfPages=$(cat ${inFile}/pdfNuOfPages)
+        ANT_raw "${inFile}/pdfNuOfPages is: ${lcntBuild_pdfNuOfPages}"
 
         calculatedSpineWidth=$( lpDo bookSpineCalc.cs -v 30 --gsm="${lcntBuild_paperGsm}" -i pdfSpineWidthSoft ${pdfResultPath} )
         # echo ${calculatedSpineWidth}
