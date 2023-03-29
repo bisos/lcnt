@@ -69,12 +69,13 @@ lcntBuildInfoFilesList=(
 
 
 _CommentBegin_
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(beginning-of-buffer)][|^]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]] || IIC       ::  vis_buildsDirsList    [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(beginning-of-buffer)][|^]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]] || IIC       ::  vis_buildsDirs
+List    [[elisp:(org-cycle)][| ]]
 _CommentEnd_
 
 function vis_buildsDirsList {
     EH_assert [[ $# -eq 0 ]]
-    find ./LCNT-INFO/Builds/ -type d -print | egrep -v './LCNT-INFO/Builds/$' | grep -v CVS
+    find ./LCNT-INFO/Builds/ -type d -print | egrep -v './LCNT-INFO/Builds/$' | grep -v CVS | sort
 }
 
 

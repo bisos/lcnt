@@ -248,8 +248,10 @@ _EOF_
 
     typeset examplesInfo="${extraInfo} ${runInfo}"
 
+    local matedBaseDir=$( cat ./matedBaseDir )
+
  cat  << _EOF_
-$( examplesSeperatorTopLabel "${G_myName} :: File Variables Links to ${bookBuildBaseDir}" )
+$( examplesSeperatorTopLabel "${G_myName} :: File Variables Links to ${matedBaseDir}" )
 ${G_myName} ${extraInfo} -i buildFvLinksUpdate
 _EOF_
 
