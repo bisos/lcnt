@@ -83,6 +83,7 @@ lcnt_docSrcList=""
 lcnt_lcntNu=""
 lcnt_shortTitle=""
 cntntRawHome=""
+purpose=""
 
 . ${opBinBase}/opAcctLib.sh
 . ${opBinBase}/opDoAtAsLib.sh
@@ -111,6 +112,10 @@ _CommentEnd_
 
 function G_postParamHook {
   TM_trace 9 "G_postParamHook"
+
+  if [ ! -z "${purpose}" ] ; then
+      return
+  fi
 
 
   isDirsProcessor || lcntInfoPrep `pwd`
@@ -175,6 +180,12 @@ function noArgsHook {
     local args="$@"
     local eachArg=""
 
+    if [ ! -z "${purpose}" ] ; then
+      lpDo echo "${purpose}"
+      lpDo vis_buildFvProc
+      return
+    fi
+
     if [ -z "${args}" ] ; then
         vis_groupingExamples
     fi
@@ -223,6 +234,44 @@ function noArgsHook {
 _CommentBegin_
 *  [[elisp:(org-cycle)][| ]] Example Groups                          :: /* Grouping Of Examples */ |
 _CommentEnd_
+
+function vis_buildFvProc {
+   G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -eq 0 ]]
+
+    typeset extraInfo="-h -v -n showRun"
+    #typeset extraInfo=""
+    typeset runInfo="-p ri=lsipusr:passive"
+
+    typeset examplesInfo="${extraInfo} ${runInfo}"
+
+ cat  << _EOF_
+$( examplesSeperatorTopLabel "${G_myName} :: File Variables Links to ${bookBuildBaseDir}" )
+${G_myName} ${extraInfo} -i buildFvLinksUpdate
+_EOF_
+
+    lpReturn
+}
+
+function vis_buildFvLinksUpdate {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -eq 0 ]]
+
+    local matedBaseDir=$( cat ./matedBaseDir )
+    local linkFilesList="isbn13Nu  medium  paperGsm  paperSize  printAgent  printColor nuOfPages spineWidth"
+
+    for each in ${linkFilesList} ; do
+      lpDo FN_fileSymlinkUpdate ${matedBaseDir}/${each} ${each}
+    done
+
+    lpReturn
+}
 
 
 _CommentBegin_
@@ -2339,7 +2388,6 @@ _EOF_
 
     lpReturn
 }
-
 
 
 _CommentBegin_
