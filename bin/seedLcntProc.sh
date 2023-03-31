@@ -266,7 +266,7 @@ _EOF_
     EH_assert [[ $# -eq 0 ]]
 
     local matedBaseDir=$( cat ./matedBaseDir )
-    local linkFilesList="isbn13Nu  medium  paperGsm  paperSize  printAgent  printColor nuOfPages spineWidth"
+    local linkFilesList="isbn13Nu  medium cover paperGsm  paperSize  printAgent  printColor nuOfPages spineWidth"
 
     for each in ${linkFilesList} ; do
       lpDo FN_fileSymlinkUpdate ${matedBaseDir}/${each} ${each}

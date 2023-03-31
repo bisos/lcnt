@@ -117,6 +117,9 @@ ${G_myName} ${extraInfo} -p inListLcntNu="/lcnt/outputs/all/lists/nuBaseDir" -p 
 ${G_myName} ${extraInfo} -p inListLcntNu="/lcnt/outputs/all/lists/nuBaseDir" -p outListLcntNu="/tmp/$$.lcntNu" -i siftLcntFunc isPublisher fpf
 ${G_myName} ${extraInfo} -p inListLcntNu="/lcnt/outputs/all/lists/nuBaseDir" -p outListLcntNu="/tmp/$$.lcntNu" -i siftLcntFunc isPrimaryPubSite www.neda.com
 ${G_myName} ${extraInfo} -p inListLcntNu="/lcnt/outputs/all/lists/nuBaseDir" -p outListLcntNu="/tmp/$$.lcntNu" -i siftLcntFunc isPubSite www.neda.com
+--- ISBN Assignment ---
+${G_myName} ${extraInfo} -p lcntNu=PLPC-120033 -i isbnVerify book-6x9-bw-sft-kdp 978-1-960957-00-9
+${G_myName} ${extraInfo} -p lcntNu=PLPC-120033 -i isbnAssign book-6x9-bw-sft-kdp 978-1-960957-00-9
 --- Locate a Frequently Used Document ---
 /acct/employee/lsipusr/org/agenda/bystar/publications.org
 ${G_myName} 180016  # Libre-Halaal ByStar Digital Ecosystem
@@ -406,3 +409,95 @@ function vis_findLcntBaseDir {
 }
 
 
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(beginning-of-buffer)][|^]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]] || IIC       ::  funcName    [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+
+function vis_isbnVerify {
+   G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+args: -p plpcNu buildBaseDir isbnNu
+_EOF_
+    }
+    EH_assert [[ $# -eq 2 ]]
+
+    local buildBaseDir="$1"
+    local isbnNu="$2"
+    local lcntBaseDir=$(vis_findLcntBaseDir 2> /dev/null | head -1)
+    local obtainedIsbn=""
+
+    if [ -z "${lcntBaseDir}" ] ; then
+      EH_problem "vis_findLcntBaseDir failed -- giving up"
+      lpDo vis_findLcntBaseDir
+      return 1
+    fi
+
+    if [ ! -d ${lcntBaseDir}/LCNT-INFO/Builds/${buildBaseDir} ] ; then
+       EH_problem "Missing ${lcntBaseDir}/LCNT-INFO/Builds/${buildBaseDir} -- giving up"
+      return 1
+    fi
+
+    if [ ! -f ${lcntBaseDir}/LCNT-INFO/Builds/${buildBaseDir}/isbn13Nu ] ; then
+      EH_problem "Missing ${lcntBaseDir}/LCNT-INFO/Builds/${buildBaseDir}/isbn13Nu -- giving up"
+      return 1
+    fi
+
+    obtainedIsbn=$(cat ${lcntBaseDir}/LCNT-INFO/Builds/${buildBaseDir}/isbn13Nu)
+
+    if [ "${obtainedIsbn}" ==  "${isbnNu}" ] ; then
+      ANT_raw "ISBN Verified: ${isbnNu}"
+      return 0
+    else
+      EH_problem "ISBN Mis-match: obtained=${obtainedIsbn} -- expected=${isbnNu}"
+      return 1
+    fi
+
+    lpReturn
+}
+
+
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(beginning-of-buffer)][|^]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]] || IIC       ::  funcName    [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+
+function vis_isbnAssign {
+   G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+args: -p plpcNu buildBaseDir isbnNu
+_EOF_
+    }
+    EH_assert [[ $# -eq 2 ]]
+
+    local buildBaseDir="$1"
+    local isbnNu="$2"
+    local lcntBaseDir=$(vis_findLcntBaseDir 2> /dev/null | head -1)
+    local obtainedIsbn=""
+
+    if [ -z "${lcntBaseDir}" ] ; then
+      EH_problem "vis_findLcntBaseDir failed -- giving up"
+      lpDo vis_findLcntBaseDir
+      return 1
+    fi
+
+    if [ ! -d ${lcntBaseDir}/LCNT-INFO/Builds/${buildBaseDir} ] ; then
+       EH_problem "Missing ${lcntBaseDir}/LCNT-INFO/Builds/${buildBaseDir} -- giving up"
+      return 1
+    fi
+
+    if [ ! -f ${lcntBaseDir}/LCNT-INFO/Builds/${buildBaseDir}/isbn13Nu ] ; then
+      EH_problem "Missing ${lcntBaseDir}/LCNT-INFO/Builds/${buildBaseDir}/isbn13Nu -- giving up"
+      return 1
+    fi
+
+    obtainedIsbn=$(cat ${lcntBaseDir}/LCNT-INFO/Builds/${buildBaseDir}/isbn13Nu)
+
+    if [ "${obtainedIsbn}" ==  "${isbnNu}" ] ; then
+      ANT_raw "Same ISBNin place: ${isbnNu} --- No action taken"
+      return 0
+    else
+      lpDo eval echo ${isbnNu} \> ${lcntBaseDir}/LCNT-INFO/Builds/${buildBaseDir}/isbn13Nu
+      return 0
+    fi
+
+    lpReturn
+}
