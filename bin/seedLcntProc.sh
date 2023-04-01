@@ -324,6 +324,7 @@ ${G_myName} build              # build, build+view, build+release
 ${G_myName} ${extraInfo} -i beamerDerivedFullBuild  # Updates disposition.gened and
 ${G_myName} ${extraInfo} -p pre="clean" -p incOnly="./common/aboutThisDoc" -p extent="build+view" -i lcntBuild cur  # Runs dblock
 ${G_myName} ${extraInfo} -i lcntBuildFpsRefresh cur  # Updates spineWidth
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -i lcntBuildFpsRefresh all
 ${G_myName} ${extraInfo} -p pre="clean" -p extent="build+view" -i lcntBuild cur  # Runs dblock
 ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view" -i lcntBuild all  # Using enabled list
 $( examplesSeperatorChapter "Export After Building" )
@@ -3325,7 +3326,7 @@ _EOF_
                             # If the version exists, also date tag it.
                             opDo cp -p ${resultsFileDest} ${releaseDestinationPath}
                             opDo ls -l ${releaseDestinationPath}
-                            opDo FN_fileSymlinkUpdate ${releaseDestinationPath} $( FN_nonDirsPart ${releaseDestinationPath} )               
+                            # opDo FN_fileSymlinkUpdate ${releaseDestinationPath} $( FN_nonDirsPart ${releaseDestinationPath} )
                         else
                             if LIST_isIn "build" "${extentList}"  ; then                                                            
                                 opDo lcnLcntInputProc.sh -p inFormat=xelatex -p outputs=pdf -i buildDocs  ${lcntBuild_docSrc}
@@ -3333,7 +3334,7 @@ _EOF_
                                 
                                 opDo cp -p ${resultsFileDest} ${releaseDestinationPath}
                                 opDo ls -l ${releaseDestinationPath}
-                                opDo FN_fileSymlinkUpdate ${releaseDestinationPath} $( FN_nonDirsPart ${releaseDestinationPath} )
+                                # opDo FN_fileSymlinkUpdate ${releaseDestinationPath} $( FN_nonDirsPart ${releaseDestinationPath} )
                             else
                                 EH_problem "Missing  Results/c-${lcntNu}-${lcntBuild_buildName}.pdf"
                                 lpReturn
@@ -3590,6 +3591,12 @@ _EOF_
             inFile=./curBuild
         fi
 
+        if [ "${inFile}" != "./curBuild" ] ; then
+          if [[ "${inFile}" != *"book"* ]] ; then
+            continue
+          fi
+        fi
+
         #
         # curBuild is now properly set. We can use it.
         #
@@ -3608,7 +3615,7 @@ _EOF_
 
         # echo ${lcntBuild_paperGsm}
 
-        pdfNuOfPages=$( lpDo bookSpineCalc.cs -v 30 -i pdfNuOfPages ${pdfResultPath} )
+        pdfNuOfPages=$( lpDo bookUtils.cs -v 30 -i pdfNuOfPages ${pdfResultPath} )
         # echo ${pdfNuOfPages}
         if [ -z  "${pdfNuOfPages}" ] ; then
           ANT_raw "Blank pdfNuOfPages -- Update Skipped"
@@ -3618,7 +3625,7 @@ _EOF_
         lcntBuild_pdfNuOfPages=$(cat ${inFile}/pdfNuOfPages)
         ANT_raw "${inFile}/pdfNuOfPages is: ${lcntBuild_pdfNuOfPages}"
 
-        calculatedSpineWidth=$( lpDo bookSpineCalc.cs -v 30 --gsm="${lcntBuild_paperGsm}" -i pdfSpineWidthSoft ${pdfResultPath} )
+        calculatedSpineWidth=$( lpDo bookUtils.cs -v 30 --gsm="${lcntBuild_paperGsm}" -i pdfSpineWidthSoft ${pdfResultPath} )
         # echo ${calculatedSpineWidth}
         if [ -z  "${calculatedSpineWidth}" ] ; then
           ANT_raw "Blank calculatedSpineWidth -- Update Skipped"
