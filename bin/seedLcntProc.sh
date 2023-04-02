@@ -95,6 +95,7 @@ purpose=""
 . ${lcntBinBase}/lcnLcntLib.sh
 . ${lcntBinBase}/lcnLcntBuildLib.sh
 . ${lcntBinBase}/lcnLcntExportLib.sh
+. ${lcntBinBase}/lcnLcntReleaseLib.sh
 
 
 # PRE parameters
@@ -3146,6 +3147,7 @@ _EOF_
 
     opDo lcntBuildsBaseFVsPrep
 
+
     local extentList=$( echo ${extent} | sed -e 's/+/ /g')
 
     if LIST_isIn "release" "${extentList}"  ; then
@@ -3206,7 +3208,10 @@ _EOF_
         done
       fi
       lpDo ls -l "${incOnlyFile_filesList}"
-    } ; lpDo incOnlyProc
+    }
+    if LIST_isIn "build" "${extentList}"  ; then
+      lpDo incOnlyProc
+    fi
 
     function resultsDestinationPath {
         EH_assert [[ $# -eq 1 ]]
@@ -3234,11 +3239,15 @@ _EOF_
     function releaseDestinationPath {
         EH_assert [[ $# -eq 1 ]]
         local resultType="$1"
-        
+
+        if [ ! -d ${lcntBuild_releaseBaseDir}/${lcntBuild_relTag} ] ; then
+          lpDo mkdir ${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}
+        fi
+
         case ${resultType} in
             "pdf")
                 #echo ${lcntBuild_releaseBaseDir}/c-${lcntNu}-${lcntBuild_buildName}-${lcntVersion}.${resultType}
-                echo ${lcntBuild_releaseBaseDir}/c-${lcntNu}-${lcntBuild_buildName}.${resultType}
+                echo ${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/c-${lcntNu}-${lcntBuild_relTag}-${lcntBuild_buildName}.${resultType}
                 ;;
             "odt")
                 echo ${lcntBuild_releaseBaseDir}/c-${lcntNu}-${lcntBuild_buildName}.${resultType}
@@ -3255,10 +3264,12 @@ _EOF_
         esac
     }
 
+    if LIST_isIn "build" "${extentList}"  ; then
     if [ -e "./curBuild" ] ; then
       if [ ! -e "./curBuild.saved" ] ; then
         lpDo cp -p -r ./curBuild ./curBuild.saved
       fi
+    fi
     fi
 
     for inFile in ${inFilesList}; do
@@ -3279,10 +3290,14 @@ _EOF_
         # Read in curBuild params
         opDo lcntBuildInfoPrep "${inFile}"
 
+        # Read in LCNT-INFO/Release/cur  params
+        opDo lcntReleaseInfoPrep "cur"
+
         local docSrcPrefix=$(  FN_prefix ${lcntBuild_docSrc} )
         local docSrcExtension=$( FN_extension ${lcntBuild_docSrc} )
         
         # 2) Runing dblock on all needed files -- For Dev we don't dblocks update
+        if LIST_isIn "build" "${extentList}"  ; then
         if [ "${1}" != "dev" ] ; then
           if ! LIST_isIn "name" "${extentList}"  ; then
             if [ ! -z "${lcntBuild_docSrc}" ] ; then
@@ -3296,6 +3311,7 @@ _EOF_
             fi
           fi
             # NOTYET, also do other files that need to be dblocked.
+        fi
         fi
         
         # 3) for all of build forms, build results
@@ -3504,9 +3520,9 @@ _EOF_
     # 4) Create accessPages for both html and md
     #
     if LIST_isIn "release" "${extentList}"  ; then
-        opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/accessPage.html -i accessPageGen "PLPC-${lcnt_lcntNu}"
-        opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/accessPage.md -i accessPageGen_md "PLPC-${lcnt_lcntNu}"
-        opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/PLPC-${lcnt_lcntNu}.bib -i inListDotBibOut "PLPC-${lcnt_lcntNu}"             
+        opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.html -i accessPageGen "PLPC-${lcnt_lcntNu}"
+        opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.md -i accessPageGen_md "PLPC-${lcnt_lcntNu}"
+        opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/PLPC-${lcnt_lcntNu}.bib -i inListDotBibOut "PLPC-${lcnt_lcntNu}"
     fi
 
     lpReturn
