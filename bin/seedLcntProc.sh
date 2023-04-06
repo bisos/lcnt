@@ -3256,7 +3256,7 @@ _EOF_
                 echo ${lcntBuild_releaseBaseDir}/c-${lcntNu}-${lcntBuild_buildName}.md
                 ;;
             "html")
-                echo ${lcntBuild_releaseBaseDir}/c-${lcntNu}-${lcntBuild_buildName}-${resultType}
+                echo ${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/c-${lcntNu}-${lcntBuild_relTag}-${lcntBuild_buildName}-${resultType}
                 ;;
             *)
                 EH_problem "Unknown ${eachResult}"
@@ -3373,12 +3373,13 @@ _EOF_
                         #
                         # We are not going to move to results for html.
 
-                        # if [ -d "${resultsPathDest}" ] ; then
-                        #     opDo mv "${resultsPathDest}" "${resultsPathDest}"-${dateTag}
-                        # fi
-                        # opDo mv heveaHtml-${docSrcPrefix} "${resultsPathDest}"
+                        if [ -d "${resultsPathDest}" ] ; then
+                             opDo mv "${resultsPathDest}" "${resultsPathDest}"-${dateTag}
+                        fi
+                        opDo mv heveaHtml-${docSrcPrefix} "${resultsPathDest}"
 
-                        htmlIndexFile="heveaHtml-${docSrcPrefix}/index.html"
+                        #htmlIndexFile="heveaHtml-${docSrcPrefix}/index.html"
+                        htmlIndexFile="${resultsPathDest}/index.html"
                       fi
                     fi
 
@@ -3409,15 +3410,14 @@ _EOF_
                         EH_problem "Missing ${htmlIndexFile}"
                       fi
                     fi              
-                    
-                    
+
                     if LIST_isIn "release" "${extentList}"  ; then
-                        #releaseDestinationPath=$( releaseDestinationPath html )
+                        releaseDestinationPath=$( releaseDestinationPath html )
                         
                         if [ -d ${resultsPathDest} ] ; then
                             # If the version exists, also date tag it.
-                            opDo cp -r -p ${resultsPathDest}  ${lcntBuild_releaseBaseDir}
-                            opDo ls -ld  ${lcntBuild_releaseBaseDir}
+                            opDo cp -r -p ${resultsPathDest}  ${releaseDestinationPath}
+                            opDo ls -ld  ${releaseDestinationPath}
                         else
                             if LIST_isIn "build" "${extentList}"  ; then
                                 opDo lcnLcntInputProc.sh -p inFormat=xelatex -p outputs=heveaHtml -i buildDocs  ${lcntBuild_docSrc}
@@ -3425,8 +3425,8 @@ _EOF_
                                     opDo mv "${resultsPathDest}" "${resultsPathDest}"-${dateTag}
                                 fi
                                 opDo mv heveaHtml-${docSrcPrefix} "${resultsPathDest}"
-                                opDo cp -r -p ${resultsPathDest}  ${lcntBuild_releaseBaseDir}
-                                opDo ls -ld  ${lcntBuild_releaseBaseDir}
+                                opDo cp -r -p ${resultsPathDest}  ${releaseDestinationPath}
+                                opDo ls -ld  ${releaseDestinationPath}
                             else
                                 EH_problem "Missing ${resultsPathDest}"
                                 lpReturn
@@ -3519,6 +3519,8 @@ _EOF_
     #
     # 4) Create accessPages for both html and md
     #
+    opDo lcntReleaseInfoPrep "cur"
+
     if LIST_isIn "release" "${extentList}"  ; then
         opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.html -i accessPageGen "PLPC-${lcnt_lcntNu}"
         opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.md -i accessPageGen_md "PLPC-${lcnt_lcntNu}"
