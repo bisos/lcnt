@@ -199,7 +199,10 @@ function noArgsHook {
             build)         # Build, release, export
                 vis_buildExamples
                 ;;
-            maintenance|maintain)           
+            release)         # Build, release, export
+                vis_releaseExamples
+                ;;
+            maintenance|maintain)
                 vis_maintenanceExamples
                 ;;
             convert)        
@@ -294,6 +297,8 @@ _EOF_
     typeset runInfo="-p ri=lsipusr:passive"
 
     typeset curBuildEndLink=$( FN_nonDirsPart $(  FN_absolutePathGet ./curBuild ))
+    typeset curReleaseEndLink=$( FN_nonDirsPart $(  FN_absolutePathGet ./LCNT-INFO/Releases/cur ))
+    typeset curExportEndLink=$( FN_nonDirsPart $(  FN_absolutePathGet ./curExport ))
 
     typeset examplesInfo="${extraInfo} ${runInfo}"
 
@@ -320,7 +325,7 @@ ${G_myName} audio
 $( examplesSeperatorChapter "Develop" )
 ${G_myName} dev                # Review warning logs, cleanup, step-by-step builds, debug
 ${G_myName} ${extraInfo}  -i fullClean
-$( examplesSeperatorChapter "Build --- curBuild=${curBuildEndLink}" )
+$( examplesSeperatorChapter "Build --- curBuild=${curBuildEndLink} curRelease=${curReleaseEndLink} curExport=${curExportEndLink}" )
 ${G_myName} build              # build, build+view, build+release
 ${G_myName} ${extraInfo} -i beamerDerivedFullBuild  # Updates disposition.gened and
 ${G_myName} ${extraInfo} -p pre="clean" -p incOnly="./common/aboutThisDoc" -p extent="build+view" -i lcntBuild cur  # Runs dblock
@@ -328,8 +333,10 @@ ${G_myName} ${extraInfo} -i lcntBuildFpsRefresh cur  # Updates spineWidth
 ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -i lcntBuildFpsRefresh all
 ${G_myName} ${extraInfo} -p pre="clean" -p extent="build+view" -i lcntBuild cur  # Runs dblock
 ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view" -i lcntBuild all  # Using enabled list
-$( examplesSeperatorChapter "Export After Building" )
-${G_myName} export            
+$( examplesSeperatorChapter "Release After Building curRelease=${curReleaseEndLink}" )
+${G_myName} release
+$( examplesSeperatorChapter "Export After Building And Release curExport=${curExportEndLink}" )
+${G_myName} export
 _EOF_
 
     lpReturn
@@ -854,14 +861,16 @@ _EOF_
         done
     }
 
+# $( examplesSeperatorSection "lcntBuild Set Current" )
+# $( listLcntBuildSetCur )
+
     
     cat  << _EOF_
 $( examplesSeperatorTopLabel "${G_myName} :: Export Activity Groupings" )
 $( examplesSeperatorChapter "curBuild/curExport Points To: -- Set it to:" )
 $( ls -l ./curBuild )
+$( ls -l ./LCNT-INFO/Releases/cur )
 $( ls -l ./curExport )
-$( examplesSeperatorSection "lcntBuild Set Current" )
-$( listLcntBuildSetCur )
 $( examplesSeperatorSection "lcntExport Set Current" )
 $( listLcntExportSetCur )
 $( examplesSeperatorChapter "Running lcntBuild And View" )
@@ -892,6 +901,35 @@ _EOF_
     
     lpReturn
 }
+
+
+function vis_releaseExamples {
+    G_funcEntry
+    function describeF {  cat  << _EOF_
+_EOF_
+                       }
+    extraInfo="-v -n showRun"
+    local inFilesList=""
+    local inFile=""
+
+    cat  << _EOF_
+$( examplesSeperatorTopLabel "${G_myName} :: Release Activity Groupings" )
+$( examplesSeperatorChapter "Current Settings" )
+$( ls -l ./curBuild )
+$( ls -l ./LCNT-INFO/Releases/cur )
+$( ls -l ./curExport )
+$( examplesSeperatorChapter "Running lcntBuild And Release" )
+${G_myName} ${extraInfo} -p extent="build+release" -i lcntBuild all          # Using enabled list
+${G_myName} ${extraInfo} -p extent="build+release" -i lcntBuild cur          # Runs dblock
+${G_myName} ${extraInfo} -p extent="build+release" -i lcntBuild dev          # Does not run dblock
+$( examplesSeperatorChapter "Release Info" )
+${G_myName} ${extraInfo} -i lcntReleaseInfo
+${G_myName} ${extraInfo} -i releasePostProc cur
+_EOF_
+
+    lpReturn
+}
+
 
 
 function vis_recurseExamples {
@@ -1289,8 +1327,6 @@ function vis_dirsRecurse {
     ANT_raw "#### ${currentDir}/${thisOne} ####"
     opDoComplain ${G_myName} -n showRun ${dashPs} -i "$@"
   fi
-
-
 
   for thisOne in ${dirsList} ; do
     opDoComplain cd ${currentDir}/${thisOne} || return
@@ -3522,9 +3558,14 @@ _EOF_
     opDo lcntReleaseInfoPrep "cur"
 
     if LIST_isIn "release" "${extentList}"  ; then
-        opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.html -i accessPageGen "PLPC-${lcnt_lcntNu}"
-        opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.md -i accessPageGen_md "PLPC-${lcnt_lcntNu}"
-        opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/PLPC-${lcnt_lcntNu}.bib -i inListDotBibOut "PLPC-${lcnt_lcntNu}"
+
+      if [ -f ./githubAccessPage.md ] ; then
+        cp ./githubAccessPage.md ./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}
+      fi
+
+      opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.html -i accessPageGen "PLPC-${lcnt_lcntNu}"
+      opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.md -i accessPageGen_md "PLPC-${lcnt_lcntNu}"
+      opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/PLPC-${lcnt_lcntNu}.bib -i inListDotBibOut "PLPC-${lcnt_lcntNu}"
     fi
 
     lpReturn
@@ -3793,6 +3834,135 @@ _EOF_
 }       
 
 
+function vis_lcntReleaseInfo {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -eq 0 ]]
+
+    opDo  ls -l ./LCNT-INFO/Releases/cur
+    ls -ld ./LCNT-INFO/Releases/*
+
+    find  ./LCNT-INFO/Releases -type f -print | xargs grep .
+
+    lpReturn
+}
+
+
+function vis_releasePostProc {
+    G_funcEntry
+    function describeF {  cat  << _EOF_
+_EOF_
+                       }
+
+    EH_assert [[ $# -gt 0 ]]
+
+    if [ -z "${cntntRawHome}" ] ; then
+        cntntRawHome="."
+    fi
+    lcntInfoPrep ${cntntRawHome}
+
+    local inFilesList=$@
+    local inFile=""
+    local eachResult=""
+    local lcntNu=${lcnt_lcntNu}
+    local lcntVersion=${lcnt_version}
+
+    local resultsFileDest=""
+    local releaseFileDest=""
+
+    local resultsPathDest=""
+    local releasePathDest=""
+
+    local dateTag=$( DATE_nowTag )
+
+    if [ "$1" == "all" ] ; then
+        inFilesList=$( vis_enabledExportsDirsList )
+    fi
+
+    if [ "$1" == "cur" ] ; then
+        inFilesList="cur"
+    fi
+
+
+    function postProc {
+      EH_assert [[ $# -eq 0 ]]
+      local builtResultBase=""
+      local here=$(pwd)
+      local eachPath=""
+      local gitDest=""
+
+      local pdfFiles=""
+      local coverFiles=""
+      local bibFiles=""
+
+      lpDo lcntInfoPrep ${cntntRawHome}
+
+      lpDo lcntBuildsBaseFVsPrep
+
+      # Read in LCNT-INFO/Release/cur  params
+      opDo lcntReleaseInfoPrep "cur"
+
+      # opDo lcntBuildInfoPrep  ${eachBuildSpec}
+
+      opDoRet pushd "${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}"
+
+      for eachPath in $(ls | grep -v CVS) ; do
+        # echo "==> Processing ${eachPath}"
+        if [ -d "${eachPath}" ] ; then
+          opDo echo skiping directory ${eachPath}
+        elif [ -f "${eachPath}" ] ; then
+          if [ "${eachPath}" == "accessPage.html" ] ; then
+            continue
+          elif [ "${eachPath}" == "accessPage.md" ] ; then
+            continue
+          elif [[ "${eachPath}" == *"cover"* ]] ; then
+            continue
+          elif [[ "${eachPath}" == *"pdf" ]] ; then
+            if [[ "${eachPath}" == *"frontCover-6x9"* ]] ; then
+              local eachPathPrefix=$(  FN_prefix ${eachPath} )
+              lpDo pdftk "${eachPath}" cat 1 output frontCover-1.pdf
+              lpDo pdftoppm -jpeg -jpegopt quality=100 -r 600 frontCover-1.pdf frontCover
+            fi
+            if [[ "${eachPath}" == *"book-8.5x11-col-emb-loc.pdf"* ]] ; then
+              local backCover=${eachPath/book/backCover}
+              local eachPathPrefix=$(  FN_prefix ${eachPath} )
+              if [ -f "${backCover}" ] ; then
+                lpDo pdftk "${eachPath}" "${backCover}" cat output ${eachPathPrefix}-merge.pdf
+              else
+                EH_problem "Missing ${backCover} --- pdf merge skipped"
+                continue
+              fi
+            fi
+            if [[ "${eachPath}" == *"book-a4-col-emb-loc.pdf"* ]] ; then
+              local backCover=${eachPath/book/backCover}
+              local eachPathPrefix=$(  FN_prefix ${eachPath} )
+              if [ -f "${backCover}" ] ; then
+                lpDo pdftk "${eachPath}" "${backCover}" cat output ${eachPathPrefix}-merge.pdf
+              else
+                EH_problem "Missing ${backCover} --- pdf merge skipped"
+                continue
+              fi
+            fi
+          elif [[ "${eachPath}" == *"bib" ]] ; then
+            continue
+          else
+            echo "==> Unexpected ${eachPath} -- skipped over"
+          fi
+        fi
+      done
+
+    }
+
+    lpDo postProc
+
+    lpDo popd
+
+    lpReturn
+}
+
+
 _CommentBegin_
 *  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(beginning-of-buffer)][|^]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]] || IIC       ::  vis_lcntExport    [[elisp:(org-cycle)][| ]]
 _CommentEnd_
@@ -3839,6 +4009,9 @@ _EOF_
 
     opDo lcntBuildsBaseFVsPrep
 
+    # Read in LCNT-INFO/Release/cur  params
+    opDo lcntReleaseInfoPrep "cur"
+
     function gitLocalBasePathObtain {
         EH_assert [[ $# -eq 0 ]]
         local gitLocalBasePath=""
@@ -3867,11 +4040,13 @@ _EOF_
         opDo lcntBuildsBaseFVsPrep      
 
         gitDest=$( gitLocalBasePathObtain )
-        
+
+        lpDo vis_releasePostProc cur
+
         for eachBuildSpec in ${lcntExport_buildSpecs}; do
             opDo lcntBuildInfoPrep  ${eachBuildSpec}
                 
-            opDoRet pushd "${lcntBuild_releaseBaseDir}"
+            opDoRet pushd "${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}"
 
             for eachPath in $(ls | grep -v CVS) ; do
               echo "==> Exporting ${eachPath} towards ${gitDest}"
@@ -3881,6 +4056,8 @@ _EOF_
                 if [ "${eachPath}" == "accessPage.html" ] ; then
                   continue
                 elif [ "${eachPath}" == "accessPage.md" ] ; then
+                  continue
+                elif [ "${eachPath}" == "githubAccessPage.md" ] ; then
                   opDo cp ${eachPath} ${gitDest}/readme.md
                   inBaseDirDo ${gitDest} git add ${gitDest}/readme.md
                 elif [[ "${eachPath}" == *"cover"* ]] ; then
@@ -3891,13 +4068,16 @@ _EOF_
                   lpDo cp ${eachPath} ${gitDest}/pdf
                   if [[ "${eachPath}" == *"8.5x11"* ]] ; then
                     local eachPathPrefix=$(  FN_prefix ${eachPath} )
-                    lpDo ebook-convert ${eachPath} ${eachPathPrefix}.epub
-                    lpDo mkdir -p ${gitDest}/ebook
-                    lpDo cp ${eachPathPrefix}.epub ${gitDest}/ebook
+                    lpDo echo ebook-convert ${eachPath} ${eachPathPrefix}.epub
+                    # lpDo mkdir -p ${gitDest}/ebook
+                    # lpDo cp ${eachPathPrefix}.epub ${gitDest}/ebook
                   fi
                 elif [[ "${eachPath}" == *"bib" ]] ; then
                   lpDo mkdir -p ${gitDest}/cite
                   lpDo cp ${eachPath} ${gitDest}/cite
+                elif [[ "${eachPath}" == *"jpg" ]] ; then
+                  lpDo mkdir -p ${gitDest}/images
+                  lpDo cp ${eachPath} ${gitDest}/images
                 else
                   echo "==> Unexpected ${eachPath} -- skipped over"
                 fi
@@ -3914,6 +4094,9 @@ _EOF_
             if [ -d "${gitDest}/cite" ] ; then
               inBaseDirDo ${gitDest} git add ${gitDest}/cite
             fi
+            if [ -d "${gitDest}/images" ] ; then
+              inBaseDirDo ${gitDest} git add ${gitDest}/images
+            fi
             if [ -d "${gitDest}/ebook" ] ; then
               inBaseDirDo ${gitDest} git add ${gitDest}/ebook
             fi
@@ -3922,7 +4105,7 @@ _EOF_
             
         done
         
-        inBaseDirDo ${gitDest} git commit -m triggered_by_lcntProc.sh_exports    # use _ instead of ' '
+        inBaseDirDo ${gitDest} git commit -m Attribution-ShareAlike_4.0_International    # use _ instead of ' '
         inBaseDirDo ${gitDest} git push
     }
     
