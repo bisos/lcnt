@@ -3911,7 +3911,13 @@ _EOF_
       for eachPath in $(ls | grep -v CVS) ; do
         # echo "==> Processing ${eachPath}"
         if [ -d "${eachPath}" ] ; then
-          opDo echo skiping directory ${eachPath}
+            if [[ "${eachPath}" == *"book-html"* ]] ; then
+              local ebookName=${eachPath/book-html/eBook.epub}
+              opDoRet pushd "${eachPath}"
+              lpDo ebook-convert index.html ${ebookName}
+              # Another way --- pandoc -f html -t epub3 --epub-metadata=metadata.xml -o output.epub input.html
+              lpDo popd
+            fi
         elif [ -f "${eachPath}" ] ; then
           if [ "${eachPath}" == "accessPage.html" ] ; then
             continue
@@ -3928,8 +3934,9 @@ _EOF_
             if [[ "${eachPath}" == *"book-8.5x11-col-emb-loc.pdf"* ]] ; then
               local backCover=${eachPath/book/backCover}
               local eachPathPrefix=$(  FN_prefix ${eachPath} )
+              local mergedName=${eachPathPrefix/emb-loc/emb-pub}
               if [ -f "${backCover}" ] ; then
-                lpDo pdftk "${eachPath}" "${backCover}" cat output ${eachPathPrefix}-merge.pdf
+                lpDo pdftk "${eachPath}" "${backCover}" cat output ${mergedName}.pdf
               else
                 EH_problem "Missing ${backCover} --- pdf merge skipped"
                 continue
@@ -3938,8 +3945,9 @@ _EOF_
             if [[ "${eachPath}" == *"book-a4-col-emb-loc.pdf"* ]] ; then
               local backCover=${eachPath/book/backCover}
               local eachPathPrefix=$(  FN_prefix ${eachPath} )
+              local mergedName=${eachPathPrefix/emb-loc/emb-pub}
               if [ -f "${backCover}" ] ; then
-                lpDo pdftk "${eachPath}" "${backCover}" cat output ${eachPathPrefix}-merge.pdf
+                lpDo pdftk "${eachPath}" "${backCover}" cat output ${mergedName}.pdf
               else
                 EH_problem "Missing ${backCover} --- pdf merge skipped"
                 continue
@@ -3958,7 +3966,6 @@ _EOF_
     lpDo postProc
 
     lpDo popd
-
     lpReturn
 }
 
@@ -4051,7 +4058,11 @@ _EOF_
             for eachPath in $(ls | grep -v CVS) ; do
               echo "==> Exporting ${eachPath} towards ${gitDest}"
               if [ -d "${eachPath}" ] ; then
-                opDo echo skiping cp -r ${eachPath} ${gitDest}
+                if [[ "${eachPath}" == *"book-html"* ]] ; then
+                  local ebookName=${eachPath/book-html/eBook.epub}
+                  lpDo mkdir -p ${gitDest}/ebook
+                  lpDo cp ${eachPath}/${ebookName} ${gitDest}/ebook
+                fi
               elif [ -f "${eachPath}" ] ; then
                 if [ "${eachPath}" == "accessPage.html" ] ; then
                   continue
@@ -4062,15 +4073,19 @@ _EOF_
                   inBaseDirDo ${gitDest} git add ${gitDest}/readme.md
                 elif [[ "${eachPath}" == *"cover"* ]] ; then
                   lpDo mkdir -p ${gitDest}/covers
-                  lpDo cp ${eachPath} ${gitDest}/covers
+                  if [[ "${eachPath}" == *"8.5x11"* ]] ; then
+                    lpDo cp ${eachPath} ${gitDest}/covers
+                  fi
+                  if [[ "${eachPath}" == *"a4"* ]] ; then
+                    lpDo cp ${eachPath} ${gitDest}/covers
+                  fi
                 elif [[ "${eachPath}" == *"pdf" ]] ; then
                   lpDo mkdir -p ${gitDest}/pdf
-                  lpDo cp ${eachPath} ${gitDest}/pdf
-                  if [[ "${eachPath}" == *"8.5x11"* ]] ; then
-                    local eachPathPrefix=$(  FN_prefix ${eachPath} )
-                    lpDo echo ebook-convert ${eachPath} ${eachPathPrefix}.epub
-                    # lpDo mkdir -p ${gitDest}/ebook
-                    # lpDo cp ${eachPathPrefix}.epub ${gitDest}/ebook
+                  if [[ "${eachPath}" == *"book-8.5x11"* ]] ; then
+                    lpDo cp ${eachPath} ${gitDest}/pdf
+                  fi
+                  if [[ "${eachPath}" == *"book-a4"* ]] ; then
+                    lpDo cp ${eachPath} ${gitDest}/pdf
                   fi
                 elif [[ "${eachPath}" == *"bib" ]] ; then
                   lpDo mkdir -p ${gitDest}/cite
@@ -4082,7 +4097,7 @@ _EOF_
                   echo "==> Unexpected ${eachPath} -- skipped over"
                 fi
               fi
-              inBaseDirDo ${gitDest} git add ${gitDest}/$( FN_nonDirsPart ${eachPath} )
+              # inBaseDirDo ${gitDest} git add ${gitDest}/$( FN_nonDirsPart ${eachPath} )
             done
 
             if [ -d "${gitDest}/covers" ] ; then
