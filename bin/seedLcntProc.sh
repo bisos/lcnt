@@ -104,6 +104,12 @@ baseDir=""
 incOnly=""
 pre=""
 enabled=""
+extent=""
+builds=""
+releaseDest=""
+exportDest=""  # See vis_lcntBuildReleaseExport for params usage example
+
+
 
 bisosPdfViewer="evince"
 
@@ -873,25 +879,26 @@ $( ls -l ./LCNT-INFO/Releases/cur )
 $( ls -l ./curExport )
 $( examplesSeperatorSection "lcntExport Set Current" )
 $( listLcntExportSetCur )
-$( examplesSeperatorChapter "Running lcntBuild And View" )
-${G_myName} ${extraInfo} -p extent="build+view" -i lcntBuild all          # Using enabled list
+$( examplesSeperatorChapter "Running lcntBuild And View And Release" )
 ${G_myName} ${extraInfo} -p extent="build+view" -i lcntBuild cur          # Runs dblock
-${G_myName} ${extraInfo} -p extent="build+view" -i lcntBuild dev          # Does not run dblock
-$( examplesSeperatorChapter "Running lcntBuild And Release" )
+${G_myName} ${extraInfo} -p extent="build+view" -i lcntBuild all          # Using enabled list
 ${G_myName} ${extraInfo} -p extent="build+release" -i lcntBuild all          # Using enabled list
-${G_myName} ${extraInfo} -p extent="build+release" -i lcntBuild cur          # Runs dblock
-${G_myName} ${extraInfo} -p extent="build+release" -i lcntBuild dev          # Does not run dblock
 $( examplesSeperatorChapter "Running lcntExport And Release" )
 ${G_myName} ${extraInfo} -i lcntExport all          # Using enabled list
 ${G_myName} ${extraInfo} -i lcntExport cur
 $( examplesSeperatorChapter "Running Build+Release+Export" )
-${G_myName} ${extraInfo} -p extent="build+release" -i lcntBuildAndExport all          # Using enabled list
-${G_myName} ${extraInfo} -p extent="build+release" -i lcntBuildAndExport cur
+${G_myName} ${extraInfo} -i lcntBuildReleaseExport all          # exportDest Using enabled list
+${G_myName} ${extraInfo} -i lcntBuildReleaseExport cur          # exportDest
+${G_myName} ${extraInfo} -p builds=all -p releaseDest=cur -i lcntBuildReleaseExport cur
 $( examplesSeperatorChapter "Build Info" )
 ${G_myName} ${extraInfo} -i lcntBuildInfo
 ls -l ./curBuild; grep . ./curBuild/*
 cat ./LCNT-INFO/Builds/enabledList
 find  ./LCNT-INFO/Builds -type f -print | grep -v '~' | xargs grep .
+$( examplesSeperatorChapter "Release Info" )
+${G_myName} ${extraInfo} -i lcntReleaseInfo
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -i lcntBuildFpsRefresh all
+${G_myName} ${extraInfo} -i releasePostProc cur
 $( examplesSeperatorChapter "Export Info" )
 ${G_myName} ${extraInfo} -i lcntExportInfo
 ls -l ./curExport; grep . ./curExport/*
@@ -3162,6 +3169,7 @@ _EOF_
     local releasePathDest=""
 
     local dateTag=$( DATE_nowTag )
+    local fileRecord="./Results/${dateTag}.record"
 
     local htmlIndexFile=""
 
@@ -3308,6 +3316,8 @@ _EOF_
     fi
     fi
 
+    lpDo eval echo "====================== ${G_myName} Start=$(DATE_nowTag) ==================" \>\> ${fileRecord}
+
     for inFile in ${inFilesList}; do
         #opDo ls -l ${inFile}
         #
@@ -3352,6 +3362,8 @@ _EOF_
         
         # 3) for all of build forms, build results
         for eachResult in ${lcntBuild_resultsList}; do
+            lpDo eval echo "----------------------------------------------" \>\> ${fileRecord}
+            lpDo eval echo "lcntBuild Start=$(DATE_nowTag) -- ${inFile} -- ${eachResult}" \>\> ${fileRecord}
             case ${eachResult} in
                 "pdf")
                     resultsFileDest=$( resultsDestinationPath pdf )
@@ -3544,6 +3556,8 @@ _EOF_
                     EH_problem "Unknown ${eachResult}"
                     lpReturn
             esac
+            lpDo eval vis_logsAnalysis \>\> ${fileRecord}
+            lpDo eval echo "lcntBuild End=$(DATE_nowTag) -- ${inFile} ${eachResult}" \>\> ${fileRecord}
         done
     done
 
@@ -3552,21 +3566,7 @@ _EOF_
         lpDo ls -l ./curBuild
     fi
 
-    #
-    # 4) Create accessPages for both html and md
-    #
-    opDo lcntReleaseInfoPrep "cur"
-
-    if LIST_isIn "release" "${extentList}"  ; then
-
-      if [ -f ./githubAccessPage.md ] ; then
-        cp ./githubAccessPage.md ./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}
-      fi
-
-      opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.html -i accessPageGen "PLPC-${lcnt_lcntNu}"
-      opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.md -i accessPageGen_md "PLPC-${lcnt_lcntNu}"
-      opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/PLPC-${lcnt_lcntNu}.bib -i inListDotBibOut "PLPC-${lcnt_lcntNu}"
-    fi
+    lpDo eval echo "##################### ${G_myName} End=$(DATE_nowTag) ##########################" \>\> ${fileRecord}
 
     lpReturn
 }
@@ -3863,7 +3863,7 @@ _EOF_
     fi
     lcntInfoPrep ${cntntRawHome}
 
-    local inFilesList=$@
+    # local inFilesList=$@
     local inFile=""
     local eachResult=""
     local lcntNu=${lcnt_lcntNu}
@@ -3877,13 +3877,13 @@ _EOF_
 
     local dateTag=$( DATE_nowTag )
 
-    if [ "$1" == "all" ] ; then
-        inFilesList=$( vis_enabledExportsDirsList )
-    fi
+    # if [ "$1" == "all" ] ; then
+        # inFilesList=$( vis_enabledExportsDirsList )
+    # fi
 
-    if [ "$1" == "cur" ] ; then
-        inFilesList="cur"
-    fi
+    # if [ "$1" == "cur" ] ; then
+        # inFilesList="cur"
+    # fi
 
 
     function postProc {
@@ -3904,7 +3904,17 @@ _EOF_
       # Read in LCNT-INFO/Release/cur  params
       opDo lcntReleaseInfoPrep "cur"
 
-      # opDo lcntBuildInfoPrep  ${eachBuildSpec}
+      #
+      # 4) Create accessPages for both html and md
+      #
+
+      if [ -f ./githubAccessPage.md ] ; then
+        cp ./githubAccessPage.md ./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}
+      fi
+
+      opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.html -i accessPageGen "PLPC-${lcnt_lcntNu}"
+      opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.md -i accessPageGen_md "PLPC-${lcnt_lcntNu}"
+      opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/PLPC-${lcnt_lcntNu}.bib -i inListDotBibOut "PLPC-${lcnt_lcntNu}"
 
       opDoRet pushd "${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}"
 
@@ -3915,7 +3925,12 @@ _EOF_
               local ebookName=${eachPath/book-html/eBook.epub}
               opDoRet pushd "${eachPath}"
               lpDo ebook-convert index.html ${ebookName}
-              # Another way --- pandoc -f html -t epub3 --epub-metadata=metadata.xml -o output.epub input.html
+              if [ -f ${here}/metadata.xml ] ; then
+                lpDo cp ${here}/metadata.xml .
+                lpDo ebook-meta --from-opf=metadata.xml ${ebookName}
+              else
+                EH_problem "Missing metadata.xml"
+              fi
               lpDo popd
             fi
         elif [ -f "${eachPath}" ] ; then
@@ -3961,11 +3976,15 @@ _EOF_
         fi
       done
 
+
     }
 
     lpDo postProc
 
     lpDo popd
+
+    lpDo vis_colorPagesPdf
+
     lpReturn
 }
 
@@ -4081,10 +4100,19 @@ _EOF_
                   fi
                 elif [[ "${eachPath}" == *"pdf" ]] ; then
                   lpDo mkdir -p ${gitDest}/pdf
-                  if [[ "${eachPath}" == *"book-8.5x11"* ]] ; then
+                  if [[ "${eachPath}" == *"book-8.5x11-col-emb-pub"* ]] ; then
                     lpDo cp ${eachPath} ${gitDest}/pdf
                   fi
-                  if [[ "${eachPath}" == *"book-a4"* ]] ; then
+                  if [[ "${eachPath}" == *"book-8.5x11-col-sft-loc"* ]] ; then
+                    lpDo cp ${eachPath} ${gitDest}/pdf
+                  fi
+                  if [[ "${eachPath}" == *"book-a4-col-emb-pub"* ]] ; then
+                    lpDo cp ${eachPath} ${gitDest}/pdf
+                  fi
+                  if [[ "${eachPath}" == *"book-a4-col-sft-loc"* ]] ; then
+                    lpDo cp ${eachPath} ${gitDest}/pdf
+                  fi
+                  if [[ "${eachPath}" == *"colorPages"* ]] ; then
                     lpDo cp ${eachPath} ${gitDest}/pdf
                   fi
                 elif [[ "${eachPath}" == *"bib" ]] ; then
@@ -4243,29 +4271,53 @@ _CommentBegin_
 *  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(delete-other-windows)][(1)]] || IIF       ::  vis_lcntBuildAndExport    [[elisp:(org-cycle)][| ]]
 _CommentEnd_
 
-function vis_lcntBuildAndExport {
+function vis_lcntBuildReleaseExport {
     G_funcEntry
     function describeF {  cat  << _EOF_
-** TODO Should we have extent
--p extent=build || extent=release || extent=build+release  (DEFAULT=build+release)
--p extent=build || extent=view || extent=build+view  (DEFAULT=build+view)
+\$1 is exportDest
+-p enabled=./LCNT-INFO/Builds/enabledList
+-p builds=all
+-p releaseDest=cur
 _EOF_
                        }
 
-    EH_assert [[ $# -gt 0 ]]
+    EH_assert [[ $# -ge 0 ]]
 
     if [ -z "${cntntRawHome}" ] ; then
         cntntRawHome="."
     fi
     lcntInfoPrep ${cntntRawHome}
-    
-    local inFilesList=$@
+
+    local exportDest=$@
+    if [ $# -eq 0 ] ; then
+      exportDest="cur"
+    else
+      exportDest=$@
+    fi
+
+    if [ -z "${enabled}" ] ; then
+      enabled="./LCNT-INFO/Builds/enabledList"
+    fi
+
+    if [ -z "${builds}" ] ; then
+      builds="all"
+    fi
+
+    if [ -z "${releaseDest}" ] ; then
+      releaseDest="cur"
+    fi
+
+    extent="build"
+    lpDo vis_lcntBuild "${builds}"
+
+    lpDo vis_lcntBuildFpsRefresh "${builds}"  # to get spineWidth and nuOfPages
 
     extent="build+release"
+    lpDo vis_lcntBuild "${builds}"
 
-    opDo vis_lcntBuild "${inFilesList}"
+    lpDo vis_releasePostProc ${releaseDest}
 
-    opDo vis_lcntExport "${inFilesList}"
+    lpDo vis_lcntExport ${exportDest}
     
     lpReturn
 }
