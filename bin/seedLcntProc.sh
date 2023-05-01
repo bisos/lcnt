@@ -1019,14 +1019,18 @@ _EOF_
 
     opDo vis_lcntBuildInfoGens
 
+    opDo vis_lcntReleaseInfoGens
+
     opDo vis_lcntExportInfoGens
 
     if [ -d ./LCNT-INFO/Builds/art-8.5x11 ] ; then
         opDo vis_lcntBuildSetCur ./LCNT-INFO/Builds/art-8.5x11
     elif [ -d ./LCNT-INFO/Builds/presPdf ] ; then       
         opDo vis_lcntBuildSetCur ./LCNT-INFO/Builds/presPdf
+    elif [ -d ./LCNT-INFO/Builds/memo-8.5x11 ] ; then
+        opDo vis_lcntBuildSetCur ./LCNT-INFO/Builds/memo-8.5x11
     else
-        EH_problem "Missing  presPdf or art-8.5x11 in ./LCNT-INFO/Builds"
+        EH_problem "Missing  presPdf or art-8.5x11 or memo-8.5x11 in ./LCNT-INFO/Builds"
     fi
 
     opDo vis_lcntExportSetCur ./LCNT-INFO/Exports/ploneProc       
@@ -4203,7 +4207,11 @@ _EOF_
     EH_assert [[ $# -eq 1 ]]
     local inFile="$1"
 
-    opDo FN_fileSymlinkUpdate "${inFile}" ./curExport
+    if [ -f  "${inFile}" ] ; then
+       opDo FN_fileSymlinkUpdate "${inFile}" ./curExport
+    else
+      lpDo echo "curExport skipped for ${inFile}"
+    fi
 
     lpReturn
 }

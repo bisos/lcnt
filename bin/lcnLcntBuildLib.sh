@@ -169,7 +169,10 @@ _EOF_
                 "articleEnFa"|"articleFaEn"|"main")
                     enabledList="${enabledList} art-8.5x11"
                     ;;
-                "presentationEnFa"|"presentationFaEn")
+                "memoEnFa")
+                    enabledList="${enabledList} memo-8.5x11"
+                    ;;
+                 "presentationEnFa"|"presentationFaEn")
                     enabledList="${enabledList} presPdf"
                     enabledList="${enabledList} pres-reveal"                    
                     ;;
@@ -217,6 +220,26 @@ _EOF_
         echo "${thisBuildName}"
         
     }
+
+
+    function memo_8.5x11_build {
+        EH_assert [[ $# -eq 0 ]]
+
+        local buildDirName="memo-8.5x11"
+        local buildDirPath="${lcntBuildCommonInfoBasePath}/${buildDirName}"
+
+        if [ ! -d "${buildDirPath}" ] ; then
+            opDo mkdir "${buildDirPath}"
+        fi
+
+        opDo fvNameValueSpecificSet ${buildDirPath} "buildDocClass" "memo"
+        opDo fvNameValueSpecificSet ${buildDirPath} "buildName" "$( buildNameGet ${buildDirName} ${lcntName} )"
+        opDo fvNameValueSpecificSet ${buildDirPath} "docSrc"  "${articleSrcFile}"
+        opDo fvNameValueSpecificSet ${buildDirPath} "paperSize" "8.5x11"
+        opDo fvNameValueSpecificSet ${buildDirPath} "results" "pdf"
+        opDo fvNameValueSpecificSet ${buildDirPath} "sides" "2"
+    }
+
 
     
     function art_8.5x11_build {
@@ -528,6 +551,11 @@ _EOF_
                 opDo html_build
                 opDo odt_build
                 opDo markdown_build             
+                ;;
+            "memoEnFa")
+                #
+                opDo memo_8.5x11_build
+                opDo html_build
                 ;;
             "presentationEnFa"|"presentationFaEn")
                 opDo presPdf_build

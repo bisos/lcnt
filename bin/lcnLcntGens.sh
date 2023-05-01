@@ -471,7 +471,8 @@ function vis_regNuShow {
   baseDir=`pwd`
 
   if [ "${lcntNu:-}" = "00000" ] ; then
-      echo ${baseDir}
+      # echo ${baseDir}   # Changed to 00000 in 20230430 for use in Builds
+      echo "00000"
       lpReturn
   fi
 

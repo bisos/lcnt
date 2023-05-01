@@ -302,6 +302,9 @@ _EOF_
                 opDo bxGithub_export
                 opDo bxBitbucket_export         
                 ;;
+            "memoEnFa")
+                lpDo echo "Memos are not exportable"
+                ;;
             *)
                 EH_problem "Missing Model"
                 ;;

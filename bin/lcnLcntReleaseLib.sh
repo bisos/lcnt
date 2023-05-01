@@ -96,11 +96,18 @@ _EOF_
     
     local lcntInfoPath="./${lcntInfoDir}"
 
+    local lcntReleaseCommonInfoBasePath="${lcntInfoPath}/Releases"
+
+    if [ ! -d "${lcntReleaseCommonInfoBasePath}" ] ; then
+        opDo mkdir "${lcntReleaseCommonInfoBasePath}"
+    fi
+
+
     function fvNameValueCommonSet {
         EH_assert [[ $# -eq 2 ]]
         local fvName=$1
         local fvValue=$2
-        local fvNamePath="${lcntBuildCommonInfoBasePath}/${fvName}"
+        local fvNamePath="${lcntReleaseCommonInfoBasePath}/${fvName}"
         
         if [[ ! -s "${fvNamePath}" ]]; then
             echo "${fvValue}" > "${fvNamePath}"
@@ -123,25 +130,23 @@ _EOF_
         fi
     }
 
-    function art_8.5x11_build {
+    function rel0_1 {
         EH_assert [[ $# -eq 0 ]]
 
-        local buildDirName="art-8.5x11"
-        local releaseDirPath="${lcntBuildCommonInfoBasePath}/${buildDirName}"
+        local relName="0.1"
+        local releaseDirPath="${lcntReleaseCommonInfoBasePath}/${relName}"
 
         if [ ! -d "${releaseDirPath}" ] ; then
             opDo mkdir "${releaseDirPath}"
         fi
 
-        opDo fvNameValueSpecificSet ${releaseDirPath} "buildDocClass" "article"
-        opDo fvNameValueSpecificSet ${releaseDirPath} "buildName" "$( buildNameGet ${buildDirName} ${lcntName} )"
-        opDo fvNameValueSpecificSet ${releaseDirPath} "docSrc"  "${articleSrcFile}"
-        opDo fvNameValueSpecificSet ${releaseDirPath} "paperSize" "8.5x11"
-        opDo fvNameValueSpecificSet ${releaseDirPath} "results" "pdf"
-        opDo fvNameValueSpecificSet ${releaseDirPath} "sides" "2"
+        lpDo fvNameValueSpecificSet ${releaseDirPath} "relTag" "${relName}"
+        lpDo fvNameValueSpecificSet ${releaseDirPath} "versionNu" "${relName}"
+
+        lpDo ln -s ${relName} ${lcntReleaseCommonInfoBasePath}/cur
     }
 
-    lpDo echo art_8.5x11_build
+    lpDo rel0_1
 
     lpReturn
 }       
