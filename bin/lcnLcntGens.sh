@@ -71,6 +71,8 @@ _CommentEnd_
 
 . ${lcntBinBase}/lcnLcntBuildLib.sh
 . ${lcntBinBase}/lcnLcntExportLib.sh
+. ${lcntBinBase}/lcnLcntReleaseLib.sh
+
 
 # PRE parameters
 
@@ -215,6 +217,7 @@ ${G_myName} ${extraInfo} -p cntntRawHome=. -e "List Entry -- .bib .html" -i lcnt
 ${G_myName} ${extraInfo} -p cntntRawHome=. -e "List Entry -- .bib .html" -i lcntEntryClean
 --- Transition and Preparation Tools ---
 ${G_myName} ${extraInfo} -p cntntRawHome=. -i plpc2lcnt
+${G_myName} ${extraInfo} -p cntntRawHome=. -i lcntInfoFullRenew
 ${G_myName} ${extraInfo} -p cntntRawHome=. -i lcntBuildInfoGens
 ${G_myName} ${extraInfo} -p cntntRawHome=. -i lcntExportInfoGens
 ${G_myName} ${extraInfo} -p cntntRawHome=. -i accessPagePublish
@@ -2015,6 +2018,46 @@ _EOF_
 
 
 _CommentBegin_
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(beginning-of-buffer)][|^]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]] || IIC       ::  vis_lcntInfoFullRenew    [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+
+function vis_lcntInfoFullRenew {
+    G_funcEntry
+    function describeF {  cat  << _EOF_
+_EOF_
+                       }
+    EH_assert [[ $# -eq 0 ]]
+
+    if [ -z "${cntntRawHome}" ] ; then
+        cntntRawHome=.
+    fi
+
+    opDo lcnLcntGens.sh -n showRun -p cntntRawHome="${cntntRawHome}" -i lcntInfoRenew
+
+    opDo vis_lcntBuildInfoGens
+
+    opDo vis_lcntReleaseInfoGens
+
+    opDo vis_lcntExportInfoGens
+
+    if [ -d ./LCNT-INFO/Builds/art-8.5x11 ] ; then
+        opDo lcntProc.sh -i lcntBuildSetCur ./LCNT-INFO/Builds/art-8.5x11
+    elif [ -d ./LCNT-INFO/Builds/presPdf ] ; then
+        opDo lcntProc.sh -i lcntBuildSetCur ./LCNT-INFO/Builds/presPdf
+    elif [ -d ./LCNT-INFO/Builds/memo-8.5x11 ] ; then
+        opDo lcntProc.sh -i lcntBuildSetCur ./LCNT-INFO/Builds/memo-8.5x11
+    else
+        EH_problem "Missing  presPdf or art-8.5x11 or memo-8.5x11 in ./LCNT-INFO/Builds"
+    fi
+
+    opDo lcntProc.sh -i lcntExportSetCur ./LCNT-INFO/Exports/ploneProc
+
+    lpReturn
+}
+
+
+
+_CommentBegin_
 *  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || IIF   ::  vis_lcntInfoRenewCustomize    [[elisp:(org-cycle)][| ]]
 _CommentEnd_
 
@@ -2070,6 +2113,8 @@ function vis_parseFormTest {
 
   echo ${colLetfSide} ${attachList}
 }
+
+
 
 
 _CommentBegin_

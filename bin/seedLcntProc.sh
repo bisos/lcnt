@@ -3304,7 +3304,8 @@ _EOF_
                 echo ${lcntBuild_releaseBaseDir}/c-${lcntNu}-${lcntBuild_buildName}.md
                 ;;
             "html")
-                echo ${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/c-${lcntNu}-${lcntBuild_relTag}-${lcntBuild_buildName}-${resultType}
+                #echo ${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/c-${lcntNu}-${lcntBuild_relTag}-${lcntBuild_buildName}-${resultType}
+                echo ${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}
                 ;;
             *)
                 EH_problem "Unknown ${eachResult}"
@@ -3468,8 +3469,9 @@ _EOF_
                         
                         if [ -d ${resultsPathDest} ] ; then
                             # If the version exists, also date tag it.
-                            opDo cp -r -p ${resultsPathDest}  ${releaseDestinationPath}
-                            opDo ls -ld  ${releaseDestinationPath}
+                            #opDo cp -r -p ${resultsPathDest}  ${releaseDestinationPath}
+                            opDo cp -r ${resultsPathDest}  ${releaseDestinationPath}
+                            opDo ls -ld  ${releaseDestinationPath}/$(basename ${resultsPathDest})
                         else
                             if LIST_isIn "build" "${extentList}"  ; then
                                 opDo lcnLcntInputProc.sh -p inFormat=xelatex -p outputs=heveaHtml -i buildDocs  ${lcntBuild_docSrc}
@@ -3478,7 +3480,7 @@ _EOF_
                                 fi
                                 opDo mv heveaHtml-${docSrcPrefix} "${resultsPathDest}"
                                 opDo cp -r -p ${resultsPathDest}  ${releaseDestinationPath}
-                                opDo ls -ld  ${releaseDestinationPath}
+                                opDo ls -ld  ${releaseDestinationPath}/$(basename ${resultsPathDest})
                             else
                                 EH_problem "Missing ${resultsPathDest}"
                                 lpReturn
