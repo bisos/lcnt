@@ -217,7 +217,7 @@ ${G_myName} ${extraInfo} -p cntntRawHome=. -e "List Entry -- .bib .html" -i lcnt
 ${G_myName} ${extraInfo} -p cntntRawHome=. -e "List Entry -- .bib .html" -i lcntEntryClean
 --- Transition and Preparation Tools ---
 ${G_myName} ${extraInfo} -p cntntRawHome=. -i plpc2lcnt
-${G_myName} ${extraInfo} -p cntntRawHome=. -i lcntInfoFullRenew
+${G_myName} ${extraInfo} -p cntntRawHome=. -i lcntInfoFullRenew    # NEEDED after baseFullStart as of 2023
 ${G_myName} ${extraInfo} -p cntntRawHome=. -i lcntBuildInfoGens
 ${G_myName} ${extraInfo} -p cntntRawHome=. -i lcntExportInfoGens
 ${G_myName} ${extraInfo} -p cntntRawHome=. -i accessPagePublish
@@ -989,6 +989,22 @@ function vis_lcntBaseConfigMulti {
             startDocBody="bodyArticleEnFa.tex"
             startBodySrcForms="art"
             ;;
+
+      "art:fa+en"|"art:fa")
+            startTemplateArticle="articleFrontFaEn.ttytex.start"
+            startDocArticle="articleFaEn.ttytex"
+            startArtSrcForms="art"
+
+            startTemplatePresentation=""
+            startDocPresentation=""
+            startPresSrcForms=""
+
+            # /bisos/apps/defaults/begin/templates/purposed/lcnt/latex/bodyArticleOnlyEnFa.tex.begin
+            startTemplateBody="bodyArticleOnlyFaEn.tex.begin"
+            startDocBody="bodyArticleFaEn.tex"
+            startBodySrcForms="art"
+            ;;
+
       "art+pres:fa+en"|"pres+art:fa+en")
             startTemplateArticle="artPresFrontFaEn.ttytex.start"
             startDocArticle="articleFaEn.ttytex"

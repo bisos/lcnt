@@ -3915,12 +3915,18 @@ _EOF_
       #
 
       if [ -f ./githubAccessPage.md ] ; then
-        cp ./githubAccessPage.md ./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}
+        lpDo cp ./githubAccessPage.md ./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}
       fi
 
       opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.html -i accessPageGen "PLPC-${lcnt_lcntNu}"
       opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.md -i accessPageGen_md "PLPC-${lcnt_lcntNu}"
-      opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/PLPC-${lcnt_lcntNu}.bib -i inListDotBibOut "PLPC-${lcnt_lcntNu}"
+      if [ -f ./lcnt.bib ] ; then
+        lpDo cp ./lcnt.bib ./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/PLPC-${lcnt_lcntNu}.bib
+      else
+        opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/PLPC-${lcnt_lcntNu}.bib -i inListDotBibOut "PLPC-${lcnt_lcntNu}"
+      fi
+
+
 
       opDoRet pushd "${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}"
 
