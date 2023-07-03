@@ -3916,10 +3916,11 @@ _EOF_
 
       if [ -f ./githubAccessPage.md ] ; then
         lpDo cp ./githubAccessPage.md ./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}
+      else
+        opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.html -i accessPageGen "PLPC-${lcnt_lcntNu}"
+        opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.md -i accessPageGen_md "PLPC-${lcnt_lcntNu}"
       fi
 
-      opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.html -i accessPageGen "PLPC-${lcnt_lcntNu}"
-      opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/accessPage.md -i accessPageGen_md "PLPC-${lcnt_lcntNu}"
       if [ -f ./lcnt.bib ] ; then
         lpDo cp ./lcnt.bib ./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/PLPC-${lcnt_lcntNu}.bib
       else
@@ -4112,6 +4113,9 @@ _EOF_
                   fi
                 elif [[ "${eachPath}" == *"pdf" ]] ; then
                   lpDo mkdir -p ${gitDest}/pdf
+                  if [[ "${eachPath}" == *"art-"* ]] ; then
+                    lpDo cp ${eachPath} ${gitDest}/pdf
+                  fi
                   if [[ "${eachPath}" == *"book-8.5x11-col-emb-pub"* ]] ; then
                     lpDo cp ${eachPath} ${gitDest}/pdf
                   fi
@@ -4215,9 +4219,10 @@ _EOF_
     EH_assert [[ $# -eq 1 ]]
     local inFile="$1"
 
-    if [ -f  "${inFile}" ] ; then
+    if [ -e  "${inFile}" ] ; then
        opDo FN_fileSymlinkUpdate "${inFile}" ./curExport
     else
+      EH_problem "Missing ${inFile}"
       lpDo echo "curExport skipped for ${inFile}"
     fi
 

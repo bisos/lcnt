@@ -497,10 +497,11 @@ function ttytexToPdf {
              else
           opDo xelatex  ${extraLatexOptions} $1.tex
           #opDo echo SKIPPED: bibtex $1
-          opDo vis_bibTexProvider_run $1.ttytex   
+          opDo vis_bibTexProvider_run $1.ttytex
           opDo makeindex $1.idx
           opDo makeglossaries $1          
           opDo xelatex  ${extraLatexOptions} $1.tex
+          opDo vis_bibTexProvider_run $1.ttytex    # in case there are bibs in notes
           opDo xelatex  ${extraLatexOptions} $1.tex
              fi
           ;;
