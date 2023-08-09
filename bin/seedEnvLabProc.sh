@@ -76,9 +76,9 @@ _EOF_
 
 # ./bystarLib.sh
 . ${opBinBase}/bystarLib.sh
-. ${opBinBase}/mmaLib.sh
-. ${opBinBase}/mmaQmailLib.sh
-. ${opBinBase}/mmaDnsLib.sh
+#. ${opBinBase}/mmaLib.sh
+#. ${opBinBase}/mmaQmailLib.sh
+#. ${opBinBase}/mmaDnsLib.sh
 
 # /opt/public/osmt/bin/bystarInfoBase.libSh 
 . ${opBinBase}/bystarInfoBase.libSh
@@ -112,6 +112,8 @@ ${G_myName} ${extraInfo}  -i  fullClean
 ${G_myName} ${extraInfo} -i envelopeTexFullStdout
 ${G_myName} ${extraInfo} -i envelopeProcPdf
 ${G_myName} ${extraInfo} -i envelopeProcLpr
+${G_myName} ${extraInfo} -i personalEnvTexFullStdout
+${G_myName} ${extraInfo} -i personalEnvProcPdf
 ${G_myName} ${extraInfo} -i labelProc 1 1
 ${G_myName} ${extraInfo} -i labelProc 1 2
 --- DEVELOPMENT MODE ---
@@ -232,6 +234,33 @@ function vis_envelopeTexFullStdout {
     vis_envelopeTexEndStdout
 }
 
+function vis_personalEnvProcPdf {
+    opDo mkdir /tmp/$$.envLabProc
+    opDo cd /tmp/$$.envLabProc
+
+    vis_personalEnvTexFullStdout > envelope.tex
+
+    pdflatex  envelope.tex
+    opDo ls -l /tmp/$$.envLabProc/envelope.pdf
+    ANT_raw "acroread /tmp/$$.envLabProc/envelope.pdf"
+}
+
+
+function vis_personalEnvTexFullStdout {
+
+    vis_envelopeTexBeginStdout
+
+    vis_personalEnvTexPrinterStdout
+
+    vis_envelopeTexOriginatorStdout
+
+    vis_envelopeTexRecepientsStdout
+
+    vis_envelopeTexEndStdout
+}
+
+
+
 
 function vis_envelopeTexBeginStdout {
     # NOTYET, this should be based on printerName
@@ -270,6 +299,30 @@ function vis_envelopeTexPrinterStdout {
 \mlabel
 _EOF_
 }
+
+
+function vis_personalEnvTexPrinterStdout {
+
+    # NOTYET, this should be based on printerName
+
+	      cat   << _EOF_
+
+%\usepackage[businessenvelope,customenvelopes,rotateenvelopes]{envlab}
+%\usepackage[businessenvelope,centerenvelopes,norotateenvelopes]{envlab}
+\usepackage[personalenvelope,centerenvelopes,rotateenvelopes]{envlab}
+
+
+\makelabels
+
+%\setlength{\EnvelopeTopMargin}{3in}
+\setlength{\EnvelopeTopMargin}{0.1in}
+
+\begin{document}
+\startlabels
+\mlabel
+_EOF_
+}
+
 
 
 function vis_labelTexPrinterStdout {

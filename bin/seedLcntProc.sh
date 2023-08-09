@@ -96,7 +96,7 @@ purpose=""
 . ${lcntBinBase}/lcnLcntBuildLib.sh
 . ${lcntBinBase}/lcnLcntExportLib.sh
 . ${lcntBinBase}/lcnLcntReleaseLib.sh
-
+. ${lcntBinBase}/lcnLcntMailingLib.sh
 
 # PRE parameters
 
@@ -219,6 +219,9 @@ function noArgsHook {
                 ;;
             "export")         # Build, release, export
                 vis_exportExamples
+                ;;
+            "mailing")         # Build, release, export
+                vis_mailingExamples
                 ;;
             examples)         # Build, release, export
                 vis_examples
@@ -343,6 +346,8 @@ $( examplesSeperatorChapter "Release After Building curRelease=${curReleaseEndLi
 ${G_myName} release
 $( examplesSeperatorChapter "Export After Building And Release curExport=${curExportEndLink}" )
 ${G_myName} export
+$( examplesSeperatorChapter "Mailing --- curBuild=${curBuildEndLink} curRelease=${curReleaseEndLink}" )
+${G_myName} mailing
 _EOF_
 
     lpReturn
@@ -3927,7 +3932,9 @@ _EOF_
         opDo lcnLcntOutputs.sh -n showRun -p outFile=./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/PLPC-${lcnt_lcntNu}.bib -i inListDotBibOut "PLPC-${lcnt_lcntNu}"
       fi
 
-
+      if [ -f ./common/pdfPrinting.org ] ; then
+        lpDo cp ./common/pdfPrinting.org ./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}
+      fi
 
       opDoRet pushd "${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}"
 
@@ -4103,6 +4110,9 @@ _EOF_
                 elif [ "${eachPath}" == "githubAccessPage.md" ] ; then
                   opDo cp ${eachPath} ${gitDest}/readme.md
                   inBaseDirDo ${gitDest} git add ${gitDest}/readme.md
+                elif [ "${eachPath}" == "pdfPrinting.org" ] ; then
+                  opDo cp ${eachPath} ${gitDest}/pdf/readme.org
+                  inBaseDirDo ${gitDest} git add ${gitDest}/pdf/readme.org
                 elif [[ "${eachPath}" == *"cover"* ]] ; then
                   lpDo mkdir -p ${gitDest}/covers
                   if [[ "${eachPath}" == *"8.5x11"* ]] ; then
