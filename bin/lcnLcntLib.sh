@@ -9,6 +9,8 @@ lcntUnInfo=""
 
 lcntNuBaseList="/lcnt/outputs/all/lists/nuBaseDir"
 
+lcntAttrGenPub=lgcc   # The default when the base dir is not in /lcnt
+lcntAttrPermanence=permanent  # The default when the base dir is not in /lcnt
 
 function isDirsProcessor {
   #set -x

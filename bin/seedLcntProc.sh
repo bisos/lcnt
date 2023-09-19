@@ -309,6 +309,8 @@ _EOF_
     typeset curReleaseEndLink=$( FN_nonDirsPart $(  FN_absolutePathGet ./LCNT-INFO/Releases/cur ))
     typeset curExportEndLink=$( FN_nonDirsPart $(  FN_absolutePathGet ./curExport ))
 
+    opDo lcntBuildInfoPrep "curBuild"
+
     typeset examplesInfo="${extraInfo} ${runInfo}"
 
  cat  << _EOF_
@@ -342,11 +344,12 @@ ${G_myName} ${extraInfo} -i lcntBuildFpsRefresh cur  # Updates spineWidth
 ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -i lcntBuildFpsRefresh all
 ${G_myName} ${extraInfo} -p pre="clean" -p extent="build+view" -i lcntBuild cur  # Runs dblock
 ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view" -i lcntBuild all  # Using enabled list
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view+release" -i lcntBuild all  # Using enabled list
 $( examplesSeperatorChapter "Release After Building curRelease=${curReleaseEndLink}" )
 ${G_myName} release
 $( examplesSeperatorChapter "Export After Building And Release curExport=${curExportEndLink}" )
 ${G_myName} export
-$( examplesSeperatorChapter "Mailing --- curBuild=${curBuildEndLink} curRelease=${curReleaseEndLink}" )
+$( examplesSeperatorChapter "Mailing --- mailingFile="${lcntBuild_mailingFile}" curBuild=${curBuildEndLink} curRelease=${curReleaseEndLink}" )
 ${G_myName} mailing
 _EOF_
 
@@ -735,7 +738,7 @@ function listLcntBuildSetCur {
     local inFilesList=""
     local inFile=""
     #inFilesList=$( vis_enabledBuildsDirsList )
-    inFilesList=$( vis_buildsDirsList )
+    inFilesList=$( vis_buildsDirsList | grep -v .auctex )
     for inFile in ${inFilesList}; do
         echo ${G_myName} ${extraInfo} -i lcntBuildSetCur ${inFile}
     done
@@ -3491,6 +3494,8 @@ _EOF_
                                 lpReturn
                             fi
                         fi
+
+                        lpDo vis_mailingsDblockUpdate
                     fi
                     ;;
                 "odt")
@@ -3567,8 +3572,10 @@ _EOF_
                     EH_problem "Unknown ${eachResult}"
                     lpReturn
             esac
-            lpDo eval vis_logsAnalysis \>\> ${fileRecord}
-            lpDo eval echo "lcntBuild End=$(DATE_nowTag) -- ${inFile} ${eachResult}" \>\> ${fileRecord}
+            if vis_funcIsDefined vis_logsAnalysis ; then
+              lpDo eval vis_logsAnalysis \>\> ${fileRecord}
+              lpDo eval echo "lcntBuild End=$(DATE_nowTag) -- ${inFile} ${eachResult}" \>\> ${fileRecord}
+            fi
         done
     done
 
@@ -3919,6 +3926,7 @@ _EOF_
       # 4) Create accessPages for both html and md
       #
 
+
       if [ -f ./githubAccessPage.md ] ; then
         lpDo cp ./githubAccessPage.md ./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}
       else
@@ -3935,6 +3943,7 @@ _EOF_
       if [ -f ./common/pdfPrinting.org ] ; then
         lpDo cp ./common/pdfPrinting.org ./${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}
       fi
+
 
       opDoRet pushd "${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}"
 
@@ -3995,15 +4004,17 @@ _EOF_
           fi
         fi
       done
-
-
     }
 
     lpDo postProc
 
     lpDo popd
 
-    lpDo vis_colorPagesPdf
+    if vis_funcIsDefined vis_colorPagesPdf ; then
+      lpDo vis_colorPagesPdf
+    else
+      ANT_cooked "skiping invocation of vis_colorPagesPdf"
+    fi
 
     lpReturn
 }

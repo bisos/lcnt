@@ -682,10 +682,12 @@ _EOF_
         lcntBuild_paperGsm=""
     fi
 
-    if [ -f "${lcntBuildInfoPath}/mailingFile" ] ; then
-        lcntBuild_mailingFile=$( head -1 "${lcntBuildInfoPath}/mailingFile" )
+    if [ -f "${lcntBuildInfoPath}/mailings" ] ; then
+        lcntBuild_mailingFile=$( head -1 "${lcntBuildInfoPath}/mailings" )
+        lcntBuild_mailings=$( cat "${lcntBuildInfoPath}/mailings" )
     else
         lcntBuild_mailingFile=""
+        lcntBuild_mailings=""
     fi
 
 }

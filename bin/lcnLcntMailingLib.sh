@@ -85,14 +85,17 @@ ${G_myName} ${extraInfo} -p extent="build+view" -i lcntBuild cur          # Runs
 $( examplesSeperatorChapter "Mailing Info" )
 ${G_myName} ${extraInfo} -i lcntMailingInfoReport
 $( examplesSeperatorChapter "Initial Setups" )
-${G_myName} ${extraInfo} -i mailingContentGen
-${G_myName} ${extraInfo} -f -i mailingContentGen
+${G_myName} ${extraInfo} -i mailingHeaderGen curBuild # curBuild is default, specify other lcntBuildInfoPath
+${G_myName} ${extraInfo} -p marmee=gmail/first.last -i mailingHeaderGen # NOTYET with no marmee parameter, edit placeholders in
+${G_myName} ${extraInfo} -f -i mailingHeaderGen
 $( examplesSeperatorChapter "Body Parts Refresh" )
-${G_myName} ${extraInfo} -i mailingBodyPartsRefresh
-${G_myName} ${extraInfo} -p pdf=pdf -i mailingBodyPartsRefresh
+${G_myName} ${extraInfo} -i mailingBodyPartsRefresh  # Creates appropriate empty dblock for html content + perhaps pdf attachement
+${G_myName} ${extraInfo} -p pdf=pdf -i mailingBodyPartsRefresh # Creates appropriate empty dblock for html content + perhaps pdf attachement
+$( examplesSeperatorChapter "Body Parts DBlock Update" )
+${G_myName} ${extraInfo} -i mailingsDblockUpdate  # Applies to all mailings
 $( examplesSeperatorChapter "Build+Release+BodyPartsRefresh " )
-${G_myName} ${extraInfo} -i resultsRelease
-${G_myName} ${extraInfo} -i buildResultsRelease
+${G_myName} ${extraInfo} -i resultsRelease    # applies mailingsDblockUpdate to the latest content
+${G_myName} ${extraInfo} -i buildResultsRelease # applies mailingsDblockUpdate to the latest content
 _EOF_
 
     lpReturn
@@ -120,9 +123,12 @@ _EOF_
     opDo lcntBuildInfoPrep ${lcntBuildInfoPath}
 
     echo "lcntBuild_mailingFile=${lcntBuild_mailingFile}"
+    for each in ${lcntBuild_mailings} ; do
+        echo "lcntBuild_mailings=${each}"
+    done
 }
 
-function vis_mailingContentGen {
+function vis_mailingHeaderGen {
     #set -x
     G_funcEntry
     function describeF {  G_funcEntryShow; cat  << _EOF_
@@ -180,6 +186,7 @@ _EOF_
 function vis_mailingBodyPartsRefresh {
     G_funcEntry
     function describeF {  G_funcEntryShow; cat  << _EOF_
+Used to be called vis_bodyPartsRefresh.
 _EOF_
     }
     EH_assert [[ $# -lt 2  ]]
@@ -230,6 +237,86 @@ _EOF_
     fi
 
 }
+
+
+function vis_mailingsDblockUpdate {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 2  ]]
+
+    local lcntBuildInfoPath=curBuild
+
+    if [ $# -eq 1 ] ; then
+         lcntBuildInfoPath="$1"
+    fi
+
+    opDo lcntBuildInfoPrep ${lcntBuildInfoPath}
+
+    if [ -z  "${lcntBuild_mailings}" ] ; then
+        lpReturn 101
+    fi
+
+    for each in ${lcntBuild_mailings} ; do
+        if [ ! -f "${each}" ] ; then
+            EH_problem "Missing ${each}"
+            continue
+        fi
+        opDo vis_dblockUpdateFile ${each}
+    done
+}
+
+
+function vis_mailingName {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -eq 0 ]]
+
+    local mailingFileName="./content.mail"
+
+    local mailingName="unspecifiedMailingName"
+
+    if [ ! -f "${mailingFileName}" ] ; then
+	EH_problem "Missing mailingName"
+    else
+	mailingName=$( egrep '^X-MailingName:' content.mail | cut -d : -f 2 )
+    fi
+
+    if [ -z "${mailingName}" ] ; then
+	EH_problem "Missing X-MailingName"
+    fi
+
+    echo ${mailingName}
+}
+
+function vis_mailingDoc {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -eq 0 ]]
+
+    local mailingFileName="./content.mail"
+
+    local mailingDoc="unspecifiedMailingName"
+
+    if [ ! -f "${mailingFileName}" ] ; then
+	EH_problem "Missing mailingName"
+    else
+	mailingDoc=$( egrep '^X-MailingDoc:' content.mail | cut -d : -f 2 )
+    fi
+
+    if [ -z "${mailingDoc}" ] ; then
+	EH_problem "Missing X-MailingDoc: -- X-MailingName used instead"
+	mailingDoc=$( vis_mailingName )
+    fi
+
+    echo ${mailingDoc}
+}
+
 
 
 
