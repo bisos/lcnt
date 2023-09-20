@@ -91,6 +91,7 @@ purpose=""
 . ${opBinBase}/lpReRunAs.libSh
 
 . ${opBinBase}/lpInBaseDirDo.libSh
+. ${opBinBase}/bleeLib.sh
 
 . ${lcntBinBase}/lcnLcntLib.sh
 . ${lcntBinBase}/lcnLcntBuildLib.sh
@@ -685,6 +686,8 @@ ${G_myName} ${extraInfo}  -p cntntRawHome=. -i lcntInfoFullRenew    # Includes a
 lcnLcntGens.sh -n showRun -p cntntRawHome=. -i lcntInfoRenew        # Modernizes LCNT-INFO -- harmless -- non-intrusive
 ${G_myName} ${extraInfo}  -p cntntRawHome=. -i lcntBuildInfoGens    # Adds LCNT-INFO/Builds
 ${G_myName} ${extraInfo}  -p cntntRawHome=. -i lcntExportInfoGens   # Adds LCNT-INFO/Exports
+$( examplesSeperatorChapter "Lcnt Build Info Update" )
+${G_myName} ${extraInfo}  -p cntntRawHome=. -i lcntBuildInfoUpdate auto mailing
 $( examplesSeperatorTopLabel "${G_myName} :: Config Activity Groupings" )
 $( examplesSeperatorChapter "Config LCNT-INFO Base to latest" )
 $( examplesSeperatorSection "Info lcntNu To Stdout" )
@@ -3172,6 +3175,10 @@ _EOF_
     local inFile=""
     local eachResult=""
     local lcntNu=$( cat ./LCNT-INFO/lcntNu )
+    if [ "${lcntNu}" == "00000" ] ; then
+      lcntNu=""
+    fi
+
     local lcntVersion=$( cat ./LCNT-INFO/version )
 
     local resultsFileDest=""
@@ -3272,19 +3279,23 @@ _EOF_
     function resultsDestinationPath {
         EH_assert [[ $# -eq 1 ]]
         local resultType="$1"
-        
+        local dashLcntNu=""
+        if [ ! -z  "${lcntNu}" ] ; then
+          dashLcntNu="-${lcntNu}"
+        fi
+
         case ${resultType} in
             "pdf")
-                echo ${lcntBuild_resultsBaseDir}/c-${lcntNu}-${lcntBuild_buildName}.${resultType}
+                echo ${lcntBuild_resultsBaseDir}/c${dashLcntNu}-${lcntBuild_buildName}.${resultType}
                 ;;
             "odt")
-                echo ${lcntBuild_resultsBaseDir}/c-${lcntNu}-${lcntBuild_buildName}.${resultType}
+                echo ${lcntBuild_resultsBaseDir}/c${dashLcntNu}-${lcntBuild_buildName}.${resultType}
                 ;;
             "markdown")
-                echo ${lcntBuild_resultsBaseDir}/c-${lcntNu}-${lcntBuild_buildName}.md
+                echo ${lcntBuild_resultsBaseDir}/c${dashLcntNu}-${lcntBuild_buildName}.md
                 ;;
             "html")
-                echo ${lcntBuild_resultsBaseDir}/c-${lcntNu}-${lcntBuild_buildName}-${resultType}
+                echo ${lcntBuild_resultsBaseDir}/c${dashLcntNu}-${lcntBuild_buildName}-${resultType}
                 ;;
             *)
                 EH_problem "Unknown ${eachResult}"
@@ -3295,6 +3306,10 @@ _EOF_
     function releaseDestinationPath {
         EH_assert [[ $# -eq 1 ]]
         local resultType="$1"
+        local dashLcntNu=""
+        if [ ! -z  "${lcntNu}" ] ; then
+          dashLcntNu="-${lcntNu}"
+        fi
 
         if [ ! -d ${lcntBuild_releaseBaseDir}/${lcntBuild_relTag} ] ; then
           lpDo mkdir ${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}
@@ -3303,13 +3318,13 @@ _EOF_
         case ${resultType} in
             "pdf")
                 #echo ${lcntBuild_releaseBaseDir}/c-${lcntNu}-${lcntBuild_buildName}-${lcntVersion}.${resultType}
-                echo ${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/c-${lcntNu}-${lcntBuild_relTag}-${lcntBuild_buildName}.${resultType}
+                echo ${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/c${dashLcntNu}-${lcntBuild_relTag}-${lcntBuild_buildName}.${resultType}
                 ;;
             "odt")
-                echo ${lcntBuild_releaseBaseDir}/c-${lcntNu}-${lcntBuild_buildName}.${resultType}
+                echo ${lcntBuild_releaseBaseDir}/c${dashLcntNu}-${lcntBuild_buildName}.${resultType}
                 ;;
             "markdown")
-                echo ${lcntBuild_releaseBaseDir}/c-${lcntNu}-${lcntBuild_buildName}.md
+                echo ${lcntBuild_releaseBaseDir}/c${dashLcntNu}-${lcntBuild_buildName}.md
                 ;;
             "html")
                 #echo ${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/c-${lcntNu}-${lcntBuild_relTag}-${lcntBuild_buildName}-${resultType}
@@ -3375,8 +3390,10 @@ _EOF_
         
         # 3) for all of build forms, build results
         for eachResult in ${lcntBuild_resultsList}; do
-            lpDo eval echo "----------------------------------------------" \>\> ${fileRecord}
-            lpDo eval echo "lcntBuild Start=$(DATE_nowTag) -- ${inFile} -- ${eachResult}" \>\> ${fileRecord}
+            if LIST_isIn "build" "${extentList}"  ; then
+               lpDo eval echo "----------------------------------------------" \>\> ${fileRecord}
+               lpDo eval echo "lcntBuild Start=$(DATE_nowTag) -- ${inFile} -- ${eachResult}" \>\> ${fileRecord}
+            fi
             case ${eachResult} in
                 "pdf")
                     resultsFileDest=$( resultsDestinationPath pdf )
@@ -3458,19 +3475,21 @@ _EOF_
                         fi
                     fi
 
-                    if [ "${lcntBuild_docSrc}" == "$(vis_getPresentationSrcFile .)" ] ; then            
-                      if [ -s  ./revealJsBase/${docSrcPrefix}.html ] ; then
-                        opDo ${viewCommand} ./revealJsBase/${docSrcPrefix}.html &
+                    if LIST_isIn "view" "${extentList}"  ; then
+                      if [ "${lcntBuild_docSrc}" == "$(vis_getPresentationSrcFile .)" ] ; then            
+                        if [ -s  ./revealJsBase/${docSrcPrefix}.html ] ; then
+                          opDo ${viewCommand} ./revealJsBase/${docSrcPrefix}.html &
+                        else
+                          EH_problem "Missing ./revealJsBase/${docSrcPrefix}.html "
+                        fi
                       else
-                        EH_problem "Missing ./revealJsBase/${docSrcPrefix}.html "
+                        if [ -s ${htmlIndexFile} ] ; then
+                          opDo ${viewCommand} ${htmlIndexFile} &
+                        else
+                          EH_problem "Missing ${htmlIndexFile}"
+                        fi
                       fi
-                    else
-                      if [ -s ${htmlIndexFile} ] ; then
-                        opDo ${viewCommand} ${htmlIndexFile} &
-                      else
-                        EH_problem "Missing ${htmlIndexFile}"
-                      fi
-                    fi              
+                    fi
 
                     if LIST_isIn "release" "${extentList}"  ; then
                         releaseDestinationPath=$( releaseDestinationPath html )
@@ -3496,6 +3515,16 @@ _EOF_
                         fi
 
                         lpDo vis_mailingsDblockUpdate
+                    fi
+
+                    if LIST_isIn "compose" "${extentList}"  ; then
+                      lpDo vis_mailingCompose
+                      # ANT_cooked "For each of the mailings we will invoke COMPOSE for the mailing"
+                    fi
+
+                    if LIST_isIn "originate" "${extentList}"  ; then
+                      lpDo vis_mailingOriginate
+                      # ANT_cooked "For each of the mailings we will invoke ORIGINATE for the mailing"
                     fi
                     ;;
                 "odt")
@@ -3572,9 +3601,11 @@ _EOF_
                     EH_problem "Unknown ${eachResult}"
                     lpReturn
             esac
-            if vis_funcIsDefined vis_logsAnalysis ; then
-              lpDo eval vis_logsAnalysis \>\> ${fileRecord}
-              lpDo eval echo "lcntBuild End=$(DATE_nowTag) -- ${inFile} ${eachResult}" \>\> ${fileRecord}
+            if LIST_isIn "build" "${extentList}"  ; then
+              if vis_funcIsDefined vis_logsAnalysis ; then
+                lpDo eval vis_logsAnalysis \>\> ${fileRecord}
+                lpDo eval echo "lcntBuild End=$(DATE_nowTag) -- ${inFile} ${eachResult}" \>\> ${fileRecord}
+              fi
             fi
         done
     done
@@ -3602,6 +3633,10 @@ _EOF_
     local inFile=""
     local eachResult=""
     local lcntNu=$( cat ./LCNT-INFO/lcntNu )
+    if [ "${lcntNu}" == "00000" ] ; then
+      lcntNu=""
+    fi
+
     local lcntVersion=$( cat ./LCNT-INFO/version )
 
     local resultsFileDest=""
@@ -3631,19 +3666,23 @@ _EOF_
     function resultsDestinationPath {
         EH_assert [[ $# -eq 1 ]]
         local resultType="$1"
+        local dashLcntNu=""
+        if [ ! -z  "${lcntNu}" ] ; then
+          dashLcntNu="-${lcntNu}"
+        fi
 
         case ${resultType} in
             "pdf")
-                echo ${lcntBuild_resultsBaseDir}/c-${lcntNu}-${lcntBuild_buildName}.${resultType}
+                echo ${lcntBuild_resultsBaseDir}/c${dashLcntNu}-${lcntBuild_buildName}.${resultType}
                 ;;
             "odt")
-                echo ${lcntBuild_resultsBaseDir}/c-${lcntNu}-${lcntBuild_buildName}.${resultType}
+                echo ${lcntBuild_resultsBaseDir}/c${dashLcntNu}-${lcntBuild_buildName}.${resultType}
                 ;;
             "markdown")
-                echo ${lcntBuild_resultsBaseDir}/c-${lcntNu}-${lcntBuild_buildName}.md
+                echo ${lcntBuild_resultsBaseDir}/c${dashLcntNu}-${lcntBuild_buildName}.md
                 ;;
             "html")
-                echo ${lcntBuild_resultsBaseDir}/c-${lcntNu}-${lcntBuild_buildName}-${resultType}
+                echo ${lcntBuild_resultsBaseDir}/c${dashLcntNu}-${lcntBuild_buildName}-${resultType}
                 ;;
             *)
                 EH_problem "Unknown ${eachResult}"

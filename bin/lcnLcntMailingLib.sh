@@ -63,6 +63,9 @@ _CommentBegin_
 *  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || IIF       ::  vis_enabledExportsDirsList    [[elisp:(org-cycle)][| ]]
 _CommentEnd_
 
+pdf=""
+headerFile=""
+
 
 _CommentBegin_
 *  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(beginning-of-buffer)][|^]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]] || IIC       ::  vis_exportExamples    [[elisp:(org-cycle)][| ]]
@@ -85,17 +88,32 @@ ${G_myName} ${extraInfo} -p extent="build+view" -i lcntBuild cur          # Runs
 $( examplesSeperatorChapter "Mailing Info" )
 ${G_myName} ${extraInfo} -i lcntMailingInfoReport
 $( examplesSeperatorChapter "Initial Setups" )
+${G_myName} ${extraInfo} -f -i mailingAsBuildName
+$( examplesSeperatorSection "Generate ailing File = mailingHeaderGen + mailingBodyPartsRefresh + mailingsDblockUpdate" )
+${G_myName} ${extraInfo} -p pdf=pdf -p headerFile=~/bpos/usageEnvs/selected/aas/marmee/selected/control/outMail/headers.mail -i mailingFileGen
+${G_myName} ${extraInfo} -p headerFile=~/bpos/usageEnvs/selected/aas/marmee/selected/control/outMail/headers.mail -i mailingFileGen
+$( examplesSeperatorSection "Mailing Headers" )
 ${G_myName} ${extraInfo} -i mailingHeaderGen curBuild # curBuild is default, specify other lcntBuildInfoPath
-${G_myName} ${extraInfo} -p marmee=gmail/first.last -i mailingHeaderGen # NOTYET with no marmee parameter, edit placeholders in
 ${G_myName} ${extraInfo} -f -i mailingHeaderGen
-$( examplesSeperatorChapter "Body Parts Refresh" )
+${G_myName} ${extraInfo} -p headerFile=~/bpos/usageEnvs/selected/aas/marmee/selected/control/outMail/headers.mail -i mailingHeaderGen
+$( examplesSeperatorSection "Body Parts Refresh" )
 ${G_myName} ${extraInfo} -i mailingBodyPartsRefresh  # Creates appropriate empty dblock for html content + perhaps pdf attachement
 ${G_myName} ${extraInfo} -p pdf=pdf -i mailingBodyPartsRefresh # Creates appropriate empty dblock for html content + perhaps pdf attachement
 $( examplesSeperatorChapter "Body Parts DBlock Update" )
 ${G_myName} ${extraInfo} -i mailingsDblockUpdate  # Applies to all mailings
-$( examplesSeperatorChapter "Build+Release+BodyPartsRefresh " )
+$( examplesSeperatorChapter "Build+Release+BodyPartsRefresh" )
 ${G_myName} ${extraInfo} -i resultsRelease    # applies mailingsDblockUpdate to the latest content
 ${G_myName} ${extraInfo} -i buildResultsRelease # applies mailingsDblockUpdate to the latest content
+$( examplesSeperatorChapter "Mailing Files Invoke -- compose or originate" )
+${G_myName} ${extraInfo} -i mailingCompose
+${G_myName} ${extraInfo} -i mailingOrinate
+$( examplesSeperatorChapter "Build --- curBuild=${curBuildEndLink} curRelease=${curReleaseEndLink} curExport=${curExportEndLink}" )
+${G_myName} ${extraInfo} -p pre="clean" -p extent="build+view" -i lcntBuild cur  # Runs dblock
+${G_myName} ${extraInfo} -p pre="clean" -p extent="compose" -i lcntBuild cur
+${G_myName} ${extraInfo} -p pre="clean" -p extent="originate" -i lcntBuild cur
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view" -i lcntBuild all  # Using enabled list
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view+release" -i lcntBuild all  # Using enabled list
+
 _EOF_
 
     lpReturn
@@ -127,6 +145,54 @@ _EOF_
         echo "lcntBuild_mailings=${each}"
     done
 }
+
+function vis_mailingAsBuildName {
+    #set -x
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 2  ]]
+
+    local lcntBuildInfoPath=curBuild
+
+    if [ $# -eq 1 ] ; then
+         lcntBuildInfoPath="$1"
+    fi
+
+    opDo lcntBuildInfoPrep ${lcntBuildInfoPath}
+
+    echo "${lcntBuild_buildName}.mail" > "${lcntBuildInfoPath}"/mailings
+}
+
+
+function vis_mailingFileGen {
+    #set -x
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 2  ]]
+
+    local lcntBuildInfoPath=curBuild
+
+    if [ $# -eq 1 ] ; then
+         lcntBuildInfoPath="$1"
+    fi
+
+    #echo pdf=$pdf
+    #echo headerFile=${headerFile}
+
+    lpDo vis_mailingHeaderGen "${lcntBuildInfoPath}"
+
+    lpDo vis_mailingBodyPartsRefresh "${lcntBuildInfoPath}"
+
+    lpDo vis_mailingsDblockUpdate "${lcntBuildInfoPath}"
+
+    lpReturn
+}
+
+
 
 function vis_mailingHeaderGen {
     #set -x
@@ -161,19 +227,18 @@ _EOF_
         fi
     fi
 
+    if [ ! -f "${headerFile}" ] ; then
+        EH_problem "Missing headerFile=${headerFile}"
+        lpReturn 103
+    fi
+
     ANT_raw "Creating ${lcntBuild_mailingFile} ..."
 
-    local thisLcntNu=$( cat ${lcntInfoPath}/lcntNu )
-    local buildName=${lcntBuild_buildName}
-    local thisMailingName=${thisLcntNu}-${lcntBuild_buildName}
+    cat "${headerFile}" > "${lcntBuild_mailingFile}"
 
-    cat  << _EOF_ > ${lcntBuild_mailingFile}
-From: fromMailAddrLineComesHere
-Subject: SubjLine Comes Here
-Bcc: bccMailAddrLineComesHere
-X-Envelope: envelopeMailAddrLineComesHere
-X-MailingName:  ${thisMailingName}
-X-MailingDoc: ${thisMailingName}
+    cat  << _EOF_ >> ${lcntBuild_mailingFile}
+X-MailingName: ${lcntBuild_buildName}
+X-MailingDoc: ${lcntBuild_docSrc}
 X-MailingParams: :type originate :extSrcBase "."
 --text follows this line--
 
@@ -203,6 +268,10 @@ _EOF_
         lpReturn 101
     fi
 
+    lpDo lcntBuildsBaseFVsPrep
+
+    lpDo lcntReleaseInfoPrep "cur"
+
     local mailingFileName="${lcntBuild_mailingFile}"
 
     if [ ! -f "${mailingFileName}" ] ; then
@@ -220,18 +289,42 @@ _EOF_
 
     lpDo rm ${savedMailingFileName}
 
+    function relDestFilePath {
+        EH_assert [[ $# -eq 1 ]]
+        local resultType="$1"
+        local dashLcntNu=""
+        if [ ! -z  "${lcnt_lcntNu}" ] ; then
+          dashLcntNu="-${lcnt_lcntNu}"
+        fi
+
+        case ${resultType} in
+            "pdf")
+                echo "${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/c${dashLcntNu}-${lcntBuild_relTag}-${lcntBuild_buildName}.${resultType}"
+                ;;
+            "html")
+                echo "${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}/c${dashLcntNu}-${lcntBuild_buildName}-${resultType}/index.html"
+                ;;
+            *)
+                EH_problem "Unknown ${eachResult}"
+                lpReturn
+        esac
+    }
+
+    local pdfFilePath=$(relDestFilePath "pdf")
+    local htmlFilePath=$(relDestFilePath "html")
+
     cat  << _EOF_ >> ${mailingFileName}
 <#part type="text/html" disposition=inline>
-<!--  [[elisp:(find-file "./mailing.ttytex")][Visit ./mailing.ttytex]]  -->
-<!-- ####+BEGIN: bx:dblock:global:file-insert-process :file "./rel/mailing-html/index.html" :load "./dblockProcess.el" :exec "bx:dblock:body-process"
+<!--  [[elisp:(find-file "./${lcntBuild_docSrc}")][Visit ./${lcntBuild_docSrc}]]  -->
+<!-- ####+BEGIN: bx:dblock:global:file-insert-process :file "${htmlFilePath}" :load "./dblockProcess.el" :exec "bx:dblock:body-process"
 -->
 <!-- ####+END: -->
 <#/part>
 _EOF_
 
     if [ "${pdf}" == "pdf" ] ; then
-	cat  << _EOF_ >> ${mailingFileName}
-<#part type="application/pdf" filename="./rel/${mailingDoc}.pdf" disposition=attachment description="Pdf File">
+	   cat  << _EOF_ >> ${mailingFileName}
+<#part type="application/pdf" filename="${pdfFilePath}" disposition=attachment description="Pdf File">
 <#/part>
 _EOF_
     fi
@@ -268,7 +361,98 @@ _EOF_
 }
 
 
-function vis_mailingName {
+function vis_mailingCompose {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 2  ]]
+
+    local thisEmacsClient=$( vis_thisEmacsClient )
+    local lcntBuildInfoPath=curBuild
+
+    if [ $# -eq 1 ] ; then
+         lcntBuildInfoPath="$1"
+    fi
+
+    opDo lcntBuildInfoPrep ${lcntBuildInfoPath}
+
+    if [ -z  "${lcntBuild_mailings}" ] ; then
+        lpReturn 101
+    fi
+
+    for each in ${lcntBuild_mailings} ; do
+        if [ ! -f "${each}" ] ; then
+            EH_problem "Missing ${each}"
+            continue
+        fi
+        lpDo ${thisEmacsClient} -e  "(mcdt:setup-and-compose/with-file \"${each}\")"
+    done
+}
+
+
+function vis_mailingCompose {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 2  ]]
+
+    local thisEmacsClient=$( vis_thisEmacsClient )
+    local lcntBuildInfoPath=curBuild
+
+    if [ $# -eq 1 ] ; then
+         lcntBuildInfoPath="$1"
+    fi
+
+    opDo lcntBuildInfoPrep ${lcntBuildInfoPath}
+
+    if [ -z  "${lcntBuild_mailings}" ] ; then
+        lpReturn 101
+    fi
+
+    for each in ${lcntBuild_mailings} ; do
+        if [ ! -f "${each}" ] ; then
+            EH_problem "Missing ${each}"
+            continue
+        fi
+        lpDo ${thisEmacsClient} -e  "(mcdt:setup-and-compose/with-file \"${each}\")"
+    done
+}
+
+
+function vis_mailingOriginate {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 2  ]]
+
+    local thisEmacsClient=$( vis_thisEmacsClient )
+    local lcntBuildInfoPath=curBuild
+
+    if [ $# -eq 1 ] ; then
+         lcntBuildInfoPath="$1"
+    fi
+
+    opDo lcntBuildInfoPrep ${lcntBuildInfoPath}
+
+    if [ -z  "${lcntBuild_mailings}" ] ; then
+        lpReturn 101
+    fi
+
+    for each in ${lcntBuild_mailings} ; do
+        if [ ! -f "${each}" ] ; then
+            EH_problem "Missing ${each}"
+            continue
+        fi
+        lpDo ${thisEmacsClient} -e  "(mcdt:setup-and-originate/with-file \"${each}\")"
+    done
+}
+
+
+
+function vis_mailingNamePlaceHolder {
     G_funcEntry
     function describeF {  G_funcEntryShow; cat  << _EOF_
 _EOF_
@@ -276,23 +460,22 @@ _EOF_
     EH_assert [[ $# -eq 0 ]]
 
     local mailingFileName="./content.mail"
-
     local mailingName="unspecifiedMailingName"
 
     if [ ! -f "${mailingFileName}" ] ; then
-	EH_problem "Missing mailingName"
+        EH_problem "Missing mailingName"
     else
-	mailingName=$( egrep '^X-MailingName:' content.mail | cut -d : -f 2 )
+        mailingName=$( egrep '^X-MailingName:' content.mail | cut -d : -f 2 )
     fi
 
     if [ -z "${mailingName}" ] ; then
-	EH_problem "Missing X-MailingName"
+        EH_problem "Missing X-MailingName"
     fi
 
     echo ${mailingName}
 }
 
-function vis_mailingDoc {
+function vis_mailingDocPlaceHolder {
     G_funcEntry
     function describeF {  G_funcEntryShow; cat  << _EOF_
 _EOF_
@@ -300,18 +483,21 @@ _EOF_
     EH_assert [[ $# -eq 0 ]]
 
     local mailingFileName="./content.mail"
-
     local mailingDoc="unspecifiedMailingName"
 
+    echo ${mailingDoc}
+
+    lpReturn
+
     if [ ! -f "${mailingFileName}" ] ; then
-	EH_problem "Missing mailingName"
+        EH_problem "Missing mailingName"
     else
-	mailingDoc=$( egrep '^X-MailingDoc:' content.mail | cut -d : -f 2 )
+        mailingDoc=$( egrep '^X-MailingDoc:' content.mail | cut -d : -f 2 )
     fi
 
     if [ -z "${mailingDoc}" ] ; then
-	EH_problem "Missing X-MailingDoc: -- X-MailingName used instead"
-	mailingDoc=$( vis_mailingName )
+        EH_problem "Missing X-MailingDoc: -- X-MailingName used instead"
+        mailingDoc=$( vis_mailingName )
     fi
 
     echo ${mailingDoc}

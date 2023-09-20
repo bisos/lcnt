@@ -184,6 +184,9 @@ function lcntInfoPrep {
   fi
 
   lcnt_lcntNu=`cat ${lcntInfoPath}/lcntNu`
+  if [ "${lcnt_lcntNu}" == "00000" ] ; then
+     lcnt_lcntNu=""
+  fi
 
   lcnt_lcntName=$( fvValueRead "${lcntInfoPath}/lcntName" )
   

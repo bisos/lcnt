@@ -576,6 +576,52 @@ _EOF_
     lpReturn
 }       
 
+function fvNameValueUpdate {
+    EH_assert [[ $# -eq 3 ]]
+    local buildDirPath=$1
+    local fvName=$2
+    local fvValue=$3
+    local fvNamePath="${buildDirPath}/${fvName}"
+
+    echo "${fvValue}" > "${fvNamePath}"
+}
+
+
+function vis_lcntBuildInfoUpdate {
+   G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+
+_EOF_
+    }
+    EH_assert [[ $# -eq 2 ]]
+
+    local buildName="$1"
+    local buildBaseRacin="$2"
+
+    if [ "${buildName}" == "auto" ] ; then
+        buildName=$( basename $(pwd) )
+    fi
+
+    lcntInfoPrep ${cntntRawHome}
+    lcntPathAnalyze ${cntntRawHome}
+
+    local lcntInfoPath="./${lcntInfoDir}"
+    local lcntBuildCommonInfoBasePath="${lcntInfoPath}/Builds"
+
+    if [ ! -d "${lcntBuildCommonInfoBasePath}" ] ; then
+        opDo mkdir "${lcntBuildCommonInfoBasePath}"
+    fi
+
+    local eachBuildDir=""
+
+    for eachBuildDir in $( ls -d ${lcntBuildCommonInfoBasePath}/${buildBaseRacin}* ) ; do
+        echo ${eachBuildDir}
+        opDo fvNameValueUpdate ${eachBuildDir} "buildName" "${buildName}"
+    done
+
+    lpReturn
+}
+
 
 
 
