@@ -587,10 +587,11 @@ function fvNameValueUpdate {
 }
 
 
-function vis_lcntBuildInfoUpdate {
+function vis_buildNameFvUpdate {
    G_funcEntry
     function describeF {  G_funcEntryShow; cat  << _EOF_
-
+arg1=buildName  -- name to assign
+arg2=buildBaseRacin -- common string of applicable buildDirs
 _EOF_
     }
     EH_assert [[ $# -eq 2 ]]

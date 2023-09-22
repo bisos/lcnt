@@ -67,6 +67,13 @@ pdf=""
 headerFile=""
 
 
+mailingDefaultsBaseEn="/bisos/apps/defaults/mailing/compose/enFa/lcntMailing"
+mailingDefaultsBaseFa="/bisos/apps/defaults/mailing/compose/faEn/lcntMailing"
+selectedComposeBase="$( echo ~/bpos/usageEnv/selected/mailings/compose )"
+#selectedAasMarmeeHeaders="$( echo ~/bpos/usageEnvs/selected/aas/marmee/selected/control/outMail/headers.mail )"
+selectedAasMarmeeHeaders="$( echo ~/bpos/usageEnvs/selected/mailings/templates/marmee/selected/headers.mail )"
+
+
 _CommentBegin_
 *  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(beginning-of-buffer)][|^]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]] || IIC       ::  vis_exportExamples    [[elisp:(org-cycle)][| ]]
 _CommentEnd_
@@ -76,7 +83,13 @@ function vis_mailingExamples {
     function describeF {  cat  << _EOF_
 _EOF_
                        }
-    extraInfo="-v -n showRun"
+    local extraInfo="-v -n showRun"
+
+    typeset curBuildEndLink=$( FN_nonDirsPart $(  FN_absolutePathGet ./curBuild ))
+    typeset curReleaseEndLink=$( FN_nonDirsPart $(  FN_absolutePathGet ./LCNT-INFO/Releases/cur ))
+    typeset curExportEndLink=$( FN_nonDirsPart $(  FN_absolutePathGet ./curExport ))
+
+    opDo lcntBuildInfoPrep curBuild
 
     cat  << _EOF_
 $( examplesSeperatorTopLabel "${G_myName} :: Mailing Activity Groupings" )
@@ -88,32 +101,24 @@ ${G_myName} ${extraInfo} -p extent="build+view" -i lcntBuild cur          # Runs
 $( examplesSeperatorChapter "Mailing Info" )
 ${G_myName} ${extraInfo} -i lcntMailingInfoReport
 $( examplesSeperatorChapter "Initial Setups" )
+${G_myName} ${extraInfo}  -p cntntRawHome=. -i buildNameFvUpdate auto mailing
 ${G_myName} ${extraInfo} -f -i mailingAsBuildName
 $( examplesSeperatorSection "Generate ailing File = mailingHeaderGen + mailingBodyPartsRefresh + mailingsDblockUpdate" )
-${G_myName} ${extraInfo} -p pdf=pdf -p headerFile=~/bpos/usageEnvs/selected/aas/marmee/selected/control/outMail/headers.mail -i mailingFileGen
-${G_myName} ${extraInfo} -p headerFile=~/bpos/usageEnvs/selected/aas/marmee/selected/control/outMail/headers.mail -i mailingFileGen
+${G_myName} ${extraInfo} -p pdf=pdf -p headerFile=${selectedAasMarmeeHeaders} -i mailingFileGen
+${G_myName} ${extraInfo} -p headerFile=${selectedAasMarmeeHeaders} -i mailingFileGen
 $( examplesSeperatorSection "Mailing Headers" )
 ${G_myName} ${extraInfo} -i mailingHeaderGen curBuild # curBuild is default, specify other lcntBuildInfoPath
 ${G_myName} ${extraInfo} -f -i mailingHeaderGen
-${G_myName} ${extraInfo} -p headerFile=~/bpos/usageEnvs/selected/aas/marmee/selected/control/outMail/headers.mail -i mailingHeaderGen
+${G_myName} ${extraInfo} -p headerFile=${selectedAasMarmeeHeaders} -i mailingHeaderGen
 $( examplesSeperatorSection "Body Parts Refresh" )
 ${G_myName} ${extraInfo} -i mailingBodyPartsRefresh  # Creates appropriate empty dblock for html content + perhaps pdf attachement
 ${G_myName} ${extraInfo} -p pdf=pdf -i mailingBodyPartsRefresh # Creates appropriate empty dblock for html content + perhaps pdf attachement
-$( examplesSeperatorChapter "Body Parts DBlock Update" )
-${G_myName} ${extraInfo} -i mailingsDblockUpdate  # Applies to all mailings
-$( examplesSeperatorChapter "Build+Release+BodyPartsRefresh" )
-${G_myName} ${extraInfo} -i resultsRelease    # applies mailingsDblockUpdate to the latest content
-${G_myName} ${extraInfo} -i buildResultsRelease # applies mailingsDblockUpdate to the latest content
-$( examplesSeperatorChapter "Mailing Files Invoke -- compose or originate" )
-${G_myName} ${extraInfo} -i mailingCompose
-${G_myName} ${extraInfo} -i mailingOrinate
-$( examplesSeperatorChapter "Build --- curBuild=${curBuildEndLink} curRelease=${curReleaseEndLink} curExport=${curExportEndLink}" )
+$( examplesSeperatorChapter "Mailing --- curBuild=${curBuildEndLink} curRelease=${curReleaseEndLink} mailing=${lcntBuild_mailingFile}" )
 ${G_myName} ${extraInfo} -p pre="clean" -p extent="build+view" -i lcntBuild cur  # Runs dblock
-${G_myName} ${extraInfo} -p pre="clean" -p extent="compose" -i lcntBuild cur
-${G_myName} ${extraInfo} -p pre="clean" -p extent="originate" -i lcntBuild cur
-${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view" -i lcntBuild all  # Using enabled list
-${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view+release" -i lcntBuild all  # Using enabled list
-
+${G_myName} ${extraInfo} -p extent="compose" -i lcntBuild cur
+${G_myName} ${extraInfo} -p extent="originate" -i lcntBuild cur
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="compose" -i lcntBuild all  # Using enabled list
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view+release+compose" -i lcntBuild all  # Using enabled list
 _EOF_
 
     lpReturn
@@ -140,6 +145,9 @@ _EOF_
 
     opDo lcntBuildInfoPrep ${lcntBuildInfoPath}
 
+    echo "baseDir=$( basename $(pwd) )"
+    echo "lcntBuild_buildName=${lcntBuild_buildName}"
+
     echo "lcntBuild_mailingFile=${lcntBuild_mailingFile}"
     for each in ${lcntBuild_mailings} ; do
         echo "lcntBuild_mailings=${each}"
@@ -162,7 +170,7 @@ _EOF_
 
     opDo lcntBuildInfoPrep ${lcntBuildInfoPath}
 
-    echo "${lcntBuild_buildName}.mail" > "${lcntBuildInfoPath}"/mailings
+    lpDo eval echo "${lcntBuild_buildName}.mail" \> "${lcntBuildInfoPath}"/mailings
 }
 
 
@@ -237,12 +245,16 @@ _EOF_
     cat "${headerFile}" > "${lcntBuild_mailingFile}"
 
     cat  << _EOF_ >> ${lcntBuild_mailingFile}
+Subject: NO SUBJECT
 X-MailingName: ${lcntBuild_buildName}
 X-MailingDoc: ${lcntBuild_docSrc}
-X-MailingParams: :type originate :extSrcBase "."
+X-MailingParams: :type compose :extSrcBase nil
+X-ComposeFwrk: message
 --text follows this line--
 
 _EOF_
+
+#
 
 
 }
@@ -279,7 +291,7 @@ _EOF_
         lpReturn 101
     fi
 
-    local mailingDoc=$( vis_mailingDoc )
+    # local mailingDoc=$( vis_mailingDoc )
     local dateTag=$( date +%y%m%d%H%M%S )
     local savedMailingFileName=${mailingFileName}.${dateTag}
 
@@ -356,7 +368,8 @@ _EOF_
             EH_problem "Missing ${each}"
             continue
         fi
-        opDo vis_dblockUpdateFile ${each}
+        lpDo vis_dblockUpdateFile ${each}  # We now do it twice. Once sometimes does not work
+        # lpDo vis_dblockUpdateFile ${each}
     done
 }
 
@@ -475,9 +488,10 @@ _EOF_
     echo ${mailingName}
 }
 
-function vis_mailingDocPlaceHolder {
+function vis_mailingDoc {
     G_funcEntry
     function describeF {  G_funcEntryShow; cat  << _EOF_
+NOTYET, Incomplete
 _EOF_
     }
     EH_assert [[ $# -eq 0 ]]

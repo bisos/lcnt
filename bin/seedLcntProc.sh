@@ -332,7 +332,6 @@ $( examplesSeperatorChapter "Recurse Based On FTOs" )
 ${G_myName} recurse
 $( examplesSeperatorChapter "Multi-Media Setup" )
 ${G_myName} mm
-$( examplesSeperatorSection "Audio" )
 ${G_myName} audio
 $( examplesSeperatorChapter "Develop" )
 ${G_myName} dev                # Review warning logs, cleanup, step-by-step builds, debug
@@ -346,11 +345,9 @@ ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -i lcntBuil
 ${G_myName} ${extraInfo} -p pre="clean" -p extent="build+view" -i lcntBuild cur  # Runs dblock
 ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view" -i lcntBuild all  # Using enabled list
 ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view+release" -i lcntBuild all  # Using enabled list
-$( examplesSeperatorChapter "Release After Building curRelease=${curReleaseEndLink}" )
+$( examplesSeperatorChapter "Release, Export, Mailing Build=${curBuildEndLink} Release=${curReleaseEndLink}" Export="${curExportEndLink}" mailingFile="${lcntBuild_mailingFile}" )
 ${G_myName} release
-$( examplesSeperatorChapter "Export After Building And Release curExport=${curExportEndLink}" )
 ${G_myName} export
-$( examplesSeperatorChapter "Mailing --- mailingFile="${lcntBuild_mailingFile}" curBuild=${curBuildEndLink} curRelease=${curReleaseEndLink}" )
 ${G_myName} mailing
 _EOF_
 
@@ -661,7 +658,6 @@ _EOF_
 }
 
 
-
 _CommentBegin_
 *  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(beginning-of-buffer)][|^]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]] || IIC       ::  vis_configExamples    [[elisp:(org-cycle)][| ]]
 _CommentEnd_
@@ -687,7 +683,8 @@ lcnLcntGens.sh -n showRun -p cntntRawHome=. -i lcntInfoRenew        # Modernizes
 ${G_myName} ${extraInfo}  -p cntntRawHome=. -i lcntBuildInfoGens    # Adds LCNT-INFO/Builds
 ${G_myName} ${extraInfo}  -p cntntRawHome=. -i lcntExportInfoGens   # Adds LCNT-INFO/Exports
 $( examplesSeperatorChapter "Lcnt Build Info Update" )
-${G_myName} ${extraInfo}  -p cntntRawHome=. -i lcntBuildInfoUpdate auto mailing
+${G_myName} ${extraInfo}  -p cntntRawHome=. -i buildNameFvUpdate builNameStrORauto buildBaseRacin
+${G_myName} ${extraInfo}  -p cntntRawHome=. -i buildNameFvUpdate auto mailing
 $( examplesSeperatorTopLabel "${G_myName} :: Config Activity Groupings" )
 $( examplesSeperatorChapter "Config LCNT-INFO Base to latest" )
 $( examplesSeperatorSection "Info lcntNu To Stdout" )
