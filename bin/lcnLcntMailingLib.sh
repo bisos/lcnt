@@ -103,7 +103,7 @@ ${G_myName} ${extraInfo} -i lcntMailingInfoReport
 $( examplesSeperatorChapter "Initial Setups" )
 ${G_myName} ${extraInfo}  -p cntntRawHome=. -i buildNameFvUpdate auto mailing
 ${G_myName} ${extraInfo} -f -i mailingAsBuildName
-$( examplesSeperatorSection "Generate ailing File = mailingHeaderGen + mailingBodyPartsRefresh + mailingsDblockUpdate" )
+$( examplesSeperatorSection "Generate Mailing File = mailingHeaderGen + mailingBodyPartsRefresh + mailingsDblockUpdate" )
 ${G_myName} ${extraInfo} -p pdf=pdf -p headerFile=${selectedAasMarmeeHeaders} -i mailingFileGen
 ${G_myName} ${extraInfo} -p headerFile=${selectedAasMarmeeHeaders} -i mailingFileGen
 $( examplesSeperatorSection "Mailing Headers" )
@@ -124,10 +124,571 @@ _EOF_
     lpReturn
 }
 
+function vis_mailingOrgMsgExamples {
+    G_funcEntry
+    function describeF {  cat  << _EOF_
+_EOF_
+                       }
+    local extraInfo="-v -n showRun"
+    local mailingFileName="mailing.orgMsg"
+    local mailingName="mailingName"
+    local dateTag=$( date +%y%m%d%H%M%S )
+
+    cat  << _EOF_
+$( examplesSeperatorChapter "Generate OrgMsg Mailing File = marmeeHeaders + mailingHeaderGen + mailingBodyParts" )
+${G_myName} ${extraInfo} -i mailingOrgMsgGen ${mailingName} ${mailingFileName}
+${G_myName} ${extraInfo} -f -p headerFile=${selectedAasMarmeeHeaders} -i mailingOrgMsgGen ${mailingFileName}
+${G_myName} ${extraInfo} -f -p headerFile=${selectedAasMarmeeHeaders} -i mailingOrgMsgGenRtl ${dateTag}.orgMsg
+$( examplesSeperatorSection "OrgMsg Mailing Invocation -- compose/originate" )
+${G_myName} ${extraInfo} -i withMailFilesCompose ${mailingFileName}
+${G_myName} ${extraInfo} -i withMailFilesOrignate ${mailingFileName}
+_EOF_
+
+    lpReturn
+}
+
+
+function mailingOrgMsgGenCommon {
+    #set -x
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 4  ]]
+
+    local argCaller="$1"
+    local argMailingFile="$2"
+    local argMailingName=$( FN_prefix $(basename "${argMailingFile}") )
+
+    if [ $# -eq 3 ] ; then
+        argMailingName="$3"
+    fi
+
+    local dateTag=$( date +%y%m%d%H%M%S )
+    local savedMailingFileName=${argMailingFile}-${dateTag}
+
+    if [ -f "${argMailingFile}" ] ; then
+        if [[ "${G_forceMode}_" == "force_" ]] ; then
+            lpDo mv ${argMailingFile} ${savedMailingFileName}
+        else
+            EH_problem "${argMailingFile} exists and forceMode not specified -- not overriding it."
+            lpReturn 102
+        fi
+    fi
+
+    if [ ! -f "${headerFile}" ] ; then
+        EH_problem "Missing headerFile=${headerFile}"
+        lpReturn 103
+    fi
+
+    ANT_raw "Creating ${argMailingFile} ..."
+
+    lpDo eval cat "${headerFile}" \> "${argMailingFile}"
+
+    cat  << _EOF_ >> ${argMailingFile}
+Subject: NO SUBJECT
+X-MailingName: ${argMailingName}
+X-MailingDoc: nil
+X-MailingParams: :type compose :extSrcBase nil
+X-ComposeFwrk: msgOrg
+--text follows this line--
+#+OPTIONS: html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \n:t d:nil
+#+STARTUP: hidestars indent inlineimages
+:PROPERTIES:
+:reply-to: nil
+:attachment: nil
+:alternatives: (text html)
+:END:
+
+#+BEGIN: bx:mtdt:content/actions
+#+BEGIN_COMMENT
+  [[elisp:(call-interactively 'org-msg-preview)][Browser Preview]] | [[elisp:(message-mode)][message-mode]] | [[elisp:(mcdt:setup-and-compose/with-curBuffer)][Compose]] | [[elisp:(mcdt:setup-and-originate/with-curBuffer)][Originate]]
+#+END_COMMENT
+#+END:
+
+_EOF_
+
+    if [ "${argCaller}" == "vis_mailingOrgMsgGenRtl" ] ; then
+        cat  << _EOF_ >> ${argMailingFile}
+#+BEGIN_EXPORT html
+<DIV dir="rtl">
+#+END_EXPORT
+
+سلام،
+
+امیدوارم خوب و خوش باشید.
+
+
+#+BEGIN_EXPORT html
+</DIV>
+#+END_EXPORT
+
+_EOF_
+    fi
+
+    lpDo ls -l "${argMailingFile}"
+}
+
+function vis_mailingOrgMsgGen {
+    #set -x
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 3  ]]
+
+    lpDo mailingOrgMsgGenCommon ${G_thisFunc} $@
+}
+
+function vis_mailingOrgMsgGenRtl {
+    #set -x
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 3  ]]
+
+    lpDo mailingOrgMsgGenCommon ${G_thisFunc} $@
+}
+
+
+function vis_mailingHtmlExamples {
+    G_funcEntry
+    function describeF {  cat  << _EOF_
+_EOF_
+                       }
+    local extraInfo="-v -n showRun"
+    local mailingFileName="mailing-html.mail"
+    local mailingName="mailingName"
+    local dateTag=$( date +%y%m%d%H%M%S )
+
+    cat  << _EOF_
+$( examplesSeperatorChapter "Generate Html Mailing File = marmeeHeaders + mailingHeaderGen + mailingBodyParts" )
+${G_myName} ${extraInfo} -i mailingHtmlGen ${mailingName} ${mailingFileName}
+${G_myName} ${extraInfo} -f -p headerFile=${selectedAasMarmeeHeaders} -i mailingHtmlGen ${mailingFileName}
+${G_myName} ${extraInfo} -f -p headerFile=${selectedAasMarmeeHeaders} -i mailingHtmlGenRtl ${dateTag}.orgMsg
+_EOF_
+
+    lpReturn
+}
+
+
+function mailingHtmlGenCommon {
+    #set -x
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 4  ]]
+
+    local argCaller="$1"
+    local argMailingFile="$2"
+    local argMailingName=$( FN_prefix $(basename "${argMailingFile}") )
+
+    if [ $# -eq 3 ] ; then
+        argMailingName="$3"
+    fi
+
+    local dateTag=$( date +%y%m%d%H%M%S )
+    local savedMailingFileName=${argMailingFile}-${dateTag}
+
+    if [ -f "${argMailingFile}" ] ; then
+        if [[ "${G_forceMode}_" == "force_" ]] ; then
+            lpDo mv ${argMailingFile} ${savedMailingFileName}
+        else
+            EH_problem "${argMailingFile} exists and forceMode not specified -- not overriding it."
+            lpReturn 102
+        fi
+    fi
+
+    if [ ! -f "${headerFile}" ] ; then
+        EH_problem "Missing headerFile=${headerFile}"
+        lpReturn 103
+    fi
+
+    ANT_raw "Creating ${argMailingFile} ..."
+
+    lpDo eval cat "${headerFile}" \> "${argMailingFile}"
+
+    cat  << _EOF_ >> ${argMailingFile}
+Subject: NO SUBJECT
+X-MailingName: ${argMailingName}
+X-MailingDoc: nil
+X-MailingParams: :type compose :extSrcBase nil
+X-ComposeFwrk: msgOrg
+--text follows this line--
+#+OPTIONS: html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \n:t d:nil
+#+STARTUP: hidestars indent inlineimages
+:PROPERTIES:
+:reply-to: nil
+:attachment: nil
+:alternatives: (text html)
+:END:
+
+#+BEGIN: bx:mtdt:content/actions
+#+BEGIN_COMMENT
+  [[elisp:(call-interactively 'org-msg-preview)][Browser Preview]] | [[elisp:(message-mode)][message-mode]] | [[elisp:(mcdt:setup-and-compose/with-curBuffer)][Compose]] | [[elisp:(mcdt:setup-and-originate/with-curBuffer)][Originate]]
+#+END_COMMENT
+#+END:
+
+_EOF_
+
+    if [ "${argCaller}" == "vis_mailingOrgMsgGenRtl" ] ; then
+        cat  << _EOF_ >> ${argMailingFile}
+#+BEGIN_EXPORT html
+<DIV dir="rtl">
+#+END_EXPORT
+
+سلام،
+
+امیدوارم خوب و خوش باشید.
+
+
+#+BEGIN_EXPORT html
+</DIV>
+#+END_EXPORT
+
+_EOF_
+    fi
+
+    lpDo ls -l "${argMailingFile}"
+}
+
+function vis_mailingHtmlGen {
+    #set -x
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 3  ]]
+
+    lpDo mailingHtmlGenCommon ${G_thisFunc} $@
+}
+
+function vis_mailingHtmlGenRtl {
+    #set -x
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 3  ]]
+
+    lpDo mailingOrgMsgGenCommon ${G_thisFunc} $@
+}
+
+
+function vis_mailingTextExamples {
+    G_funcEntry
+    function describeF {  cat  << _EOF_
+_EOF_
+                       }
+    local extraInfo="-v -n showRun"
+    local mailingFileName="mailing-text.mail"
+    local mailingName="mailingName"
+    local dateTag=$( date +%y%m%d%H%M%S )
+
+    cat  << _EOF_
+$( examplesSeperatorChapter "Generate Text Mailing File = marmeeHeaders + mailingHeaderGen + mailingBodyParts" )
+${G_myName} ${extraInfo} -i mailingTextGen ${mailingName} ${mailingFileName}
+${G_myName} ${extraInfo} -f -p headerFile=${selectedAasMarmeeHeaders} -i mailingTextGen ${mailingFileName}
+${G_myName} ${extraInfo} -f -p headerFile=${selectedAasMarmeeHeaders} -i mailingTextGenRtl ${dateTag}.orgMsg
+_EOF_
+
+    lpReturn
+}
+
+
+function mailingTextGenCommon {
+    #set -x
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 4  ]]
+
+    local argCaller="$1"
+    local argMailingFile="$2"
+    local argMailingName=$( FN_prefix $(basename "${argMailingFile}") )
+
+    if [ $# -eq 3 ] ; then
+        argMailingName="$3"
+    fi
+
+    local dateTag=$( date +%y%m%d%H%M%S )
+    local savedMailingFileName=${argMailingFile}-${dateTag}
+
+    if [ -f "${argMailingFile}" ] ; then
+        if [[ "${G_forceMode}_" == "force_" ]] ; then
+            lpDo mv ${argMailingFile} ${savedMailingFileName}
+        else
+            EH_problem "${argMailingFile} exists and forceMode not specified -- not overriding it."
+            lpReturn 102
+        fi
+    fi
+
+    if [ ! -f "${headerFile}" ] ; then
+        EH_problem "Missing headerFile=${headerFile}"
+        lpReturn 103
+    fi
+
+    ANT_raw "Creating ${argMailingFile} ..."
+
+    lpDo eval cat "${headerFile}" \> "${argMailingFile}"
+
+    cat  << _EOF_ >> ${argMailingFile}
+Subject: NO SUBJECT
+X-MailingName: ${argMailingName}
+X-MailingDoc: nil
+X-MailingParams: :type compose :extSrcBase nil
+X-ComposeFwrk: msgOrg
+--text follows this line--
+#+OPTIONS: html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \n:t d:nil
+#+STARTUP: hidestars indent inlineimages
+:PROPERTIES:
+:reply-to: nil
+:attachment: nil
+:alternatives: (text html)
+:END:
+
+#+BEGIN: bx:mtdt:content/actions
+#+BEGIN_COMMENT
+  [[elisp:(call-interactively 'org-msg-preview)][Browser Preview]] | [[elisp:(message-mode)][message-mode]] | [[elisp:(mcdt:setup-and-compose/with-curBuffer)][Compose]] | [[elisp:(mcdt:setup-and-originate/with-curBuffer)][Originate]]
+#+END_COMMENT
+#+END:
+
+_EOF_
+
+    if [ "${argCaller}" == "vis_mailingOrgMsgGenRtl" ] ; then
+        cat  << _EOF_ >> ${argMailingFile}
+#+BEGIN_EXPORT html
+<DIV dir="rtl">
+#+END_EXPORT
+
+سلام،
+
+امیدوارم خوب و خوش باشید.
+
+
+#+BEGIN_EXPORT html
+</DIV>
+#+END_EXPORT
+
+_EOF_
+    fi
+
+    lpDo ls -l "${argMailingFile}"
+}
+
+function vis_mailingTextGen {
+    #set -x
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 3  ]]
+
+    lpDo mailingTextGenCommon ${G_thisFunc} $@
+}
+
+function vis_mailingTextGenRtl {
+    #set -x
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 3  ]]
+
+    lpDo mailingTextGenCommon ${G_thisFunc} $@
+}
+
 
 _CommentBegin_
 *  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || IIF       ::  vis_lcntExportInfoReport    [[elisp:(org-cycle)][| ]]
 _CommentEnd_
+
+
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  IIF            :: vis_composeStart |  [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+
+
+function vis_mailingStartLcntExamples {
+    G_funcEntry
+    function describeF {  cat  << _EOF_
+_EOF_
+                       }
+    local extraInfo="-v -n showRun"
+    local mailingFileName="mailing-text.mail"
+    local mailingName="mailingName"
+    local dateTag=$( date +%y%m%d%H%M%S )
+    local selectedComposeBase="~/bpos/usageEnv/selected/mailings/compose"
+
+    cat  << _EOF_
+$( examplesSeperatorChapter "startMailingLcnt -- LaTeX-Static Mailings Starting Point Generator" )
+$( examplesSeperatorSection "LaTeX-Mailing Start -- With Default Parameters" )
+${G_myName} ${extraInfo} -i composeStart                         # Creates Dir -- Mailing Name Will Be Date Tagged
+${G_myName} ${extraInfo} -i composeStart dated                   # Creates Dir -- Mailing Name Will Be Date Tagged
+${G_myName} ${extraInfo} -p pdf=pdf -i composeStart dated        # RUN THIS (Commonly)
+${G_myName} ${extraInfo} -i composeStart mailingName ""          # Creates Dir -- mailingName is specified
+${G_myName} ${extraInfo} -p base=. -i composeStart mailingName ""       # mailingName is specified
+$( examplesSeperatorSection "LaTeX-Mailing Start Globish -- EnFa -- With Specified Parameters" )
+${G_myName} ${extraInfo} -p base=${selectedComposeBase} -p template="${mailingDefaultsBaseEn}" -p header="${selectedAasMarmeeHeaders}" -i composeStart mailingName
+${G_myName} ${extraInfo} -p base=${selectedComposeBase} -p template="${mailingDefaultsBaseEn}" -i composeStart mailingName ""
+${G_myName} ${extraInfo} -p pdf=pdf -p base=. -p template="${mailingDefaultsBaseEn}" -i composeStart basicLaTeX pdf
+${G_myName} ${extraInfo} -p base=. -p template="${mailingDefaultsBaseEn}" -i composeStart basicLaTeX ""
+$( examplesSeperatorSection "LaTeX-Mailing Start Farsi -- FaEn -- With Specified Parameters" )
+${G_myName} ${extraInfo} -p base=${selectedComposeBase} -p template="${mailingDefaultsBaseFa}" -i composeStart mailingName
+${G_myName} ${extraInfo} -p base=${selectedComposeBase} -p template="${mailingDefaultsBaseFa}" -i composeStart mailingName ""
+${G_myName} ${extraInfo} -p pdf=pdf -p base=. -p template="${mailingDefaultsBaseFa}" -i composeStart basicLaTeX pdf
+${G_myName} ${extraInfo} -p base=. -p template="${mailingDefaultsBaseFa}" -i composeStart basicLaTeX ""
+$( examplesSeperatorSection "Add Mailing To Existing LCNT -- NOTYET -- Done through existing lcntProc.sh" )
+lcntProc.sh mailing  # mailingAsBuildName, mailingFileGen
+$( examplesSeperatorChapter "Show Mailing Defaults" )
+${G_myName} ${extraInfo} -i showMailingDefaults
+_EOF_
+
+    lpReturn
+}
+
+
+
+function vis_composeStart {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+** Example:  ${G_myName} -p base=~/bpos/usageEnvs/selected/mailings/com/example/statics -p header=~/bpos/usageEnvs/selected/mailings/com/example/johnDoe/content.mail -p template=baseDir -i composeStart mailName
+**
+** -p base=~/bpos/usageEnvs/selected/mailings/compose  -- Specifies where the mailing will be created in
+** -p header=~/bpos/usageEnvs/selected/mailings/mohsenProfessional/common/content.mail  -- Mail header fields will be extracted from this -- Body will be ignored
+** -p template=~/bpos/usageEnvs/selected/mailings/templates/static/enFa/generic  -- Starting point body as mailing.ttytex
+** \$1 : Optional ICM Arg1 specifies the mailing name. If None, dateTag is used as name
+** \$2 : Optional ICM Arg2 specifies the dateTag over-write name extention -- "" means just mailngName. If None, dateTag is appended to mailingName.
+_EOF_
+    }
+    EH_assert [[ $# -le 2 ]]  # 0=dateTagIt 1=nameIt+datTag 2=nameIt+Qualifier
+
+    local thisEmacsClient=$( vis_thisEmacsClient )
+
+    # Output base directory
+    typeset baseDir="$( FN_absolutePathGet ~/bpos/usageEnvs/selected/mailings/compose )"
+    if [ ! -z "${base:-}" ] ; then
+        baseDir="$( FN_absolutePathGet ${base} )"
+    fi
+
+    # mailingName and mailingBaseDir
+    typeset mailingBaseDir
+    typeset mailingName
+    typeset dateTag=$( DATE_nowTag )
+    if [ $# -gt  0 ] ; then
+        mailingName=$1
+        if [ -z mailingName ] ; then
+            mailingName=${dateTag}
+            mailingBaseDir=${baseDir}/${mailingName}
+        else
+            mailingBaseDir=${baseDir}/${mailingName}-${dateTag}  # The specified name is also date tagged.
+        fi
+    else  # Which means $# == 0
+        mailingName=${dateTag}
+        mailingBaseDir=${baseDir}/${mailingName}
+    fi
+
+    if [ $# == 2 ] ; then
+        if [ -z "$2" ] ; then
+            mailingBaseDir=${baseDir}/${mailingName}
+        else
+            mailingBaseDir=${baseDir}/${mailingName}-${2}
+        fi
+    fi
+
+    ### Mailing Template
+
+    typeset templateBaseDir="${mailingDefaultsBaseEn}"
+    if [ ! -z "${template:-}" ] ; then
+        templateBaseDir=${template}
+    fi
+
+    if [ ! -d "${templateBaseDir}" ] ; then
+        EH_problem "Missing Template BaseDir: ${templateBaseDir}"
+        lpReturn 101
+    fi
+
+    ### headerFile
+    typeset headerFile="$( FN_absolutePathGet ${templateBaseDir}/content.mail )"
+    if [ ! -z "${header}" ] ; then
+        headerFile="$( FN_absolutePathGet ${header} )"
+        if [ ! -f ${headerFile} ] ; then
+            EH_problem "Missing Header File: ${headerFile}"
+            lpReturn 101
+        fi
+    fi
+    if [ ! -f "${headerFile}" ] ; then
+        headerFile="${selectedAasMarmeeHeaders}"
+        if [ ! -f ${headerFile} ] ; then
+            EH_problem "Missing Header File: ${headerFile}"
+            lpReturn 101
+        fi
+    fi
+
+    if [ -d  "${mailingBaseDir}" ] ; then
+        EH_problem "${mailingBaseDir} Already In Place -- Will Not Overwrite, Force It With:"
+        ANT_raw "rm -r -f ${mailingBaseDir}"
+        lpReturn
+
+    else
+        opDoRet mkdir -p ${mailingBaseDir}
+    fi
+
+    ls -ldt ${mailingBaseDir}
+    ls -ldt ${templateBaseDir}
+    ls -ldt ${headerFile}
+
+    # inBaseDirDo ${templateBaseDir} eval "find . -print | grep -v CVS | egrep -v ~\$ | cpio -o | (cd ${mailingBaseDir}; cpio -imdv)"
+    inBaseDirDo ${templateBaseDir} eval "find . -print | grep -v CVS | egrep -v ~\$ | cpio -o | (cd ${mailingBaseDir}; cpio -imd)"
+
+    # inBaseDirDo ${mailingBaseDir}  cp "${headerFile}" .
+
+    # All ./LCNT-Info/Builds/mailing-*/buildName are now set to basename of ${mailingBaseDir}
+    # arg1=auto means use basename of directory as buildName -- arg2=mailing means do this for all build names matching "mailing"
+    inBaseDirDo ${mailingBaseDir}  lcntProc.sh -v -n showRun  -p cntntRawHome=. -i buildNameFvUpdate auto mailing
+
+    # We can now create the mailingFile based on buildName
+    inBaseDirDo ${mailingBaseDir}  lcntProc.sh -v -n showRun  -i mailingAsBuildName
+
+    inBaseDirDo ${mailingBaseDir} lcntProc.sh -p pdf=${pdf} -p headerFile=${headerFile} -v -n showRun -i mailingFileGen
+
+    #opDo ${thisEmacsClient} -n -e "(progn (find-file \"${mailingBaseDir}/mailing.ttytex\") (blee:ppmm:org-mode-content-list))"
+    # opDo ${thisEmacsClient} -n -e "(progn (find-file \"${mailingBaseDir}/content.mail\"))"
+
+    echo "===================="
+    echo "$( FN_nonDirsPart ${mailingBaseDir} ) is ready to be configured."
+    echo "+ ${mailingBaseDir}; lsf"
+
+    lpReturn
+}
+
+
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(beginning-of-buffer)][|^]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]] || IIC       ::  showDefaults    [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+
+
+function vis_showMailingDefaults {
+   G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -eq 0 ]]
+
+    #if vis_reRunAsRoot G_thisFunc $@ ; then lpReturn globalReRunRetVal; fi;
+
+    ANT_raw "mailingDefaultsBaseEn=${mailingDefaultsBaseEn}"
+    ANT_raw "mailingDefaultsBaseFa=${mailingDefaultsBaseFa}"
+    ANT_raw "selectedComposeBase=${selectedComposeBase}"
+    ANT_raw "selectedAasMarmeeHeaders=${selectedAasMarmeeHeaders}"
+
+    lpReturn
+}
+
+
 
 function vis_lcntMailingInfoReport {
     #set -x
@@ -201,7 +762,6 @@ _EOF_
 }
 
 
-
 function vis_mailingHeaderGen {
     #set -x
     G_funcEntry
@@ -255,8 +815,6 @@ X-ComposeFwrk: message
 _EOF_
 
 #
-
-
 }
 
 
@@ -373,7 +931,6 @@ _EOF_
     done
 }
 
-
 function vis_mailingCompose {
     G_funcEntry
     function describeF {  G_funcEntryShow; cat  << _EOF_
@@ -394,43 +951,7 @@ _EOF_
         lpReturn 101
     fi
 
-    for each in ${lcntBuild_mailings} ; do
-        if [ ! -f "${each}" ] ; then
-            EH_problem "Missing ${each}"
-            continue
-        fi
-        lpDo ${thisEmacsClient} -e  "(mcdt:setup-and-compose/with-file \"${each}\")"
-    done
-}
-
-
-function vis_mailingCompose {
-    G_funcEntry
-    function describeF {  G_funcEntryShow; cat  << _EOF_
-_EOF_
-    }
-    EH_assert [[ $# -lt 2  ]]
-
-    local thisEmacsClient=$( vis_thisEmacsClient )
-    local lcntBuildInfoPath=curBuild
-
-    if [ $# -eq 1 ] ; then
-         lcntBuildInfoPath="$1"
-    fi
-
-    opDo lcntBuildInfoPrep ${lcntBuildInfoPath}
-
-    if [ -z  "${lcntBuild_mailings}" ] ; then
-        lpReturn 101
-    fi
-
-    for each in ${lcntBuild_mailings} ; do
-        if [ ! -f "${each}" ] ; then
-            EH_problem "Missing ${each}"
-            continue
-        fi
-        lpDo ${thisEmacsClient} -e  "(mcdt:setup-and-compose/with-file \"${each}\")"
-    done
+    lpDo vis_withMailFilesCompose ${lcntBuild_mailings}
 }
 
 
@@ -454,7 +975,37 @@ _EOF_
         lpReturn 101
     fi
 
-    for each in ${lcntBuild_mailings} ; do
+    lpDo vis_withMailFilesOriginate ${lcntBuild_mailings}
+}
+
+function vis_withMailFilesCompose {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -ge 1  ]]
+
+    local thisEmacsClient=$( vis_thisEmacsClient )
+
+    for each in $* ; do
+        if [ ! -f "${each}" ] ; then
+            EH_problem "Missing ${each}"
+            continue
+        fi
+        lpDo ${thisEmacsClient} -e  "(mcdt:setup-and-compose/with-file \"${each}\")"
+    done
+}
+
+function vis_withMailFilesOriginate {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -ge 1  ]]
+
+    local thisEmacsClient=$( vis_thisEmacsClient )
+
+    for each in $* ; do
         if [ ! -f "${each}" ] ; then
             EH_problem "Missing ${each}"
             continue
@@ -462,7 +1013,6 @@ _EOF_
         lpDo ${thisEmacsClient} -e  "(mcdt:setup-and-originate/with-file \"${each}\")"
     done
 }
-
 
 
 function vis_mailingNamePlaceHolder {
