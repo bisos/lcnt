@@ -121,6 +121,8 @@ ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="
 ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view+release+compose" -i lcntBuild all  # Using enabled list
 _EOF_
 
+    vis_mailingComposeExamples
+
     lpReturn
 }
 
@@ -139,7 +141,24 @@ $( examplesSeperatorChapter "Generate OrgMsg Mailing File = marmeeHeaders + mail
 ${G_myName} ${extraInfo} -i mailingOrgMsgGen ${mailingName} ${mailingFileName}
 ${G_myName} ${extraInfo} -f -p headerFile=${selectedAasMarmeeHeaders} -i mailingOrgMsgGen ${mailingFileName}
 ${G_myName} ${extraInfo} -f -p headerFile=${selectedAasMarmeeHeaders} -i mailingOrgMsgGenRtl ${dateTag}.orgMsg
-$( examplesSeperatorSection "OrgMsg Mailing Invocation -- compose/originate" )
+_EOF_
+
+    lpReturn
+}
+
+function vis_mailingComposeExamples {
+    G_funcEntry
+    function describeF {  cat  << _EOF_
+_EOF_
+                       }
+    local extraInfo="-v -n showRun"
+    local mailingFileName=$( vis_hereMailFilesList |  tr " " "\n" | head -1 )
+    [[ -z "${mailingFileName}" ]] && mailingFileName="mailing.orgMsg"
+
+    cat  << _EOF_
+$( examplesSeperatorSection "Mailing Invocation (.orgMsg and .mail) -- compose/originate" )
+${G_myName} ${extraInfo} -i hereMailFilesList
+${G_myName} ${extraInfo} -i hereMailFilesComposeOffer # $(vis_hereMailFilesList)
 ${G_myName} ${extraInfo} -i withMailFilesCompose ${mailingFileName}
 ${G_myName} ${extraInfo} -i withMailFilesOrignate ${mailingFileName}
 _EOF_
@@ -978,6 +997,36 @@ _EOF_
     lpDo vis_withMailFilesOriginate ${lcntBuild_mailings}
 }
 
+function vis_hereMailFilesList {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -eq 0 ]]
+
+    local dotMailFiles=$(ls ./*.mail 2> /dev/null)
+    local dotOrgMsgFiles=$(ls ./*.orgMsg 2> /dev/null)
+    local allMailFiles="${dotMailFiles}"" ${dotOrgMsgFiles}"
+
+    [[ "${allMailFiles}" != " " ]] && echo ${allMailFiles}
+}
+
+function vis_hereMailFilesComposeOffer {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -eq 0 ]]
+
+    local filesList=$( vis_hereMailFilesList )
+
+    for each in ${filesList} ; do
+        echo ${G_myName} -i withMailFilesCompose "${each}"
+        echo "(mcdt:setup-and-compose/with-file \"${each}\")"
+    done
+}
+
+
 function vis_withMailFilesCompose {
     G_funcEntry
     function describeF {  G_funcEntryShow; cat  << _EOF_
@@ -987,7 +1036,7 @@ _EOF_
 
     local thisEmacsClient=$( vis_thisEmacsClient )
 
-    for each in $* ; do
+    for each in "$@" ; do
         if [ ! -f "${each}" ] ; then
             EH_problem "Missing ${each}"
             continue

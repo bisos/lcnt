@@ -101,6 +101,7 @@ _EOF_
     vis_mailingTextExamples
     vis_mailingHtmlExamples
     vis_mailingOrgMsgExamples
+    vis_mailingComposeExamples
 
     vis_mailingStartLcntExamples
 }
