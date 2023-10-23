@@ -221,7 +221,7 @@ X-ComposeFwrk: msgOrg
 
 #+BEGIN: bx:mtdt:content/actions
 #+BEGIN_COMMENT
-  [[elisp:(call-interactively 'org-msg-preview)][Browser Preview]] | [[elisp:(message-mode)][message-mode]] | [[elisp:(mcdt:setup-and-compose/with-curBuffer)][Compose]] | [[elisp:(mcdt:setup-and-originate/with-curBuffer)][Originate]]
+  [[elisp:(call-interactively 'org-msg-preview)][Browser Preview]] | [[elisp:(message-mode)][message-mode]] | [[elisp:(mtdt:setup-and-compose/with-curBuffer)][Compose]] | [[elisp:(mtdt:setup-and-originate/with-curBuffer)][Originate]]
 #+END_COMMENT
 #+END:
 
@@ -346,7 +346,7 @@ X-ComposeFwrk: msgOrg
 
 #+BEGIN: bx:mtdt:content/actions
 #+BEGIN_COMMENT
-  [[elisp:(call-interactively 'org-msg-preview)][Browser Preview]] | [[elisp:(message-mode)][message-mode]] | [[elisp:(mcdt:setup-and-compose/with-curBuffer)][Compose]] | [[elisp:(mcdt:setup-and-originate/with-curBuffer)][Originate]]
+  [[elisp:(call-interactively 'org-msg-preview)][Browser Preview]] | [[elisp:(message-mode)][message-mode]] | [[elisp:(b:mtdt:setup-and-compose/with-curBuffer)][Compose]] | [[elisp:(b:mtdt:setup-and-originate/with-curBuffer)][Originate]]
 #+END_COMMENT
 #+END:
 
@@ -471,7 +471,7 @@ X-ComposeFwrk: msgOrg
 
 #+BEGIN: bx:mtdt:content/actions
 #+BEGIN_COMMENT
-  [[elisp:(call-interactively 'org-msg-preview)][Browser Preview]] | [[elisp:(message-mode)][message-mode]] | [[elisp:(mcdt:setup-and-compose/with-curBuffer)][Compose]] | [[elisp:(mcdt:setup-and-originate/with-curBuffer)][Originate]]
+  [[elisp:(call-interactively 'org-msg-preview)][Browser Preview]] | [[elisp:(message-mode)][message-mode]] | [[elisp:(b:mtdt:setup-and-compose/with-curBuffer)][Compose]] | [[elisp:(b:mtdt:setup-and-originate/with-curBuffer)][Originate]]
 #+END_COMMENT
 #+END:
 
@@ -937,6 +937,7 @@ _EOF_
     opDo lcntBuildInfoPrep ${lcntBuildInfoPath}
 
     if [ -z  "${lcntBuild_mailings}" ] ; then
+        ANT_cooked "Blank lcntBuild_mailings"
         lpReturn 101
     fi
 
@@ -1022,7 +1023,7 @@ _EOF_
 
     for each in ${filesList} ; do
         echo ${G_myName} -i withMailFilesCompose "${each}"
-        echo "(mcdt:setup-and-compose/with-file \"${each}\")"
+        echo "(b:mtdt:setup-and-compose/with-file \"${each}\")"
     done
 }
 
@@ -1041,7 +1042,7 @@ _EOF_
             EH_problem "Missing ${each}"
             continue
         fi
-        lpDo ${thisEmacsClient} -e  "(mcdt:setup-and-compose/with-file \"${each}\")"
+        lpDo ${thisEmacsClient} -e  "(b:mtdt:setup-and-compose/with-file \"${each}\")"
     done
 }
 
@@ -1059,25 +1060,25 @@ _EOF_
             EH_problem "Missing ${each}"
             continue
         fi
-        lpDo ${thisEmacsClient} -e  "(mcdt:setup-and-originate/with-file \"${each}\")"
+        lpDo ${thisEmacsClient} -e  "(b:mtdt:setup-and-originate/with-file \"${each}\")"
     done
 }
 
 
-function vis_mailingNamePlaceHolder {
+function vis_mailingNameOfFile {
     G_funcEntry
     function describeF {  G_funcEntryShow; cat  << _EOF_
 _EOF_
     }
-    EH_assert [[ $# -eq 0 ]]
+    EH_assert [[ $# -eq 1 ]]
 
-    local mailingFileName="./content.mail"
+    local mailingFileName="$1"
     local mailingName="unspecifiedMailingName"
 
     if [ ! -f "${mailingFileName}" ] ; then
         EH_problem "Missing mailingName"
     else
-        mailingName=$( egrep '^X-MailingName:' content.mail | cut -d : -f 2 )
+        mailingName=$( egrep '^X-MailingName:' ${mailingFileName} | cut -d : -f 2 )
     fi
 
     if [ -z "${mailingName}" ] ; then
