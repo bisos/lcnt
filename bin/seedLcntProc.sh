@@ -1585,6 +1585,8 @@ function vis_fullClean {
     typeset thisOne=""
 
     hookRun "fullCleanHookPre"
+
+
     if [[ -L figures ]] ; then
         /bin/rm figures
     fi
@@ -1610,6 +1612,32 @@ function vis_fullClean {
 
     for thisOne in ${docsList} ; do
         case ${thisOne##*.} in 
+            "ttytex")
+                opDoComplain lcnLcntInputProc.sh -p cleanType=realclean -i clean ${thisOne}
+                opDo FN_dirDeleteIfThere ./revealJsBase
+                opDo FN_dirDeleteIfThere ./auto
+                ;;
+            "odp")
+                ANT_raw "Skipping cleaning for .odp"
+                ;;
+            *)
+                EH_problem "${thisOne}: Unknown Type"
+                return 1
+                ;;
+        esac
+    done
+
+    local buildDocSrcList=""
+
+    buildsDirsList=$( vis_buildsDirsList )
+    for each in ${buildsDirsList}; do
+      if [ -f "${each}/docSrc" ] ; then
+        buildDocSrcList="${buildDocSrcList} $(cat ${each}/docSrc)"
+      fi
+    done
+
+    for thisOne in ${buildDocSrcList} ; do
+        case ${thisOne##*.} in
             "ttytex")
                 opDoComplain lcnLcntInputProc.sh -p cleanType=realclean -i clean ${thisOne}
                 opDo FN_dirDeleteIfThere ./revealJsBase
@@ -3309,7 +3337,7 @@ _EOF_
         fi
 
         if [ ! -d ${lcntBuild_releaseBaseDir}/${lcntBuild_relTag} ] ; then
-          lpDo mkdir ${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}
+          lpDo mkdir -p ${lcntBuild_releaseBaseDir}/${lcntBuild_relTag}
         fi
 
         case ${resultType} in
