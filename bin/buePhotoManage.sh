@@ -279,6 +279,21 @@ _EOF_
   done
 }
 
+function vis_resizeToSmall {
+  EH_assert [[ $# -gt 0 ]]
+  function describeF {  cat  << _EOF_
+  Args: $@ -- Each being a path
+_EOF_
+  }
+
+  for thisFile in $@; do
+      typeset thisPrefix=$( FN_prefix ${thisFile} )
+      typeset thisExtension=$( FN_extension ${thisFile} )
+
+      opDo convert -resize 10% ${thisFile}  ${thisPrefix}-small.jpg
+  done
+}
+
 function vis_resizeToMediumSameExtension {
   EH_assert [[ $# -gt 0 ]]
   function describeF {  cat  << _EOF_
@@ -491,9 +506,11 @@ _EOF_
       typeset dateRenamedFile=$( vis_exifDateAutoRename ${thisFile} )
 
       if [ -z "${dateRenamedFile}" ] ; then
-	  opDo vis_resizeToMedium ${thisFile}
+        opDo vis_resizeToMedium ${thisFile}
+        opDo vis_resizeToSmall ${thisFile}
       else
 	  opDo vis_resizeToMedium ${dateRenamedFile}
+	  opDo vis_resizeToSmall ${dateRenamedFile}
       fi
   done
 }

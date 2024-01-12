@@ -161,6 +161,7 @@ ${G_myName} ${extraInfo} -i hereMailFilesList
 ${G_myName} ${extraInfo} -i hereMailFilesComposeOffer # $(vis_hereMailFilesList)
 ${G_myName} ${extraInfo} -i withMailFilesCompose ${mailingFileName}
 ${G_myName} ${extraInfo} -i withMailFilesOrignate ${mailingFileName}
+${G_myName} ${extraInfo} -i mtdtSelectMailing ${mailingFileName}
 _EOF_
 
     lpReturn
@@ -1062,6 +1063,25 @@ _EOF_
         fi
         lpDo ${thisEmacsClient} -e  "(b:mtdt:setup-and-originate/with-file \"${each}\")"
     done
+}
+
+function vis_mtdtSelectMailing {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+
+_EOF_
+    }
+    EH_assert [[ $# -eq 1  ]]
+
+    local mailingFileName="$1"
+    local thisEmacsClient=$( vis_thisEmacsClient )
+
+    if [ ! -f "${mailingFileName}" ] ; then
+        EH_problem "Missing ${mailingFileName}"
+        continue
+    fi
+
+    lpDo ${thisEmacsClient} -e  "(b:mtdt:derive/fromFilesAndSelect  \"${mailingFileName}\")"
 }
 
 
