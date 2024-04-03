@@ -336,6 +336,7 @@ ${G_myName} audio
 $( examplesSeperatorChapter "Develop" )
 ${G_myName} dev                # Review warning logs, cleanup, step-by-step builds, debug
 ${G_myName} ${extraInfo}  -i fullClean
+${G_myName} ${extraInfo}  -i fullClean Results
 $( examplesSeperatorChapter "Build --- curBuild=${curBuildEndLink} curRelease=${curReleaseEndLink} curExport=${curExportEndLink}" )
 ${G_myName} build              # build, build+view, build+release
 ${G_myName} ${extraInfo} -i beamerDerivedFullBuild  # Updates disposition.gened and
@@ -1577,6 +1578,14 @@ _CommentBegin_
 _CommentEnd_
 
 function vis_fullClean {
+
+  local extraCleans=""
+
+  if [ $# -eq 1 ] ; then
+    extraCleans="$1"
+  fi
+
+
     g_myInit ; retIfFail 2> /dev/null
     #set -x
 
@@ -1608,6 +1617,12 @@ function vis_fullClean {
 
     if [[ -L seedDesc ]] ; then
         /bin/rm seedDesc
+    fi
+
+    if [ "${extraCleans}" == "Results" ] ; then
+      if [[ -d ./Results ]] ; then
+        lpDo rm -r -f ./Results/*
+      fi
     fi
 
     for thisOne in ${docsList} ; do
