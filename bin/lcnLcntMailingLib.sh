@@ -101,12 +101,12 @@ ${G_myName} ${extraInfo} -p extent="build+view" -i lcntBuild cur          # Runs
 $( examplesSeperatorChapter "Mailing Info" )
 ${G_myName} ${extraInfo} -i lcntMailingInfoReport
 $( examplesSeperatorChapter "Initial Setups" )
-${G_myName} ${extraInfo}  -p cntntRawHome=. -i buildNameFvUpdate auto mailing
-${G_myName} ${extraInfo} -f -i mailingAsBuildName
+${G_myName} ${extraInfo}  -p cntntRawHome=. -i buildNameFvUpdate auto mailing  # Sets ALL Builds/mailing s to baseDir
+${G_myName} ${extraInfo} -f -i mailingAsBuildName  # Sets curBuild/mailings to arg1 (defaults to baseDir)
 $( examplesSeperatorSection "Generate Mailing File = mailingHeaderGen + mailingBodyPartsRefresh + mailingsDblockUpdate" )
 ${G_myName} ${extraInfo} -p pdf=pdf -p headerFile=${selectedAasMarmeeHeaders} -i mailingFileGen
 ${G_myName} ${extraInfo} -p headerFile=${selectedAasMarmeeHeaders} -i mailingFileGen
-$( examplesSeperatorSection "Mailing Headers" )
+$( examplesSeperatorSection "Mailing Headers -- Used by mailingFileGen" )
 ${G_myName} ${extraInfo} -i mailingHeaderGen curBuild # curBuild is default, specify other lcntBuildInfoPath
 ${G_myName} ${extraInfo} -f -i mailingHeaderGen
 ${G_myName} ${extraInfo} -p headerFile=${selectedAasMarmeeHeaders} -i mailingHeaderGen
@@ -114,17 +114,46 @@ $( examplesSeperatorSection "Body Parts Refresh" )
 ${G_myName} ${extraInfo} -i mailingBodyPartsRefresh  # Creates appropriate empty dblock for html content + perhaps pdf attachement
 ${G_myName} ${extraInfo} -p pdf=pdf -i mailingBodyPartsRefresh # Creates appropriate empty dblock for html content + perhaps pdf attachement
 $( examplesSeperatorChapter "Mailing --- curBuild=${curBuildEndLink} curRelease=${curReleaseEndLink} mailing=${lcntBuild_mailingFile}" )
+${G_myName} ${extraInfo} -p cntntRawHome=. -i buildEnabledMailingsSet mailings
+${G_myName} ${extraInfo} -p cntntRawHome=.-i buildEnabledMailingsSet mailings+
+cat "./LCNT-INFO/Builds/enabledList"
 ${G_myName} ${extraInfo} -p pre="clean" -p extent="build+view" -i lcntBuild cur  # Runs dblock
+${G_myName} ${extraInfo} -p extent="mailingPrep" -i lcntBuild cur
 ${G_myName} ${extraInfo} -p extent="compose" -i lcntBuild cur
-${G_myName} ${extraInfo} -p extent="originate" -i lcntBuild cur
-${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="compose" -i lcntBuild all  # Using enabled list
-${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view+release+compose" -i lcntBuild all  # Using enabled list
+${G_myName} ${extraInfo} -p extent="extCompose" -i lcntBuild cur
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledMailings" -p extent="mailingPrep" -i lcntBuild all  # Using enabled list
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledMailings" -p extent="compose" -i lcntBuild all  # Using enabled list
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledMailings" -p extent="build+view+release+compose" -i lcntBuild all  # Using enabled list
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledMailings" -p extent="build+view+release" -i lcntBuild all  # Using enabled list
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledMailings" -p extent="build+view+release+mailingPrep" -i lcntBuild all  # Using enabled list
 _EOF_
+
+    vis_mailingFullPrepExamples
 
     vis_mailingComposeExamples
 
     lpReturn
 }
+
+
+function vis_mailingFullPrepExamples {
+    G_funcEntry
+    function describeF {  cat  << _EOF_
+_EOF_
+                       }
+    local extraInfo="-v -n showRun"
+    local mailingFileName=$( vis_hereMailFilesList |  tr " " "\n" | head -1 )
+    [[ -z "${mailingFileName}" ]] && mailingFileName="mailing.orgMsg"
+
+    cat  << _EOF_
+$( examplesSeperatorSection "Mailing Full Prep --- " )
+${G_myName} ${extraInfo} -p cntntRawHome=. -i mailingFullPrep  # mailingName=$( basename $(pwd) )
+${G_myName} ${extraInfo}  -p cntntRawHome=. -i mailingFullPrep $( basename $(pwd) )
+_EOF_
+
+    lpReturn
+}
+
 
 function vis_mailingOrgMsgExamples {
     G_funcEntry
@@ -156,7 +185,7 @@ _EOF_
     [[ -z "${mailingFileName}" ]] && mailingFileName="mailing.orgMsg"
 
     cat  << _EOF_
-$( examplesSeperatorSection "Mailing Invocation (.orgMsg and .mail) -- compose/originate" )
+$( examplesSeperatorSection "Mailing Invocation (.orgMsg and .mail) -- compose/extCompose" )
 ${G_myName} ${extraInfo} -i hereMailFilesList
 ${G_myName} ${extraInfo} -i hereMailFilesComposeOffer # $(vis_hereMailFilesList)
 ${G_myName} ${extraInfo} -i withMailFilesCompose ${mailingFileName}
@@ -165,6 +194,32 @@ ${G_myName} ${extraInfo} -i mtdtSelectMailing ${mailingFileName}
 _EOF_
 
     lpReturn
+}
+
+
+function vis_mailingFullPrep {
+    #set -x
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 2  ]]
+
+    local argMailingName=$(basename $(pwd))
+
+    if [ $# -eq 1 ] ; then
+        argMailingName="$1"
+    fi
+
+    lpDo vis_buildNameFvUpdate ${argMailingName} mailing
+    lpDo vis_buildEnabledMailingsSet mailings
+    lpDo vis_mailingAsBuildName # ${argMailingName}
+
+    lpDo lcntProc.sh -v -n showRun -p enabled="./LCNT-INFO/Builds/enabledMailings" -p extent="build+view+release" -i lcntBuild all  # Using enabled list
+
+    lpDo vis_mailingAsBuildName # ${argMailingName}
+
+    lpDo lcntProc.sh -v -n showRun  -p pdf=pdf -p headerFile=${selectedAasMarmeeHeaders} -i mailingFileGen
 }
 
 
@@ -209,8 +264,9 @@ _EOF_
 Subject: NO SUBJECT
 X-MailingName: ${argMailingName}
 X-MailingDoc: nil
-X-MailingParams: :type compose :extSrcBase nil
-X-ComposeFwrk: msgOrg
+X-MailingParams: :compose native :extSrcBase nil
+X-ComposeFwrk: orgMsg
+X-MailingPurpose: Mailing
 --text follows this line--
 #+OPTIONS: html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \n:t d:nil
 #+STARTUP: hidestars indent inlineimages
@@ -222,7 +278,7 @@ X-ComposeFwrk: msgOrg
 
 #+BEGIN: bx:mtdt:content/actions
 #+BEGIN_COMMENT
-  [[elisp:(call-interactively 'org-msg-preview)][Browser Preview]] | [[elisp:(message-mode)][message-mode]] | [[elisp:(mtdt:setup-and-compose/with-curBuffer)][Compose]] | [[elisp:(mtdt:setup-and-originate/with-curBuffer)][Originate]]
+  [[elisp:(call-interactively 'org-msg-preview)][Browser Preview]] | [[elisp:(message-mode)][message-mode]] | [[elisp:(mtdt:setup-and-compose/with-curBuffer)][Compose]] | [[elisp:(mtdt:setup-and-extCompose/with-curBuffer)][ExtCompose]]
 #+END_COMMENT
 #+END:
 
@@ -334,8 +390,9 @@ _EOF_
 Subject: NO SUBJECT
 X-MailingName: ${argMailingName}
 X-MailingDoc: nil
-X-MailingParams: :type compose :extSrcBase nil
-X-ComposeFwrk: msgOrg
+X-MailingParams: :compose native :extSrcBase nil
+X-ComposeFwrk: orgMsg
+X-MailingPurpose: Mailing
 --text follows this line--
 #+OPTIONS: html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \n:t d:nil
 #+STARTUP: hidestars indent inlineimages
@@ -347,7 +404,7 @@ X-ComposeFwrk: msgOrg
 
 #+BEGIN: bx:mtdt:content/actions
 #+BEGIN_COMMENT
-  [[elisp:(call-interactively 'org-msg-preview)][Browser Preview]] | [[elisp:(message-mode)][message-mode]] | [[elisp:(b:mtdt:setup-and-compose/with-curBuffer)][Compose]] | [[elisp:(b:mtdt:setup-and-originate/with-curBuffer)][Originate]]
+  [[elisp:(call-interactively 'org-msg-preview)][Browser Preview]] | [[elisp:(message-mode)][message-mode]] | [[elisp:(b:mtdt:setup-and-compose/with-curBuffer)][Compose]] | [[elisp:(b:mtdt:setup-and-extCompose/with-curBuffer)][ExtCompose]]
 #+END_COMMENT
 #+END:
 
@@ -411,7 +468,7 @@ _EOF_
 $( examplesSeperatorChapter "Generate Text Mailing File = marmeeHeaders + mailingHeaderGen + mailingBodyParts" )
 ${G_myName} ${extraInfo} -i mailingTextGen ${mailingName} ${mailingFileName}
 ${G_myName} ${extraInfo} -f -p headerFile=${selectedAasMarmeeHeaders} -i mailingTextGen ${mailingFileName}
-${G_myName} ${extraInfo} -f -p headerFile=${selectedAasMarmeeHeaders} -i mailingTextGenRtl ${dateTag}.orgMsg
+${G_myName} ${extraInfo} -f -p headerFile=${selectedAasMarmeeHeaders} -i mailingTextGenRtl ${dateTag}.mail
 _EOF_
 
     lpReturn
@@ -459,8 +516,9 @@ _EOF_
 Subject: NO SUBJECT
 X-MailingName: ${argMailingName}
 X-MailingDoc: nil
-X-MailingParams: :type compose :extSrcBase nil
-X-ComposeFwrk: msgOrg
+X-MailingParams: :compose native :extSrcBase nil
+X-ComposeFwrk: orgMsg
+X-MailingPurpose: Mailing
 --text follows this line--
 #+OPTIONS: html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \n:t d:nil
 #+STARTUP: hidestars indent inlineimages
@@ -472,7 +530,7 @@ X-ComposeFwrk: msgOrg
 
 #+BEGIN: bx:mtdt:content/actions
 #+BEGIN_COMMENT
-  [[elisp:(call-interactively 'org-msg-preview)][Browser Preview]] | [[elisp:(message-mode)][message-mode]] | [[elisp:(b:mtdt:setup-and-compose/with-curBuffer)][Compose]] | [[elisp:(b:mtdt:setup-and-originate/with-curBuffer)][Originate]]
+  [[elisp:(call-interactively 'org-msg-preview)][Browser Preview]] | [[elisp:(message-mode)][message-mode]] | [[elisp:(b:mtdt:setup-and-compose/with-curBuffer)][Compose]] | [[elisp:(b:mtdt:setup-and-extCompose/with-curBuffer)][ExtCompose]]
 #+END_COMMENT
 #+END:
 
@@ -739,6 +797,7 @@ function vis_mailingAsBuildName {
     #set -x
     G_funcEntry
     function describeF {  G_funcEntryShow; cat  << _EOF_
+MailingName is derived from BuildName and stored in the build profile.
 _EOF_
     }
     EH_assert [[ $# -lt 2  ]]
@@ -976,7 +1035,7 @@ _EOF_
 }
 
 
-function vis_mailingOriginate {
+function vis_mailingExtCompose {
     G_funcEntry
     function describeF {  G_funcEntryShow; cat  << _EOF_
 _EOF_
@@ -996,7 +1055,26 @@ _EOF_
         lpReturn 101
     fi
 
-    lpDo vis_withMailFilesOriginate ${lcntBuild_mailings}
+    lpDo vis_withMailFilesExtCompose ${lcntBuild_mailings}
+}
+
+function vis_mailingPrep {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 2  ]]
+
+    local thisEmacsClient=$( vis_thisEmacsClient )
+    local lcntBuildInfoPath=curBuild
+
+    if [ $# -eq 1 ] ; then
+         lcntBuildInfoPath="$1"
+    fi
+
+    opDo lcntBuildInfoPrep ${lcntBuildInfoPath}
+
+    lpDo vis_mailingsDblockUpdate ${lcntBuildInfoPath}
 }
 
 function vis_hereMailFilesList {
@@ -1024,7 +1102,7 @@ _EOF_
 
     for each in ${filesList} ; do
         echo ${G_myName} -i withMailFilesCompose "${each}"
-        echo "(b:mtdt:setup-and-compose/with-file \"${each}\")"
+        echo "(b:mtdt:mfp/compose \"${each}\")"
     done
 }
 
@@ -1043,11 +1121,11 @@ _EOF_
             EH_problem "Missing ${each}"
             continue
         fi
-        lpDo ${thisEmacsClient} -e  "(b:mtdt:setup-and-compose/with-file \"${each}\")"
+        lpDo ${thisEmacsClient} -e  "(b:mtdt:mfp/compose \"${each}\")"
     done
 }
 
-function vis_withMailFilesOriginate {
+function vis_withMailFilesExtCompose {
     G_funcEntry
     function describeF {  G_funcEntryShow; cat  << _EOF_
 _EOF_
@@ -1061,9 +1139,30 @@ _EOF_
             EH_problem "Missing ${each}"
             continue
         fi
-        lpDo ${thisEmacsClient} -e  "(b:mtdt:setup-and-originate/with-file \"${each}\")"
+        lpDo ${thisEmacsClient} -e  "(b:mtdt:mfp/extCompose \"${each}\")"
     done
 }
+
+
+function vis_withMailFilesMailingPrep {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -ge 1  ]]
+
+    local thisEmacsClient=$( vis_thisEmacsClient )
+
+    for each in $* ; do
+        if [ ! -f "${each}" ] ; then
+            EH_problem "Missing ${each}"
+            continue
+        fi
+        lpDo ${thisEmacsClient} -e  "(b:mtdt:setup-and-NOTYET/with-file \"${each}\")"
+    done
+}
+
+
 
 function vis_mtdtSelectMailing {
     G_funcEntry

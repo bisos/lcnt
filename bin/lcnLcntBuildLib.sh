@@ -136,6 +136,9 @@ _EOF_
 
     local lcntBuildCommonInfoBasePath="${lcntInfoPath}/Builds"
 
+    local hereDir=$(pwd)
+    lcntAttrHomeRelBase=${lcntAttrHomeRelBase:-${hereDir}}
+
     read -r -a lcntAttrHomeArray <<< "$lcntAttrHomeRelBase"
 
     echo ${lcntAttrHomeArray}
@@ -198,7 +201,7 @@ _EOF_
         local fvName=$2
         local fvValue=$3
         local fvNamePath="${buildDirPath}/${fvName}"
-        
+
         if [[ ! -s "${fvNamePath}" ]]; then
             echo "${fvValue}" > "${fvNamePath}"
         else
@@ -232,6 +235,9 @@ _EOF_
             opDo mkdir "${buildDirPath}"
         fi
 
+        lpDo eval echo \\\\includecomment{whenBuildPrimary} \> ${buildDirPath}/build.tex
+        lpDo eval echo \\\\excludecomment{whenBuildMailing} \>\> ${buildDirPath}/build.tex
+
         opDo fvNameValueSpecificSet ${buildDirPath} "buildDocClass" "memo"
         opDo fvNameValueSpecificSet ${buildDirPath} "buildName" "$( buildNameGet ${buildDirName} ${lcntName} )"
         opDo fvNameValueSpecificSet ${buildDirPath} "docSrc"  "${articleSrcFile}"
@@ -252,6 +258,9 @@ _EOF_
             opDo mkdir "${buildDirPath}"
         fi
 
+        lpDo eval echo \\\\includecomment{whenBuildPrimary} \> ${buildDirPath}/build.tex
+        lpDo eval echo \\\\excludecomment{whenBuildMailing} \>\> ${buildDirPath}/build.tex
+
         opDo fvNameValueSpecificSet ${buildDirPath} "buildDocClass" "article"
         opDo fvNameValueSpecificSet ${buildDirPath} "buildName" "$( buildNameGet ${buildDirName} ${lcntName} )"
         opDo fvNameValueSpecificSet ${buildDirPath} "docSrc"  "${articleSrcFile}"
@@ -269,6 +278,9 @@ _EOF_
         if [ ! -d "${buildDirPath}" ] ; then
             opDo mkdir "${buildDirPath}"
         fi
+
+        lpDo eval echo \\\\includecomment{whenBuildPrimary} \> ${buildDirPath}/build.tex
+        lpDo eval echo \\\\excludecomment{whenBuildMailing} \>\> ${buildDirPath}/build.tex
 
         opDo fvNameValueSpecificSet ${buildDirPath} "buildDocClass" "article"
         opDo fvNameValueSpecificSet ${buildDirPath} "buildName" "$( buildNameGet ${buildDirName} ${lcntName} )" 
@@ -420,11 +432,14 @@ _EOF_
             opDo mkdir "${buildDirPath}"
         fi
 
+        lpDo eval echo \\\\includecomment{whenBuildPrimary} \> ${buildDirPath}/build.tex
+        lpDo eval echo \\\\excludecomment{whenBuildMailing} \>\> ${buildDirPath}/build.tex
+
         opDo fvNameValueSpecificSet ${buildDirPath} "buildDocClass" "article"
         opDo fvNameValueSpecificSet ${buildDirPath} "buildName" "$( buildNameGet ${buildDirName} ${lcntName} )" 
         opDo fvNameValueSpecificSet ${buildDirPath} "docSrc"  "${articleSrcFile}"
         opDo fvNameValueSpecificSet ${buildDirPath} "paperSize" "html"
-        opDo fvNameValueSpecificSet ${buildDirPath} "results" "pdf"
+        opDo fvNameValueSpecificSet ${buildDirPath} "results" "html"
         opDo fvNameValueSpecificSet ${buildDirPath} "sides" "2" 
     }
 
@@ -538,6 +553,75 @@ _EOF_
         opDo fvNameValueSpecificSet ${buildDirPath} "sides" "2" 
     }
 
+
+
+    function mailing_art_let_build {
+        EH_assert [[ $# -eq 0 ]]
+
+        local buildDirName="mailing-let"
+        local buildDirPath="${lcntBuildCommonInfoBasePath}/${buildDirName}"
+
+        if [ ! -d "${buildDirPath}" ] ; then
+            opDo mkdir "${buildDirPath}"
+        fi
+
+        lpDo eval echo \\\\excludecomment{whenBuildPrimary} \> ${buildDirPath}/build.tex
+        lpDo eval echo \\\\includecomment{whenBuildMailing} \>\> ${buildDirPath}/build.tex
+
+        opDo fvNameValueSpecificSet ${buildDirPath} "buildDocClass" "article"
+        opDo fvNameValueSpecificSet ${buildDirPath} "buildName" "$( buildNameGet ${buildDirName} ${lcntName} )"
+        opDo fvNameValueSpecificSet ${buildDirPath} "docSrc"  "${articleSrcFile}"
+        opDo fvNameValueSpecificSet ${buildDirPath} "paperSize" "8.5x11"
+        opDo fvNameValueSpecificSet ${buildDirPath} "results" "pdf"
+        opDo fvNameValueSpecificSet ${buildDirPath} "sides" "2"
+    }
+
+    function mailing_art_a4_build {
+        EH_assert [[ $# -eq 0 ]]
+
+        local buildDirName="mailing-a4"
+        local buildDirPath="${lcntBuildCommonInfoBasePath}/${buildDirName}"
+
+        if [ ! -d "${buildDirPath}" ] ; then
+            opDo mkdir "${buildDirPath}"
+        fi
+
+        lpDo eval echo \\\\excludecomment{whenBuildPrimary} \> ${buildDirPath}/build.tex
+        lpDo eval echo \\\\includecomment{whenBuildMailing} \>\> ${buildDirPath}/build.tex
+
+        opDo fvNameValueSpecificSet ${buildDirPath} "buildDocClass" "article"
+        opDo fvNameValueSpecificSet ${buildDirPath} "buildName" "$( buildNameGet ${buildDirName} ${lcntName} )"
+        opDo fvNameValueSpecificSet ${buildDirPath} "docSrc"  "${articleSrcFile}"
+        opDo fvNameValueSpecificSet ${buildDirPath} "paperSize" "a4"
+        opDo fvNameValueSpecificSet ${buildDirPath} "results" "pdf"
+        opDo fvNameValueSpecificSet ${buildDirPath} "sides" "2"
+    }
+
+
+
+    function mailing_html_build {
+        EH_assert [[ $# -eq 0 ]]
+
+        local buildDirName="mailing-html"
+        local buildDirPath="${lcntBuildCommonInfoBasePath}/${buildDirName}"
+
+        if [ ! -d "${buildDirPath}" ] ; then
+            opDo mkdir "${buildDirPath}"
+        fi
+
+        lpDo eval echo \\\\excludecomment{whenBuildPrimary} \> ${buildDirPath}/build.tex
+        lpDo eval echo \\\\includecomment{whenBuildMailing} \>\> ${buildDirPath}/build.tex
+
+        opDo fvNameValueSpecificSet ${buildDirPath} "buildDocClass" "article"
+        opDo fvNameValueSpecificSet ${buildDirPath} "buildName" "$( buildNameGet ${buildDirName} ${lcntName} )"
+        opDo fvNameValueSpecificSet ${buildDirPath} "docSrc"  "${articleSrcFile}"
+        opDo fvNameValueSpecificSet ${buildDirPath} "paperSize" "html"
+        opDo fvNameValueSpecificSet ${buildDirPath} "results" "html"
+        opDo fvNameValueSpecificSet ${buildDirPath} "sides" "2"
+    }
+
+
+
     local eachModel=""
 
     for eachModel in ${lcnt_docSrcList} ; do
@@ -550,7 +634,10 @@ _EOF_
                 opDo art_17.5x23.5_build                                                
                 opDo html_build
                 opDo odt_build
-                opDo markdown_build             
+                opDo markdown_build
+                lpDo mailing_art_let_build
+                lpDo mailing_art_a4_build
+                lpDo mailing_html_build
                 ;;
             "memoEnFa")
                 #
@@ -584,6 +671,64 @@ function fvNameValueUpdate {
     local fvNamePath="${buildDirPath}/${fvName}"
 
     echo "${fvValue}" > "${fvNamePath}"
+}
+
+
+function vis_buildEnabledMailingsSet {
+   G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -eq 1 ]]
+    local enabledListTag="$1"
+
+    lcntInfoPrep ${cntntRawHome}
+    lcntPathAnalyze ${cntntRawHome}
+
+    local lcntInfoPath="./${lcntInfoDir}"
+    local lcntBuildCommonInfoBasePath="${lcntInfoPath}/Builds"
+
+   function getEnabledList {
+        EH_assert [[ $# -eq 0 ]]
+        local enabledList="$(cat ${lcntBuildCommonInfoBasePath}/enabledList)"
+
+        case ${enabledListTag} in
+            "mailings")
+                # NOTYET, this should be done with ls *
+                # enabledList="mailing-html mailing-a4 mailing-let"
+                enabledList=$( inBaseDirDo ${lcntBuildCommonInfoBasePath} ls -d mailing* )
+                ;;
+            "mailings+")
+                enabledList="${enabledList} mailing-html mailing-a4 mailing-let"
+                ;;
+            *)
+                EH_problem "Missing docModel: ${enabledListTag}"
+                ;;
+        esac
+        echo ${enabledList}
+    }
+
+
+    
+    function fvNameValueCommonSet {
+        EH_assert [[ $# -eq 2 ]]
+        local fvName=$1
+        local fvValue=$2
+        local fvNamePath="${lcntBuildCommonInfoBasePath}/${fvName}"
+
+        lpDo eval cat /dev/null \> "${fvNamePath}"
+        for each in ${fvValue} ; do
+            lpDo eval echo "${each}" \>\> "${fvNamePath}"
+        done
+
+        # if [[ ! -s "${fvNamePath}" ]]; then
+        #     echo "${fvValue}" > "${fvNamePath}"
+        # else
+        #     ANT_cooked "Exists"
+        # fi
+    }
+    
+    lpDo fvNameValueCommonSet "enabledMailings" "$( getEnabledList )"
 }
 
 

@@ -3475,6 +3475,21 @@ _EOF_
                             fi
                         fi
                     fi
+
+                    if LIST_isIn "compose" "${extentList}"  ; then
+                      lpDo vis_mailingCompose
+                      # ANT_cooked "For each of the mailings we will invoke COMPOSE for the mailing"
+                    fi
+
+                    if LIST_isIn "extCompose" "${extentList}"  ; then
+                      lpDo vis_mailingExtCompose
+                      # ANT_cooked "For each of the mailings we will invoke EXTCOMPOSE for the mailing"
+                    fi
+
+                    if LIST_isIn "mailingPrep" "${extentList}"  ; then
+                      lpDo vis_mailingPrep
+                      # ANT_cooked "For each of the mailings we will invoke mailingPrep for the mailing"
+                    fi
                     ;;
                 "html")
                     resultsPathDest=$( resultsDestinationPath html )
@@ -3562,10 +3577,16 @@ _EOF_
                       # ANT_cooked "For each of the mailings we will invoke COMPOSE for the mailing"
                     fi
 
-                    if LIST_isIn "originate" "${extentList}"  ; then
-                      lpDo vis_mailingOriginate
-                      # ANT_cooked "For each of the mailings we will invoke ORIGINATE for the mailing"
+                    if LIST_isIn "extCompose" "${extentList}"  ; then
+                      lpDo vis_mailingExtCompose
+                      # ANT_cooked "For each of the mailings we will invoke EXTCOMPOSE for the mailing"
                     fi
+
+                    if LIST_isIn "mailingPrep" "${extentList}"  ; then
+                      lpDo vis_mailingPrep
+                      # ANT_cooked "For each of the mailings we will invoke mailingPrep for the mailing"
+                    fi
+
                     ;;
                 "odt")
                     resultsFileDest=$( resultsDestinationPath odt )                 

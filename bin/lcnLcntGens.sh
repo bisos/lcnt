@@ -508,6 +508,8 @@ function vis_regNuShow {
 
   fi
 
+  lcntAttrSource=${lcntAttrSource:-bystar}
+
   typeset thisDoc
 
   for thisDoc in ${srcFilesList} ; do
@@ -897,7 +899,8 @@ function vis_lcntBaseConfigMulti {
 
   multiFormats="${lcnt_docSrcForms}:${lcnt_docSrcLangs}"
 
-  # /lcnt/lgpc/bystar/SOURCE-INFO/templates/artPresFrontEn.ttytex.start 
+  # /lcnt/lgpc/bystar/SOURCE-INFO/templates/artPresFrontEn.ttytex.start
+  lcntAttrSource=${lcntAttrSource:-bystar}
   docStartTemplateBase=${lcntBaseDir}${lcntAttrGenPub}/${lcntAttrSource}/SOURCE-INFO/templates
 
   startLcntProcTemplate=""
@@ -1563,6 +1566,7 @@ function vis_lcntInfoGen {
   EH_assert [[ "${srcLangs}_" != "INVALID_" ]]
 
   local lcntSource_bystarUid=$(id -u -n)
+  local hereDir=$(pwd)
 
   #set -x
   lcnLcntPre
@@ -1652,9 +1656,12 @@ function vis_lcntInfoGen {
    fi
  fi
 
- guessedTitle=${lcntAttrHomeRelBase}    #### `cat ${lcntInfoPath}/docSrcList`
+ guessedTitle=${lcntAttrHomeRelBase:-${hereDir}}    #### `cat ${lcntInfoPath}/docSrcList`
 
-
+ lcntSource_origin=${lcntSource_origin:-NA}
+ lcntSource_author1=${lcntSource_author1:-NA}
+ lcntSource_pubDestUrls=${lcntSource_pubDestUrls:-NA}
+ lcntSource_organization=${lcntSource_organization:-NA}
 
  if [[ ! -s ${lcntInfoPath}/accessPageInclusion ]]; then
      if [ "${srcForms}" == "pdf" ] ; then
@@ -1786,7 +1793,7 @@ function vis_lcntInfoGen {
 
  typeset wasDocGroup=`cat ${lcntInfoPath}/docGroup`
  if [ "${wasDocGroup}_" == "UnSpecifiedDocGroup_" ] ||  [ ! -s ${lcntInfoPath}/docGroup ] ; then 
-   echo "${lcntAttrGroup}" > ${lcntInfoPath}/docGroup
+   echo "${lcntAttrGroup:-NA}" > ${lcntInfoPath}/docGroup
  fi
 
  if [[ ! -s ${lcntInfoPath}/date ]]; then
