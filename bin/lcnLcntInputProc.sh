@@ -344,6 +344,7 @@ function doing_realclean {
    ${1}.mtc* \
    ${1}.maf \
    ${1}.run.xml \
+   ${1}.mw \
    ${1}.ps \
    ${1}.pdf missfont.log comment.cut *~
 

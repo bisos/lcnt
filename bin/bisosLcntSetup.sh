@@ -275,6 +275,7 @@ _EOF_
 
     lpDo sudo mkdir -p /de/sys
     lpDo sudo chown bisos:bisos /de/sys
+    lpDo sudo chmod  g+w /de/sys
 
     lpDo mkdir -p /de/sys/lcnt
     
@@ -346,6 +347,7 @@ _EOF_
     EH_assert [ -d "${lcntBasesPath}" ]
 
     lpDo FN_fileSymlinkUpdate ${lcntBasesPath}/lcnt/lgpc /de/sys/lcnt/lgpc
+    lpDo FN_fileSymlinkUpdate ${lcntBasesPath}/lcnt/lgcc /de/sys/lcnt/lgcc
 }
 
 
