@@ -350,6 +350,7 @@ $( examplesSeperatorChapter "Release, Export, Mailing Build=${curBuildEndLink} R
 ${G_myName} release
 ${G_myName} export
 ${G_myName} mailing
+${G_myName} -i logsAnalysis
 _EOF_
 
     lpReturn
@@ -3219,6 +3220,8 @@ _EOF_
       lcntNu=""
     fi
 
+    local lcntInputProcVerbosity="-h -v -n showRun"
+
     local lcntVersion=$( cat ./LCNT-INFO/version )
 
     local resultsFileDest=""
@@ -3442,7 +3445,7 @@ _EOF_
                         continue
                     fi
                     if LIST_isIn "build" "${extentList}"  ; then
-                        opDo lcnLcntInputProc.sh -p inFormat=xelatex -p outputs=pdf -i buildDocs  ${lcntBuild_docSrc}
+                        opDo lcnLcntInputProc.sh ${lcntInputProcVerbosity} -p inFormat=xelatex -p outputs=pdf -i buildDocs  ${lcntBuild_docSrc}
                         opDo cp ${docSrcPrefix}.pdf ${resultsFileDest}
                     fi
                     if LIST_isIn "view" "${extentList}"  ; then
@@ -3463,7 +3466,7 @@ _EOF_
                             # opDo FN_fileSymlinkUpdate ${releaseDestinationPath} $( FN_nonDirsPart ${releaseDestinationPath} )
                         else
                             if LIST_isIn "build" "${extentList}"  ; then                                                            
-                                opDo lcnLcntInputProc.sh -p inFormat=xelatex -p outputs=pdf -i buildDocs  ${lcntBuild_docSrc}
+                                opDo lcnLcntInputProc.sh  ${lcntInputProcVerbosity} -p inFormat=xelatex -p outputs=pdf -i buildDocs  ${lcntBuild_docSrc}
                                 opDo cp ${docSrcPrefix}.pdf ${resultsFileDest}
                                 
                                 opDo cp -p ${resultsFileDest} ${releaseDestinationPath}
@@ -3502,7 +3505,7 @@ _EOF_
                         lpDo vis_buildHtmlPreview "${lcntBuild_docSrc}"
                         extent=${storedExtent}
                       else
-                        opDo lcnLcntInputProc.sh -p inFormat=xelatex -p outputs=heveaHtml -i buildDocs  ${lcntBuild_docSrc}
+                        opDo lcnLcntInputProc.sh  ${lcntInputProcVerbosity} -p inFormat=xelatex -p outputs=heveaHtml -i buildDocs  ${lcntBuild_docSrc}
                         #
                         # We are not going to move to results for html.
 
@@ -3556,7 +3559,7 @@ _EOF_
                             opDo ls -ld  ${releaseDestinationPath}/$(basename ${resultsPathDest})
                         else
                             if LIST_isIn "build" "${extentList}"  ; then
-                                opDo lcnLcntInputProc.sh -p inFormat=xelatex -p outputs=heveaHtml -i buildDocs  ${lcntBuild_docSrc}
+                                opDo lcnLcntInputProc.sh  ${lcntInputProcVerbosity} -p inFormat=xelatex -p outputs=heveaHtml -i buildDocs  ${lcntBuild_docSrc}
                                 if [ -d "${resultsPathDest}" ] ; then
                                     opDo mv "${resultsPathDest}" "${resultsPathDest}"-${dateTag}
                                 fi
@@ -4461,6 +4464,21 @@ _EOF_
 
     lpDo vis_lcntExport ${exportDest}
     
+    lpReturn
+}
+
+function vis_logsAnalysis {
+    G_funcEntry
+    function describeF {  cat  << _EOF_
+_EOF_
+    }
+
+    echo "Missing References"
+    lpDo grep 'LaTeX Warning: Reference' articleEnFa.log
+
+    echo "Missing Citations"
+    egrep '^biblatex' articleEnFa.log | grep -v 'in the database' | grep -v 'Please verify' | grep -v 'LaTeX afterwards'
+
     lpReturn
 }
 

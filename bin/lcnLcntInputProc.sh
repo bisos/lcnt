@@ -485,12 +485,12 @@ function ttytexToPdf {
 
   case ${inFormat} in
       "latex"|"")
-          pdflatex ${extraLatexOptions} $1.tex
-          bibtex $1
-          makeindex $1.idx
-          makeglossaries $1
-          pdflatex ${extraLatexOptions} $1.tex
-          pdflatex ${extraLatexOptions} $1.tex
+          opDo pdflatex ${extraLatexOptions} $1.tex
+          opDo bibtex $1
+          opDo makeindex $1.idx
+          opDo makeglossaries $1
+          opDo pdflatex ${extraLatexOptions} $1.tex
+          opDo pdflatex ${extraLatexOptions} $1.tex
           ;;
       "xelatex")
              if [ "$1" == "presentationEnFa" ] ; then
