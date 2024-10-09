@@ -57,6 +57,7 @@ itemsOrderedList=(
     lcaJsRevealBinsPrep.sh
     mmBinsPrep.sh
     lcaObsStudioBinsPrep.sh
+    lcaAudioVideoBinsPrep.sh
 )
 
 
