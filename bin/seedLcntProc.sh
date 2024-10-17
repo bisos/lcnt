@@ -344,7 +344,7 @@ ${G_myName} ${extraInfo} -p pre="clean" -p incOnly="./common/aboutThisDoc" -p ex
 ${G_myName} ${extraInfo} -i lcntBuildFpsRefresh cur  # Updates spineWidth
 ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -i lcntBuildFpsRefresh all
 ${G_myName} ${extraInfo} -p pre="clean" -p extent="build+view" -i lcntBuild cur  # Runs dblock
-${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view" -i lcntBuild all  # Using enabled list
+$( enabledList_buildView )
 ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view+release" -i lcntBuild all  # Using enabled list
 $( examplesSeperatorChapter "Release, Export, Mailing Build=${curBuildEndLink} Release=${curReleaseEndLink}" Export="${curExportEndLink}" mailingFile="${lcntBuild_mailingFile}" )
 ${G_myName} release
@@ -356,8 +356,17 @@ _EOF_
     lpReturn
 }       
 
-bystarUid=""
+function enabledList_buildView {
+  echo ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view" -i lcntBuild all  # Using enabled list
+  if [ -f ./LCNT-INFO/Builds/enabledList.pres ] ;  then
+     echo ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList.pres" -p extent="build+view" -i lcntBuild all
+  fi
+  if [ -f ./LCNT-INFO/Builds/enabledList.reveal ] ;  then
+     echo ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList.reveal" -p extent="build+view" -i lcntBuild all
+  fi
+}
 
+bystarUid=""
 
 _CommentBegin_
 *  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(beginning-of-buffer)][|^]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]] || IIC       ::  vis_examples    [[elisp:(org-cycle)][| ]]
@@ -3432,7 +3441,7 @@ _EOF_
         fi
         
         # 3) for all of build forms, build results
-        for eachResult in ${lcntBuild_resultsList}; do
+        for eachResult in ${lcntBuild_resultsList} ; do
             if LIST_isIn "build" "${extentList}"  ; then
                lpDo eval echo "----------------------------------------------" \>\> ${fileRecord}
                lpDo eval echo "lcntBuild Start=$(DATE_nowTag) -- ${inFile} -- ${eachResult}" \>\> ${fileRecord}
@@ -3660,6 +3669,16 @@ _EOF_
                             fi
                         fi
                     fi
+                    ;;
+                "disposition")
+                    echo "==============  Updating ./disposition.gened================"
+
+                    lpDo lcntProc.sh  -i fullClean
+                    opDo lcntProc.sh -i dblockUpdateFile presentationEnFa.ttytex
+                    opDo lcnLcntInputProc.sh -p inFormat=xelatex -p outputs=pdf -i buildDocs presentationEnFa.ttytex
+                    opDo FN_dirDeleteIfThere ./disposition
+                    opDo beamerExternalExtensions.py -v 20 -i latexSrcToDispositionUpdate ./presentationEnFa.pdf
+                    lpDo beamerPdfPages.cs -v 20  -i updatePages ./presentationEnFa.pdf
                     ;;
                 *)
                     EH_problem "Unknown ${eachResult}"
