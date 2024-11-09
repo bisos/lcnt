@@ -359,10 +359,13 @@ _EOF_
 function enabledList_buildView {
   echo ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList" -p extent="build+view" -i lcntBuild all  # Using enabled list
   if [ -f ./LCNT-INFO/Builds/enabledList.pres ] ;  then
-     echo ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList.pres" -p extent="build+view" -i lcntBuild all
+     echo ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList.pres" -p extent="build+view" -i lcntBuild all  # pdf+disposition+reveal
   fi
   if [ -f ./LCNT-INFO/Builds/enabledList.reveal ] ;  then
-     echo ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList.reveal" -p extent="build+view" -i lcntBuild all
+     echo ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList.reveal" -p extent="build+view" -i lcntBuild all # disposition+reveal
+  fi
+  if [ -f ./LCNT-INFO/Builds/enabledList.presPdf ] ;  then
+     echo ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledList.presPdf" -p extent="build+view" -i lcntBuild all # pdf, beamer for pres
   fi
 }
 
@@ -1677,6 +1680,10 @@ function vis_fullClean {
                 ;;
         esac
     done
+
+    if [[ -d ./disposition.gened ]] ; then
+      lpDo rm -r -f ./disposition.gened
+    fi
 
     if [ -x ./presDispose.sh ] ; then
         opDo ./presDispose.sh -i fullClean
@@ -3447,14 +3454,14 @@ _EOF_
                lpDo eval echo "lcntBuild Start=$(DATE_nowTag) -- ${inFile} -- ${eachResult}" \>\> ${fileRecord}
             fi
             case ${eachResult} in
-                "pdf")
+                "pdf"|"pdf3")
                     resultsFileDest=$( resultsDestinationPath pdf )
                     if LIST_isIn "name" "${extentList}"  ; then             
                         lpDo echo "${resultsFileDest}"
                         continue
                     fi
                     if LIST_isIn "build" "${extentList}"  ; then
-                        opDo lcnLcntInputProc.sh ${lcntInputProcVerbosity} -p inFormat=xelatex -p outputs=pdf -i buildDocs  ${lcntBuild_docSrc}
+                        opDo lcnLcntInputProc.sh ${lcntInputProcVerbosity} -p inFormat=xelatex -p outputs=${eachResult} -i buildDocs  ${lcntBuild_docSrc}
                         opDo cp ${docSrcPrefix}.pdf ${resultsFileDest}
                     fi
                     if LIST_isIn "view" "${extentList}"  ; then
@@ -3673,7 +3680,7 @@ _EOF_
                 "disposition")
                     echo "==============  Updating ./disposition.gened================"
 
-                    lpDo lcntProc.sh  -i fullClean
+                    # lpDo lcntProc.sh  -i fullClean
                     opDo lcntProc.sh -i dblockUpdateFile presentationEnFa.ttytex
                     opDo lcnLcntInputProc.sh -p inFormat=xelatex -p outputs=pdf -i buildDocs presentationEnFa.ttytex
                     opDo FN_dirDeleteIfThere ./disposition

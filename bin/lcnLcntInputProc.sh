@@ -38,6 +38,7 @@ typeset -t currentBase=""
 
 typeset -t inFormat=""   ## xelatex, latex, tex, texinfo, oda, fm5, ...
 
+typeset latexBuildExtent="pdf3"
 
 extraLatexOptions=""
 
@@ -133,6 +134,14 @@ function vis_buildDocs {
                    doing_ps ${subjectBaseName}
                    ;;
              'pdf')
+                    doing_pdf ${subjectBaseName}
+                    ;;
+             'pdf1')
+                    latexBuildExtent="pdf1"
+                    doing_pdf ${subjectBaseName}
+                    ;;
+             'pdf3')
+                    latexBuildExtent="pdf3"
                     doing_pdf ${subjectBaseName}
                     ;;
              'pdf+')
@@ -494,7 +503,15 @@ function ttytexToPdf {
           ;;
       "xelatex")
              if [ "$1" == "presentationEnFa" ] ; then
-                 opDo xelatex  ${extraLatexOptions} $1.tex
+                 if [ ${latexBuildExtent} == "pdf1" ] ; then
+                    opDo xelatex  ${extraLatexOptions} $1.tex
+                 elif [ ${latexBuildExtent} == "pdf3" ] ; then
+                     opDo xelatex  ${extraLatexOptions} $1.tex
+                     opDo xelatex  ${extraLatexOptions} $1.tex
+                     opDo xelatex  ${extraLatexOptions} $1.tex
+                 else
+                     EH_problem "OOPS -- Bad latexBuildExtent=${latexBuildExtent}"
+                 fi
              else
           opDo xelatex  ${extraLatexOptions} $1.tex
           #opDo echo SKIPPED: bibtex $1
