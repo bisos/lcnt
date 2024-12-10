@@ -174,6 +174,8 @@ mp3gain
 ${G_myName} ${extraInfo} -i frameNamesBlankGen
 --- Recording Start ---
 audacity
+cat ~/.audacity-data/audacity.cfg
+${G_myName} -i audacityCfgStdout > ~/.audacity-data/audacity.cfg
 _EOF_
 
   hookRun "examplesHookPost"
@@ -186,6 +188,36 @@ noArgsHook() {
 _CommentBegin_
 *  [[elisp:(org-cycle)][| ]]  IIFs          :: /Interactively Invokable Functions (IIF)s/ |  [[elisp:(org-cycle)][| ]]
 _CommentEnd_
+
+function vis_audacityCfgStdout {
+  EH_assert [[ $# -eq 0 ]]
+  function describeF {  cat  << _EOF_
+_EOF_
+  }
+  cat  << _EOF_
+[Export]
+ Path=.
+_EOF_
+}
+
+
+
+function vis_playlistGen {
+  EH_assert [[ $# -eq 0 ]]
+  function describeF {  cat  << _EOF_
+_EOF_
+  }
+
+  buePlayListsDir="${bystarUidHome}/LUE/PlayLists/${basePlayListName}"
+
+  opDo mkdir -p ${buePlayListsDir}
+
+  opDo fapg --format=pls --recursive --output="${buePlayListsDir}/${basePlayListName}.pls" ${hereDir}
+
+  opDo ls -l ${buePlayListsDir}/${basePlayListName}.pls
+}
+
+
 
 
 _CommentBegin_
