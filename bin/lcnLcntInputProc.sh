@@ -253,7 +253,7 @@ function vis_clean {
                  doing_cleanKeepResults ${subjectBaseName}
                  ;;
            *)
-              EH_problem "Unknown: ${cleanType}"
+              EH_problem "Unknown cleanType: cleanType=${cleanType}"
               exit 1
               ;;
          esac

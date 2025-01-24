@@ -1682,7 +1682,7 @@ function vis_fullClean {
     done
 
     if [[ -d ./disposition.gened ]] ; then
-      lpDo rm -r -f ./disposition.gened
+      lpDo echo SKIPPED -- NOTYET Should  be in distClean not in fullClean -- rm -r -f ./disposition.gened
     fi
 
     if [ -x ./presDispose.sh ] ; then
