@@ -75,7 +75,7 @@ _CommentEnd_
 
 function vis_buildsDirsList {
     EH_assert [[ $# -eq 0 ]]
-    find ./LCNT-INFO/Builds/ -type d -print | egrep -v './LCNT-INFO/Builds/$' | grep -v CVS | sort
+    find ./LCNT-INFO/Builds/ -type d -print | egrep -v './LCNT-INFO/Builds/$' | grep -v CVS | grep -v .auctex-auto | sort
 }
 
 

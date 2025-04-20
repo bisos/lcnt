@@ -106,6 +106,7 @@ ${G_myName} ${extraInfo} -f -i mailingAsBuildName  # Sets curBuild/mailings to a
 $( examplesSeperatorSection "Generate Mailing File = mailingHeaderGen + mailingBodyPartsRefresh + mailingsDblockUpdate" )
 ${G_myName} ${extraInfo} -p pdf=pdf -p headerFile=${selectedAasMarmeeHeaders} -i mailingFileGen
 ${G_myName} ${extraInfo} -p headerFile=${selectedAasMarmeeHeaders} -i mailingFileGen
+${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledMailings" -p headerFile=${selectedAasMarmeeHeaders} -i mailingFileGenEnabled
 $( examplesSeperatorSection "Mailing Headers -- Used by mailingFileGen" )
 ${G_myName} ${extraInfo} -i mailingHeaderGen curBuild # curBuild is default, specify other lcntBuildInfoPath
 ${G_myName} ${extraInfo} -f -i mailingHeaderGen
@@ -117,6 +118,7 @@ $( examplesSeperatorChapter "Mailing --- curBuild=${curBuildEndLink} curRelease=
 ${G_myName} ${extraInfo} -p cntntRawHome=. -i buildEnabledMailingsSet mailings
 ${G_myName} ${extraInfo} -p cntntRawHome=.-i buildEnabledMailingsSet mailings+
 cat "./LCNT-INFO/Builds/enabledList"
+cat "./LCNT-INFO/Builds/enabledMailings"
 ${G_myName} ${extraInfo} -p pre="clean" -p extent="build+view" -i lcntBuild cur  # Runs dblock
 ${G_myName} ${extraInfo} -p extent="mailingPrep" -i lcntBuild cur
 ${G_myName} ${extraInfo} -p extent="compose" -i lcntBuild cur
@@ -813,6 +815,23 @@ _EOF_
     lpDo eval echo "${lcntBuild_buildName}.mail" \> "${lcntBuildInfoPath}"/mailings
 }
 
+function vis_mailingFileGenEnabled {
+    #set -x
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -eq 0  ]]
+
+    inFilesList=$( vis_enabledBuildsDirsList )
+    for inFile in ${inFilesList}; do
+        lpDo vis_mailingFileGen ${inFile}
+    done
+
+    lpReturn
+}
+
+
 
 function vis_mailingFileGen {
     #set -x
@@ -840,7 +859,6 @@ _EOF_
     lpReturn
 }
 
-
 function vis_mailingHeaderGen {
     #set -x
     G_funcEntry
@@ -857,19 +875,40 @@ _EOF_
 
     opDo lcntBuildInfoPrep ${lcntBuildInfoPath}
 
-    if [ -z  "${lcntBuild_mailingFile}" ] ; then
+    if [ -z  "${lcntBuild_mailings}" ] ; then
+        ANT_cooked "Blank lcntBuild_mailings"
+        lpReturn 101
+    fi
+
+    for each in ${lcntBuild_mailings} ; do
+        lpDo mailingHeaderGenOne ${each}
+    done
+}
+
+
+function mailingHeaderGenOne {
+    #set -x
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -eq 1  ]]
+
+    local mailingFile="$1"
+
+    if [ -z  "${mailingFile}" ] ; then
         lpReturn 101
     fi
 
     local dateTag=$( date +%y%m%d%H%M%S )
-    local savedMailingFileName=${lcntBuild_mailingFile}-${dateTag}
+    local savedMailingFileName=${mailingFile}-${dateTag}
 
 
-    if [ -f "${lcntBuild_mailingFile}" ] ; then
+    if [ -f "${mailingFile}" ] ; then
         if [[ "${G_forceMode}_" == "force_" ]] ; then
-            lpDo mv ${lcntBuild_mailingFile} ${savedMailingFileName}
+            lpDo mv ${mailingFile} ${savedMailingFileName}
         else
-            EH_problem "${lcntBuild_mailingFile} exists and forceMode not specified -- not overriding it."
+            EH_problem "${mailingFile} exists and forceMode not specified -- not overriding it."
             lpReturn 102
         fi
     fi
@@ -879,11 +918,11 @@ _EOF_
         lpReturn 103
     fi
 
-    ANT_raw "Creating ${lcntBuild_mailingFile} ..."
+    ANT_raw "Creating ${mailingFile} ..."
 
-    cat "${headerFile}" > "${lcntBuild_mailingFile}"
+    cat "${headerFile}" > "${mailingFile}"
 
-    cat  << _EOF_ >> ${lcntBuild_mailingFile}
+    cat  << _EOF_ >> ${mailingFile}
 Subject: NO SUBJECT
 X-MailingName: ${lcntBuild_buildName}
 X-MailingDoc: ${lcntBuild_docSrc}
@@ -913,15 +952,31 @@ _EOF_
 
     opDo lcntBuildInfoPrep ${lcntBuildInfoPath}
 
-    if [ -z  "${lcntBuild_mailingFile}" ] ; then
-        lpReturn 101
-    fi
-
     lpDo lcntBuildsBaseFVsPrep
 
     lpDo lcntReleaseInfoPrep "cur"
 
-    local mailingFileName="${lcntBuild_mailingFile}"
+    if [ -z  "${lcntBuild_mailings}" ] ; then
+        ANT_cooked "Blank lcntBuild_mailings"
+        lpReturn 101
+    fi
+
+    for each in ${lcntBuild_mailings} ; do
+        lpDo mailingBodyPartsRefreshOne ${each}
+    done
+}
+
+
+function mailingBodyPartsRefreshOne {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+Used to be called vis_bodyPartsRefresh.
+_EOF_
+    }
+
+    EH_assert [[ $# -eq 1  ]]
+
+    local mailingFileName="$1"
 
     if [ ! -f "${mailingFileName}" ] ; then
         EH_problem "Missing ${mailingFileName}"
