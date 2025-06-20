@@ -89,6 +89,12 @@ _EOF_
     typeset curReleaseEndLink=$( FN_nonDirsPart $(  FN_absolutePathGet ./LCNT-INFO/Releases/cur ))
     typeset curExportEndLink=$( FN_nonDirsPart $(  FN_absolutePathGet ./curExport ))
 
+    local mailingName=""
+    if [ -f "./LCNT-INFO/Builds/enabledMailings" ] ; then
+        typeset mailingsBase=$(tail -1  ./LCNT-INFO/Builds/enabledMailings)
+        mailingName=$(echo ./LCNT-INFO/Builds/${mailingsBase})
+    fi
+
     opDo lcntBuildInfoPrep curBuild
 
     cat  << _EOF_
@@ -105,7 +111,7 @@ ${G_myName} ${extraInfo}  -p cntntRawHome=. -i buildNameFvUpdate auto mailing  #
 ${G_myName} ${extraInfo} -f -i mailingAsBuildName  # Sets curBuild/mailings to arg1 (defaults to baseDir)
 $( examplesSeperatorSection "Generate Mailing File = mailingHeaderGen + mailingBodyPartsRefresh + mailingsDblockUpdate" )
 ${G_myName} ${extraInfo} -p pdf=pdf -p headerFile=${selectedAasMarmeeHeaders} -i mailingFileGen
-${G_myName} ${extraInfo} -p headerFile=${selectedAasMarmeeHeaders} -i mailingFileGen
+${G_myName} ${extraInfo} -p headerFile=${selectedAasMarmeeHeaders} -i mailingFileGen ${mailingName}
 ${G_myName} ${extraInfo} -p enabled="./LCNT-INFO/Builds/enabledMailings" -p headerFile=${selectedAasMarmeeHeaders} -i mailingFileGenEnabled
 $( examplesSeperatorSection "Mailing Headers -- Used by mailingFileGen" )
 ${G_myName} ${extraInfo} -i mailingHeaderGen curBuild # curBuild is default, specify other lcntBuildInfoPath
@@ -833,6 +839,35 @@ _EOF_
 
 
 
+function vis_mailingFileGenObsoleted {
+    #set -x
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 2  ]]
+
+    local lcntBuildInfoPath=curBuild
+
+    if [ $# -eq 1 ] ; then
+         lcntBuildInfoPath="$1"
+    fi
+
+    opDo lcntBuildInfoPrep ${lcntBuildInfoPath}
+
+    # echo  ${lcntBuildInfoPath}
+    #echo pdf=$pdf
+    #echo headerFile=${headerFile}
+
+    lpDo vis_mailingHeaderGen "${lcntBuildInfoPath}"
+
+    lpDo vis_mailingBodyPartsRefresh "${lcntBuildInfoPath}"
+
+    lpDo vis_mailingsDblockUpdate "${lcntBuildInfoPath}"
+
+    lpReturn
+}
+
 function vis_mailingFileGen {
     #set -x
     G_funcEntry
@@ -847,17 +882,39 @@ _EOF_
          lcntBuildInfoPath="$1"
     fi
 
+    opDo lcntBuildInfoPrep ${lcntBuildInfoPath}
+
+    lpDo lcntBuildsBaseFVsPrep
+
+    lpDo lcntReleaseInfoPrep "cur"
+
+    # echo  ${lcntBuildInfoPath}
     #echo pdf=$pdf
     #echo headerFile=${headerFile}
 
-    lpDo vis_mailingHeaderGen "${lcntBuildInfoPath}"
+    if [ -z  "${lcntBuild_mailings}" ] ; then
+        ANT_cooked "Blank lcntBuild_mailings"
+        lpReturn 101
+    fi
 
-    lpDo vis_mailingBodyPartsRefresh "${lcntBuildInfoPath}"
-
-    lpDo vis_mailingsDblockUpdate "${lcntBuildInfoPath}"
+    for each in ${lcntBuild_mailings} ; do
+        if [ -f "${each}" ] ; then
+            if [[ "${G_forceMode}_" != "force_" ]] ; then
+                ANT_cooked "${each} exists and forceMode not specified -- just dblock updating."
+                lpDo vis_dblockUpdateFile ${each}  # We now do it twice. Once sometimes does not work
+                continue
+            fi
+        else
+            lpDo mailingHeaderGenOne ${each}
+            lpDo mailingBodyPartsRefreshOne ${each}
+            lpDo vis_dblockUpdateFile ${each}  # We now do it twice. Once sometimes does not work
+        fi
+    done
 
     lpReturn
 }
+
+
 
 function vis_mailingHeaderGen {
     #set -x
