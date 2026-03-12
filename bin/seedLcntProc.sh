@@ -336,7 +336,8 @@ ${G_myName} audio
 $( examplesSeperatorChapter "Develop" )
 ${G_myName} dev                # Review warning logs, cleanup, step-by-step builds, debug
 ${G_myName} ${extraInfo}  -i fullClean
-${G_myName} ${extraInfo}  -i fullClean Results
+${G_myName} ${extraInfo}  -i fullClean Results # also clean ./Results dir
+${G_myName} ${extraInfo}  -i fullClean ForGit  # also clean ./Results and ./disposition.gened dir
 $( examplesSeperatorChapter "Build --- curBuild=${curBuildEndLink} curRelease=${curReleaseEndLink} curExport=${curExportEndLink}" )
 ${G_myName} build              # build, build+view, build+release
 ${G_myName} ${extraInfo} -i beamerDerivedFullBuild  # Updates disposition.gened and
@@ -1636,6 +1637,15 @@ function vis_fullClean {
       if [[ -d ./Results ]] ; then
         lpDo rm -r -f ./Results/*
       fi
+    elif [ "${extraCleans}" == "ForGit" ] ; then
+      if [[ -d ./Results ]] ; then
+        lpDo rm -r -f ./Results/*
+      fi
+      if [[ -d ./disposition.gened ]] ; then
+        lpDo rm -r -f ./disposition.gened
+      fi
+    else
+      EH_problem "Unsupported arg=${extraCleans} -- Ignored"
     fi
 
     for thisOne in ${docsList} ; do
