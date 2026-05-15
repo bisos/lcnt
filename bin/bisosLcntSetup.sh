@@ -33,6 +33,9 @@ function vis_moduleDescription {  cat  << _EOF_
 **  [[elisp:(org-cycle)][| ]]  Panel        :: [[file:/libre/ByStar/InitialTemplates/activeDocs/bxServices/versionControl/fullUsagePanel-en.org::Xref-VersionControl][Panel Roadmap Documentation]] [[elisp:(org-cycle)][| ]]
 *  [[elisp:(org-cycle)][| ]]  Info          :: *[Module Description:]* [[elisp:(org-cycle)][| ]]
 
+_EOF_
+}
+
 
 function vis_help {
  cat  << _EOF_
@@ -124,6 +127,7 @@ typeset -t acctTypePrefix=""
 typeset -t bystarUid="MANDATORY"
 typeset -t inListLcntNu=""
 typeset -t lcntParam=""
+typeset -t bxoId=""
 
 function G_postParamHook {
     #bystarUidHome=$( FN_absolutePathGet ~${bystarUid} )
@@ -154,7 +158,8 @@ $( examplesSeperatorChapter "BISOS LCNT BinsPreps" )
 ${G_myName} ${extraInfo} -i bisosLcntBinsPrep   # invokes lcaLaTexBinsPrep.sh and others
 $( examplesSeperatorChapter "LCNT Bases Setup" )
 ${G_myName} ${extraInfo} -i lcntBaseBpoActivate # activate the public BISOS pip_lcntBases BPO
-${G_myName} ${extraInfo} -i lcntBasesSetup  # Uses pip_lcntBases BPO and creats links to /de/sys/lcnt and /lcnt
+${G_myName} ${extraInfo} -i lcntBasesSetup  # With no args we use /bisos/git/bxRepos/bxlcnt/bro_lcntBases-rawBisos
+${G_myName} ${extraInfo} -p bxoId=pip_lcntBases -i lcntBasesSetup  # Uses pip_lcntBases BPO and creats links to /de/sys/lcnt and /lcnt
 ${G_myName} ${extraInfo} -i usgBpos_lcntBases_bxoPath  # Passive -- BPO Path containing link to /de/sys/lcnt/lgpc etc
 ${G_myName} ${extraInfo} -i usgBposLcntBasesSetup # 
 $( examplesSeperatorChapter "/lcnt Preparations" )
@@ -255,6 +260,16 @@ function vis_lcntBaseBpoActivate {
     lpDo bpoActivate.sh -h -v -n showRun -p privacy="priv" -p bpoId="pip_lcntBases" -i bpoActivate
 }
 
+function vis_lcntBaseBxoActivate {
+    EH_assert [[ $# -lt 2 ]]
+function describeF {  G_funcEntryShow; cat  << _EOF_
+** NOTYET, when no args, assume /bisos/git/bxRepos/bxlcnt/bro_lcntBases-rawBisos
+Otherwise look for -p bxo=bxoId
+_EOF_
+      }
+
+    lpReturn 101
+}
 
 function vis_symLinkContent%% {
   EH_assert [[ $# -eq 0 ]]
@@ -269,9 +284,15 @@ function vis_lcntBasesSetup {
    G_funcEntry
     function describeF {  G_funcEntryShow; cat  << _EOF_
 ** Uses pip_lcntBases BPO and creats links to /de/sys/lcnt and /lcnt
+This is a  temporary hack that for now is hardcoded to use the pip_lcntBases BPO. This should be made more flexible in the future.
 _EOF_
                        }
-    EH_assert [[ $# -eq 0 ]]
+
+    EH_assert [[ $# -lt 2 ]]
+
+    if [ $# -eq 0 ] ; then
+      bxoId="/bisos/git/bxRepos/bxlcnt/bro_lcntBases-rawBisos"
+    fi
 
     lpDo sudo mkdir -p /de/sys
     lpDo sudo chown bisos:bisos /de/sys
@@ -284,7 +305,17 @@ _EOF_
     fi
 
     # pip_lcntBases should become a public BPO
-    local thisBxoHome=$(lpDo FN_absolutePathGet ~pip_lcntBases)
+    # local thisBxoHome=$(lpDo FN_absolutePathGet ~pip_lcntBases)
+    local thisBxoHome="/bisos/git/bxRepos/bxlcnt/bro_lcntBases-rawBisos"
+
+    if [ "${thisBxoHome}" != "${bxoId}" ] ; then
+        if [ "${bxoId}" == "pip_lcntBases" ] ; then
+            thisBxoHome=$(lpDo FN_absolutePathGet ${bxoId})
+        else 
+            EH_problem "Unexpected bxoId -- ${bxoId}"
+            lpReturn 101
+        fi
+    fi
 
     EH_assert [ -d ${thisBxoHome}/bxdpt ]
     
