@@ -13,7 +13,7 @@ if [ "${loadFiles}" == "" ] ; then
 fi
 ####+END:
 
-. ${opBinBase}/bleeLib.sh
+. ${bleeBinBase}/bleeLib.sh
 
 function vis_examples {
   typeset extraInfo="-v -n showRun"

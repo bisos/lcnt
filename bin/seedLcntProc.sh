@@ -91,7 +91,7 @@ purpose=""
 . ${opBinBase}/lpReRunAs.libSh
 
 . ${opBinBase}/lpInBaseDirDo.libSh
-. ${opBinBase}/bleeLib.sh
+. ${bleeBinBase}/bleeLib.sh
 
 . ${lcntBinBase}/lcnLcntLib.sh
 . ${lcntBinBase}/lcnLcntBuildLib.sh
