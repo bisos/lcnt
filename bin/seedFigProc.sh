@@ -40,7 +40,8 @@ ${G_myName} ${extraInfo} -i odgConverts ${oneFig}
 --- Convert Odg to Pdf and Png ---
 echo *71x30*.odg | bystarPlone3GalleriaManage.sh  -i imageDescStart
 libreoffice --headless --convert-to pdf t1.odg 
-libreoffice --headless --convert-to png t1.odg 
+libreoffice --headless --convert-to png t1.odg
+libreoffice --headless --convert-to odg t1.svg
 ${G_myName} ${extraInfo} -i odgToPdf $( echo ${filesList} )
 ${G_myName} ${extraInfo} -i odgToPng $( echo ${filesList} )
 -- Process Latest .odg File

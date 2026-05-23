@@ -13,6 +13,7 @@ from bisos.b import b_io
 # import collections
 
 from bisos.sbom import pkgsSeed  # pkgsSeed.plantWithWhich("seedSbom.cs")
+ap = pkgsSeed.aptPkg
 pp = pkgsSeed.pipPkg
 
 def playwrightInstall():
@@ -21,13 +22,19 @@ def playwrightInstall():
 playwright install
 """)
 
+aptPkgsList = [
+    ap("libgtk-4-dev"),               #
+    ap("libmanette-0.2-dev"),        #
+]
+
 
 pipPkgsList = [
-    pp("playwright", ">=1.40.0"),
+    pp("playwright", ver=">=1.40.0"),
     pp("playwrightInstall", func=playwrightInstall),
 ]
 
 pkgsSeed.setup(
+    aptPkgsList=aptPkgsList,
     pipPkgsList=pipPkgsList,
 )
 
@@ -75,7 +82,9 @@ def examples_csu() -> b.op.Outcome:
 
     cs.examples.menuChapter('*Command Examples*')
     if not (resStr := b.subProc.Op(outcome=cmndOutcome, log=0).bash(
-       f"""which playwright""").stdout):  return(b_io.eh.badOutcome(cmndOutcome))
+       f"""which playwright""").stdout):
+        pass
+        # return(b_io.eh.badOutcome(cmndOutcome))
 
     literal(f"which playwright # {resStr.strip()}")
     literal("playwright --version")

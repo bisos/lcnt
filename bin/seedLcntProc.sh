@@ -1611,11 +1611,11 @@ function vis_fullClean {
 
 
     if [[ -L figures ]] ; then
-        /bin/rm figures
+      lpDo echo "NOT /bin/rm figures"
     fi
 
     if [[ -L tables ]] ; then
-        /bin/rm tables
+        lpDo echo "NOT /bin/rm tables"
     fi
 
     if [[ -L ./common ]] ; then
