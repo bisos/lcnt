@@ -955,6 +955,9 @@ ${G_myName} ${extraInfo} -p extent="build+release" -i lcntBuild dev          # D
 $( examplesSeperatorChapter "Release Info" )
 ${G_myName} ${extraInfo} -i lcntReleaseInfo
 ${G_myName} ${extraInfo} -i releasePostProc cur
+$( examplesSeperatorChapter "Release Info" )
+${G_myName} ${extraInfo} -i lcntReleaseNew         # Create LCNT-INFO/Releases/cur + 0.1
+${G_myName} ${extraInfo} -i lcntReleaseNew 0.2     # Create LCNT-INFO/Releases/*
 _EOF_
 
     lpReturn
@@ -3989,6 +3992,41 @@ _EOF_
 
     lpReturn
 }       
+
+function vis_lcntReleaseNew {
+    G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+_EOF_
+    }
+    EH_assert [[ $# -lt 2 ]]
+
+    typeset curReleaseEndLink=$( FN_nonDirsPart $(  FN_absolutePathGet ./LCNT-INFO/Releases/cur ))
+    typeset nextReleaseNu=$(printf "%.1f" $(echo "${curReleaseEndLink} + 0.1" | bc))
+
+    if [ $# -eq 1 ] ; then
+      nextReleaseNu=$1
+    fi
+
+    # echo ${curReleaseEndLink}
+    # echo ${nextReleaseNu}
+
+    if [ -d ./LCNT-INFO/Releases/${nextReleaseNu} ] ; then
+      EH_problem "./LCNT-INFO/Releases/${nextReleaseNu} Already Exits -- Aborting lcntReleaseNew"
+      lpReturn 101
+    fi
+
+    lpDo mkdir ./LCNT-INFO/Releases/${nextReleaseNu}
+    lpDo eval echo ${nextReleaseNu} \> ./LCNT-INFO/Releases/${nextReleaseNu}/relTag
+    lpDo eval echo ${nextReleaseNu} \> ./LCNT-INFO/Releases/${nextReleaseNu}/versionNu
+
+    lpDo rm ./LCNT-INFO/Releases/cur
+    inBaseDirDo ./LCNT-INFO/Releases  ln -s ${nextReleaseNu} cur
+
+    lpDo  ls -l ./LCNT-INFO/Releases/cur
+
+    lpReturn
+}
+
 
 
 function vis_lcntReleaseInfo {
