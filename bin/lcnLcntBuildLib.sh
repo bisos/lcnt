@@ -144,6 +144,12 @@ _EOF_
     echo ${lcntAttrHomeArray}
     
     local lcntName=${lcntAttrHomeArray[-1]}  # TODO -- lcntName needs to become a fv in LCNT_INFO
+    if [ -f "./LCNT-INFO/lcntName" ] ; then
+        lcntName=$(cat ./LCNT-INFO/lcntName)
+    else
+        EH_problem "Missing ./LCNT-INFO/lcntName"
+    fi
+    #
 
     if [ ! -d "${lcntBuildCommonInfoBasePath}" ] ; then
         opDo mkdir "${lcntBuildCommonInfoBasePath}"

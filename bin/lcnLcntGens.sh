@@ -581,7 +581,15 @@ function vis_baseFullStart {
 
   opDo vis_lcntRefresh
 
-  opDo vis_lcntBaseConfigMulti 
+  opDo vis_lcntBaseConfigMulti
+
+  if [ ! -d "./LCNT-INFO/Builds" ] ; then
+      lpDo vis_lcntInfoFullRenew
+  fi
+
+  if [ -f "./bodyArticleEnFa.tex" ] ; then
+      opDo bx-dblock -i dblockUpdateFileOrIgnore ./bodyArticleEnFa.tex
+  fi
 }
 
 _CommentBegin_
@@ -1656,7 +1664,8 @@ function vis_lcntInfoGen {
    fi
  fi
 
- guessedTitle=${lcntAttrHomeRelBase:-${hereDir}}    #### `cat ${lcntInfoPath}/docSrcList`
+ hereDirRelative=$( FN_nonDirsPart ${hereDir} )
+ guessedTitle=${lcntAttrHomeRelBase:-${hereDirRelative}}    #### `cat ${lcntInfoPath}/docSrcList`
 
  lcntSource_origin=${lcntSource_origin:-NA}
  lcntSource_author1=${lcntSource_author1:-NA}
