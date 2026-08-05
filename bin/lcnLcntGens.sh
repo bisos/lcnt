@@ -613,17 +613,13 @@ function vis_emptyCreateMulti {
             perhapsTouch articleEnFa.ttytex
             primaryDocument="articleEnFa.ttytex"
             ;;
-      "memo:en+fa")
-            perhapsTouch memoEnFa.ttytex
-            primaryDocument="memoEnFa.ttytex"
+      "memo:en+fa"|"memo:en")
+            perhapsTouch articleEnFa.ttytex
+            primaryDocument="articleEnFa.ttytex"
             ;;
       "memo:fa+en")
             perhapsTouch memoFaEn.ttytex
             primaryDocument="memoFaEn.ttytex"
-            ;;
-      "memo:en")
-            perhapsTouch memoEn.ttytex
-            primaryDocument="memoEn.ttytex"
             ;;
       "art+pres:en+fa")
           perhapsTouch articleEnFa.ttytex
@@ -919,32 +915,18 @@ function vis_lcntBaseConfigMulti {
   startDocBodyPres=""
 
   case ${multiFormats} in 
-      "memo:en+fa")
+      "memo:en+fa"|"memo:en")
             startTemplateArticle="memoMainEnFa.ttytex.start"
-            startDocArticle="memoEnFa.ttytex"
+            startDocArticle="articleEnFa.ttytex"
             startArtSrcForms="memo"
 
             startTemplatePresentation=""
             startDocPresentation=""
             startPresSrcForms=""
 
-            startTemplateBody=""
-            startDocBody=""
-            startBodySrcForms=""
-            ;;
-
-      "memo:en")
-            startTemplateArticle="memoMainEn.ttytex.start"
-            startDocArticle="memoEn.ttytex"
-            startArtSrcForms="memo"
-
-            startTemplatePresentation=""
-            startDocPresentation=""
-            startPresSrcForms=""
-
-            startTemplateBody=""
-            startDocBody=""
-            startBodySrcForms=""
+            startTemplateBody="bodyMemoEnFa.tex.begin"
+            startDocBody="memoEnFa.tex"
+            startBodySrcForms="memo"
             ;;
 
       "memo:fa+en")
