@@ -16,6 +16,8 @@ from bisos.sbom import pkgsSeed  # pkgsSeed.plantWithWhich("seedSbom.cs")
 ap = pkgsSeed.aptPkg
 pp = pkgsSeed.pipPkg
 
+pkgsSeed.pkgsSeedInfo.virtenv = "/bisos/venv/py3/asc"
+
 def playwrightInstall():
     outcome =  b.subProc.WOpW(invedBy=None, log=1).bash(
         f"""
