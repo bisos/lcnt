@@ -4392,6 +4392,11 @@ _EOF_
             "git")
                 methodExportGit
                 ;;
+            "localWeb")
+                # Python: bisos.lcnt exportLocalWeb_csu. Lands the release on the web sites of this
+                # same system named in LCNT-INFO/Exports/<spec>/destinations (FQDNs).
+                lpDo lcntExportLocalWeb.cs -i localWebExport "${cntntRawHome}" "${inFile}"
+                ;;
             *)
                 EH_problem "Unknown exportMethod ${lcntExport_exportMethod}"
                 lpReturn

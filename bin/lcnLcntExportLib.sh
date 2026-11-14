@@ -185,7 +185,22 @@ _EOF_
                 ;;
             git)
                 applicableBuildSpecs="${applicableBuildSpecs} $( echo ${buildsDirList} | xargs -n 1 | grep 8.5x11 )"
-                applicableBuildSpecs="${applicableBuildSpecs} $( echo ${buildsDirList} | xargs -n 1 | grep presPdf )"           
+                applicableBuildSpecs="${applicableBuildSpecs} $( echo ${buildsDirList} | xargs -n 1 | grep presPdf )"
+                ;;
+            localWeb)
+                # An article: its pdf and its html (embedded in the access page). A presentation: its pdf only.
+                local docSrcWords=" $( echo ${lcnt_docSrcList} ) "     # the list is one per line: make it one line
+                case "${docSrcWords}" in
+                    *" articleEnFa "*|*" presArtEnFa "*)
+                        applicableBuildSpecs="${applicableBuildSpecs} $( echo ${buildsDirList} | xargs -n 1 | grep '/art-8.5x11$' )"
+                        applicableBuildSpecs="${applicableBuildSpecs} $( echo ${buildsDirList} | xargs -n 1 | grep '/html$' )"
+                        ;;
+                esac
+                case "${docSrcWords}" in
+                    *" presentationEnFa "*)
+                        applicableBuildSpecs="${applicableBuildSpecs} $( echo ${buildsDirList} | xargs -n 1 | grep '/presPdf$' )"
+                        ;;
+                esac
                 ;;
             *)
                 EH_problem "Unknown exportType: ${exportType}"
@@ -231,7 +246,28 @@ _EOF_
         opDo fvNameValueSpecificSet ${exportDirPath} "buildSpecs"  "$( buildSpecsForExportGet web )"
     }
 
-    local bxGithub_export_hasRun=false    
+    local localWeb_export_hasRun=false
+    function localWeb_export {
+        EH_assert [[ $# -eq 0 ]]
+
+        # Made idempotent
+        if [ ${localWeb_export_hasRun} = false ] ; then localWeb_export_hasRun=true; else  return;  fi
+
+        local exportDirName="localWeb"
+        local exportDirPath="${lcntExportCommonInfoBasePath}/${exportDirName}"
+
+        if [ ! -d "${exportDirPath}" ] ; then
+            opDo mkdir "${exportDirPath}"
+        fi
+
+        opDo fvNameValueSpecificSet ${exportDirPath} "exportSpecName" "${exportDirName}"
+        opDo fvNameValueSpecificSet ${exportDirPath} "exportMethod" "localWeb"
+        opDo fvNameValueSpecificSet ${exportDirPath} "buildSpecs"  "$( buildSpecsForExportGet localWeb )"
+        # No "destinations" file: the FQDNs of the web sites on this system are for the author to list.
+        # Not in Exports/enabledList either: "export all" does not land documents on web sites.
+    }
+
+    local bxGithub_export_hasRun=false
     function bxGithub_export {
         EH_assert [[ $# -eq 0 ]]
 
@@ -289,18 +325,21 @@ _EOF_
         case ${eachModel} in
             "articleEnFa")
                 opDo ploneProc_export
+                opDo localWeb_export
                 opDo bxGithub_export
-                opDo bxBitbucket_export         
+                opDo bxBitbucket_export
                 ;;
             "presentationEnFa")
                 opDo webApache_export
+                opDo localWeb_export
                 opDo bxGithub_export
-                opDo bxBitbucket_export         
+                opDo bxBitbucket_export
                 ;;
             "presArtEnFa")
                 opDo ploneProc_export
+                opDo localWeb_export
                 opDo bxGithub_export
-                opDo bxBitbucket_export         
+                opDo bxBitbucket_export
                 ;;
             "memoEnFa")
                 lpDo echo "Memos are not exportable"
