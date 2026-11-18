@@ -2563,7 +2563,8 @@ function vis_heveaRevealFixups {
   EH_assert [[ $# -eq 1 ]]
   fileBaseName=$1
 
-  elispScriptFile="${opBinBase}/elispFilterHtml.el"
+  # elispScriptFile="${opBinBase}/elispFilterHtml.el"
+  elispScriptFile="/bisos/blee/bin/elispFilterHtml.el"
 
   #if [[ ! -f ${elispScriptFile} ]] ; then 
     #vis_outputScript > ${elispScriptFile}
@@ -2574,7 +2575,7 @@ function vis_heveaRevealFixups {
 
   FN_fileRmIfThere ${outFileName}
 
-  opDo ${opBinBase}/elispFilterHtml.sh -v -n showRun  ${extraInfo:-} -p el="${elispScriptFile}" -p exec=mainRevealHevea -p inFile="${inFileName}" -p outFile="${outFileName}" -i emacs ${fileBaseName}
+  opDo elispFilterHtml.sh -v -n showRun  ${extraInfo:-} -p el="${elispScriptFile}" -p exec=mainRevealHevea -p inFile="${inFileName}" -p outFile="${outFileName}" -i emacs ${fileBaseName}
 }
 
 
@@ -3194,7 +3195,7 @@ _EOF_
             opDo mkdir -p ./rel/${thisPrefix}${tagPostfix}-html   
             opDo cp -r -p ./heveaHtml-${thisPrefix}/*  ./rel/${thisPrefix}${tagPostfix}-html
         
-            opDo /opt/public/osmt/bin/elispFilterHtml.sh -v -n showRun  -i deTitleCompletely ./rel/${thisPrefix}${tagPostfix}-html/index.html
+            opDo elispFilterHtml.sh -v -n showRun  -i deTitleCompletely ./rel/${thisPrefix}${tagPostfix}-html/index.html
         else
             EH_problem "Missing ./heveaHtml-${thisPrefix}/index.html -- Release Skipped"
         fi
